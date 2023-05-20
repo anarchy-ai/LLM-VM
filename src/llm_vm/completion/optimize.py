@@ -5,6 +5,7 @@ import time
 import os
 import json
 import tempfile
+import abc
 
 def asyncStart(foo):
     t = [None, None]
@@ -68,8 +69,26 @@ def CALL_SMALL(*args, **kwargs):
     ans = openai.Completion.create(*args, **kwargs)
     return ans['choices'][0]['text']
 
-    
+
+
 class Optimizer:
+    @abc.abstractmethod
+    class complete(self, stable_context, dynamic_prompt, **kwargs):
+        pass
+
+
+class HostedOptimizer(Optimizer):
+    def __init__(self, anarchy_key, MIN_TRAIN_EXS = 20, MAX_TRAIN_EXS = 2000, call_small = "claude", call_big = "gpt-4"):
+        self.anarchy_key = anarchy_key
+        self.MIN_TRAIN_EXS = MIN_TRAIN_EXS
+        self.MAX_TRAIN_EXS = MAX_TRAIN_EXS
+        self.call_small = call_small
+        self.call_big = call_big
+
+    def complete(self, stable_context, dynamic_prompt, **kwargs):
+        pass # TODO: actually use the api!
+    
+class LocalOptimizer(Optimizer):
     def __init__(self, storage=local_ephemeral(), MIN_TRAIN_EXS = 20, MAX_TRAIN_EXS = 2000, call_small = CALL_SMALL, call_big = CALL_BIG):
         self.storage = storage
         self.MIN_TRAIN_EXS = MIN_TRAIN_EXS
@@ -142,7 +161,6 @@ class Optimizer:
                 completion = asyncAwait(best_completion)
 
         return completion, succeed_train['closure']
-
 
 def create_jsonl_file(data_list):
     out = tempfile.TemporaryFile('w+')
