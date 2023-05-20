@@ -78,8 +78,9 @@ class Optimizer:
 
 
 class HostedOptimizer(Optimizer):
-    def __init__(self, anarchy_key, MIN_TRAIN_EXS = 20, MAX_TRAIN_EXS = 2000, call_small = "claude", call_big = "gpt-4"):
+    def __init__(self, anarchy_key, openai_key, MIN_TRAIN_EXS = 20, MAX_TRAIN_EXS = 2000, call_small = "claude", call_big = "gpt-4"):
         self.anarchy_key = anarchy_key
+        self.openai_key = openai_key
         self.MIN_TRAIN_EXS = MIN_TRAIN_EXS
         self.MAX_TRAIN_EXS = MAX_TRAIN_EXS
         self.call_small = call_small
