@@ -87,8 +87,18 @@ class HostedOptimizer(Optimizer):
         self.call_big = call_big
 
     def complete(self, stable_context, dynamic_prompt, is_calling_big, **kwargs):
-        # user specifies to call with big model or small model
+        """
+        Completes text optimization using either the small or big model based on the value of "is_calling_big".
 
+        Params:
+            stable_context (str): The stable context for the optimization.
+            dynamic_prompt (str): The dynamic prompt for the optimization.
+            is_calling_big (bool): Determines whether to use the big model or small model.
+            **kwargs: Additional arguments (if they exist) to the API call.
+
+        Returns:
+            str: The completed, ouputted model text.
+        """
         # Make call to OpenAI API for the text optimization and completion
         return CALL_SMALL(
             model=self.call_small,
