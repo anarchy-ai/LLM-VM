@@ -101,12 +101,12 @@ class HostedOptimizer(Optimizer):
         """
         # Make call to OpenAI API for the text optimization and completion
         return CALL_SMALL(
-            model=self.call_small,
             prompt=stable_context + dynamic_prompt,
+            model=self.call_small,
             **kwargs
         ) if is_calling_big else CALL_BIG(
-            model=self.call_big,
             prompt=stable_context + dynamic_prompt,
+            model=self.call_big,
             **kwargs
         )
     
