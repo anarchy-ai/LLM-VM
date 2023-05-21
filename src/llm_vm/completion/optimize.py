@@ -73,7 +73,7 @@ def CALL_SMALL(*args, **kwargs):
 
 class Optimizer:
     @abc.abstractmethod
-    class complete(self, stable_context, dynamic_prompt, **kwargs):
+    def complete(self, stable_context, dynamic_prompt, **kwargs):
         pass
 
 
@@ -86,8 +86,19 @@ class HostedOptimizer(Optimizer):
         self.call_small = call_small
         self.call_big = call_big
 
-    def complete(self, stable_context, dynamic_prompt, **kwargs):
-        pass # TODO: actually use the api!
+    def complete(self, stable_context, dynamic_prompt, is_calling_big, **kwargs):
+        # user specifies to call with big model or small model
+
+        # Make call to OpenAI API for the text optimization and completion
+        return CALL_SMALL(
+            model=self.call_small,
+            prompt=stable_context + dynamic_prompt,
+            **kwargs
+        ) if is_calling_big else CALL_BIG(
+            model=self.call_big,
+            prompt=stable_context + dynamic_prompt,
+            **kwargs
+        )
     
 class LocalOptimizer(Optimizer):
     def __init__(self, storage=local_ephemeral(), MIN_TRAIN_EXS = 20, MAX_TRAIN_EXS = 2000, call_small = CALL_SMALL, call_big = CALL_BIG):
