@@ -103,7 +103,10 @@ if __name__ == "__main__":
     load_dotenv()
     openai.api_key = os.getenv('OPENAI_KEY')
     print("key:", openai.api_key)
-    optimizer = LocalOptimizer(MIN_TRAIN_EXS=2)
+    #optimizer = LocalOptimizer(MIN_TRAIN_EXS=2)
+    optimizer = HostedOptimizer(openai_key = openai.api_key, 
+                                anarchy_key = 'cd-sk-q90I2yoijUTt7fvG1BTj', 
+                                MIN_TRAIN_EXS=2)
     i = 0
     for h in haskell.splitlines():
         print("At: ", i)

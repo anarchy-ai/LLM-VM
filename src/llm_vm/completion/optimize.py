@@ -103,8 +103,6 @@ class HostedOptimizer(Optimizer):
         self.openai_key = openai_key
         self.MIN_TRAIN_EXS = MIN_TRAIN_EXS
         self.MAX_TRAIN_EXS = MAX_TRAIN_EXS
-        self.call_small = call_small
-        self.call_big = call_big
 
     def complete(self, stable_context, dynamic_prompt, **kwargs):
         """
@@ -122,6 +120,7 @@ class HostedOptimizer(Optimizer):
         payload = {**kwargs, 
                    'stable_context': stable_context, 
                    'dynamic_context': dynamic_context,
+                   'anarchy_key' : self.anarchy_key,
                    'openai_key' : self.openai_key,
                    'MIN_TRAIN_EXS' : self.MIN_TRAIN_EXS,
                    'MAX_TRAIN_EXS' : self.MAX_TRAIN_EXS
