@@ -119,10 +119,12 @@ def create_jsonl_file(data_list: list, file_name: str, compress: bool = True) ->
 '''
 
 
-if __name__ == "__main__":
-    load_dotenv()
-    openai.api_key = os.getenv('OPENAI_KEY')
-    print("key:", openai.api_key)
+def run_hosted_optimizer_test(openai_key, anarchy_key):
+    optimizer = HostedOptimizer(openai_key, anarchy_key)
+    print(optimizer.complete("What is the population of continent?", "Antarctica"))
+
+
+def run_haskell_test():
     optimizer = LocalOptimizer(MIN_TRAIN_EXS=2)
     i = 0
     for h in haskell.splitlines():
@@ -131,3 +133,12 @@ if __name__ == "__main__":
         if i > 4:
             time.sleep(200)
         i += 1
+
+if __name__ == "__main__":
+    load_dotenv()
+    openai.api_key = os.getenv('OPENAI_KEY')
+    anarchy_key = os.getenv('ANARCHY_KEY')
+    print("key:", openai.api_key)
+    # run_haskell_test()
+    run_hosted_optimizer_test(openai.api_key, anarchy_key)
+
