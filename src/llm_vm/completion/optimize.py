@@ -120,7 +120,7 @@ class HostedOptimizer(Optimizer):
         url = "https://api.chat.dev/completion/optimizing"
         payload = {**kwargs, 
                    'stable_context': stable_context, 
-                   'dynamic_context': dynamic_prompt,
+                   'dynamic_prompt': dynamic_prompt,
                    'anarchy_key' : self.anarchy_key,
                    'openai_key' : self.openai_key,
                    'MIN_TRAIN_EXS' : self.MIN_TRAIN_EXS,
@@ -128,6 +128,7 @@ class HostedOptimizer(Optimizer):
                    }
         headers = {'Authorization': f'Bearer {self.anarchy_key}'}
 
+        print("Payload: ", payload)
         try:
             response = requests.post(url, json=payload, headers=headers)
             response.raise_for_status()  # Raise an exception for 4XX and 5XX status codes
