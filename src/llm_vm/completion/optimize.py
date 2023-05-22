@@ -6,6 +6,7 @@ import os
 import json
 import tempfile
 import abc
+import requests
 
 def asyncStart(foo):
     t = [None, None]
@@ -119,7 +120,7 @@ class HostedOptimizer(Optimizer):
         url = "https://api.chat.dev/completion/optimizing"
         payload = {**kwargs, 
                    'stable_context': stable_context, 
-                   'dynamic_context': dynamic_context,
+                   'dynamic_context': dynamic_prompt,
                    'anarchy_key' : self.anarchy_key,
                    'openai_key' : self.openai_key,
                    'MIN_TRAIN_EXS' : self.MIN_TRAIN_EXS,
