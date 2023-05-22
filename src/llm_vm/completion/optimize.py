@@ -182,8 +182,8 @@ class LocalOptimizer(Optimizer):
                     'args' : kwargs, 
                     'MIN_TRAIN_EXS' : self.MIN_TRAIN_EXS, 
                     'MAX_TRAIN_EXS' : self.MAX_TRAIN_EXS,
-                    'call_small' : self.call_small.split(' ')[1], # HACKS 
-                    'call_big' : self.call_big.split(' ')[1],
+                    'call_small' : str(self.call_small).split(' ')[1], # HACKS 
+                    'call_big' : str(self.call_big).split(' ')[1],
                     }) if c_id is None else c_id
         c_id = hash(c_id)
 
