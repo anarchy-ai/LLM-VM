@@ -134,7 +134,7 @@ class HostedOptimizer(Optimizer):
         try:
             response = requests.post(url, json=payload, headers=headers)
             response.raise_for_status()  # Raise an exception for 4XX and 5XX status codes
-            return response.json()
+            return response.json()['completion']
         except requests.exceptions.RequestException as e:
             print("Error occurred:", e)
         
