@@ -11,24 +11,17 @@ def call_gpt(state, cur_prompt: str, stop: str, max_tokens = 20, quality = "best
         print_op("\nGPT input for {" +stop + "} "+ str(len(cur_prompt)) + ".")
     if state.verbose > 2:
         print_op(prepPrintPromptContext(cur_prompt))
-
     ask_tokens = max_tokens + len(cur_prompt) / 2.7
-
     if state.verbose > 0:
         print_op("ASK_TOKENS:", ask_tokens)
-
     if (ask_tokens) > 2049:
         quality = 'best'
-
     model = { 'best' : ("text-davinci-003", 0.02), 
               'okay' : ("text-curie-001", 0.002), 
              }[quality]
-
     def calcCost(p):
         return (len(p) / 2700.0) * model[1]
-
     cost = calcCost(cur_prompt)
-
     try:
         ans = openai.Completion.create(
             model=model[0],
@@ -41,27 +34,21 @@ def call_gpt(state, cur_prompt: str, stop: str, max_tokens = 20, quality = "best
         print_op("WTF:", e)
         state.price += cost
         return "OpenAI is down!"
-
     response_text = ans['choices'][0]['text']
-
     simpleprice = model[1] * ans['usage']['total_tokens'] / 1000
     if state.verbose > 0:
         print_op("SimplePrice: $"+str(simpleprice))
     state.price += simpleprice
-
     if state.verbose > 2:
         print_op("GPT output:")
         print_op(prepPrintPromptContext(response_text))
         print_op("GPT output fin.\n")
-
     return response_text
 def delete_file(file_name):  
     location = os.getcwd()
     path = os.path.join(location, file_name)  
     os.remove(path)
     return True
-
-
 def call_ChatGPT(cur_prompt, stop = None, max_tokens = 20, temperature = 0.2, gpt4 = False):
     ans = openai.ChatCompletion.create(
         model="gpt-3.5-turbo-0301" if not gpt4 else 'gpt-4',
@@ -69,9 +56,7 @@ def call_ChatGPT(cur_prompt, stop = None, max_tokens = 20, temperature = 0.2, gp
         stop=stop,
         messages=cur_prompt,
         temperature=temperature)
-
     return ans['choices'][0]['message']['content']
-
     return response_text
 
 def call_gpt(cur_prompt: str, stop: str, max_tokens = 20, quality = "best", temperature = 0.0, model = "text-davinci-003"):
@@ -82,9 +67,7 @@ def call_gpt(cur_prompt: str, stop: str, max_tokens = 20, quality = "best", temp
         prompt=cur_prompt,
         temperature=temperature
     )
-    
     return ans['choices'][0]['text']
-
 import gzip
 import json
 def create_jsonl_file(data_list: list, file_name: str, compress: bool = True) -> None:
@@ -101,7 +84,6 @@ def create_jsonl_file(data_list: list, file_name: str, compress: bool = True) ->
     if not file_name.endswith(sjsonl):
         file_name = file_name + sjsonl
     # Save data
-    
     if compress:
         file_name = file_name + sgz
         with gzip.open(file_name, 'w') as compressed:
@@ -115,7 +97,6 @@ def create_jsonl_file(data_list: list, file_name: str, compress: bool = True) ->
                 jout = json.dumps(ddict) + '\n'
                 out.write(jout)
     return file_name, open(file_name, "rb")
-
 '''
 
 if __name__ == "__main__":
