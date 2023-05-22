@@ -59,6 +59,8 @@ class local_ephemeral:
 
 def CALL_BIG(prompt, gpt4=False, **kwargs):
     cur_prompt = [{'role': "system", 'content' : prompt}]
+    print("CUR_PROMPT:", cur_prompt)
+    print("KWARGS:", kwargs)
     ans = openai.ChatCompletion.create(
         messages=cur_prompt,
         model="gpt-3.5-turbo-0301" if not gpt4 else 'gpt-4',
