@@ -14,82 +14,56 @@ grandparent_dir = os.path.dirname(os.path.dirname(current_dir))
 utils_dir = os.path.join(grandparent_dir, 'utils/')
 sys.path.append(utils_dir)
 
-from labels import *
-from utils import *
 from keys import *
-from tool_picker import *
-from disambiguate import *
-from extract import *
-from contained import *
+from labels import *
+from tools import * 
+from typings import * 
+
+try: 
+    from .utils import *
+    from .tool_picker import *
+    from .disambiguate import *
+    from .extract import *
+    from .contained import *
+except:
+    from utils import *
+    from tool_picker import *
+    from disambiguate import *
+    from extract import *
+    from contained import *
 
 
-def buildGenericTools():
-    tools = []
+def buildGenericTools(tools):
 
-    # wolfram Math
-    tools += [{'description': "The tool performs complicated calculations",
-               'dynamic_params': {"input": 'The open-ended natural language numerical math query.'},
-               'method': 'GET',
-               'args': {'url': "http://api.wolframalpha.com/v2/query",
-                         'params': {'appid': WOLFRAM_KEY,
-                                    'input': '{input}'}
-                        },
-               'examples': [("What is the date multiplied by seventy?"),
-                            ("Is 5073 raised to the 3rd power divisible by 73?")
-                            ]}]
-
-    # wolfram live facts
-    tools += [{'description': "The tool returns live statistical information, such as the date or populations, or geographical facts about cities",
-               'dynamic_params': {"input": 'natural language search query'},
-               'method': 'GET',
-               'args': {'url': "http://api.wolframalpha.com/v2/query",
-                         'params': {'appid': WOLFRAM_KEY,
-                                    'input': '{input}'}
-                        },
-               'examples': [("How many people are in Germany?"),
+    # wolfram (math & live facts)
+    tools[0]['examples'] = [("How many people are in Germany?"),
                             ("What is the date today?"),
-                            ("Area of the place.")
-                            ]}]
+                            ("Area of the place."),
+                            ("What is the date multiplied by seventy?"),
+                            ("Is 5073 raised to the 3rd power divisible by 73?")
+                            ]
+
 
     # geopy
-    tools += [{'description': "Find the driving distance and time to travel between two cities.",
-               'dynamic_params': {"origins": 'the origin city', "destinations": 'the destination city'},
-               'method': 'GET',
-               'args': {'url': "https://maps.googleapis.com/maps/api/distancematrix/json",
-                         'params': {'key': GOOGLE_MAPS_KEY,
-                                    'origins': '{origins}',
-                                    'destinations': '{destinations}'}
-                        },
-               'examples': [("I'm in Paris and am curious about how long it would take to get to Zurich."),
+    tools[1]['examples'] = [[("I'm in Paris and am curious about how long it would take to get to Zurich."),
                             ("How long would it take to get between South Africa and Kenya."),
                             ("How many miles would the elephants travel going from Alaska to Montreal?")
-                            ]}]
+                            ]]
     # weather
-    tools += [{'description': 'Find the weather at a single location and returns it in celcius.',
-               'dynamic_params': {"latitude": 'latitude as a float (e.g., 32.1234).',
-                                  "longitude": 'longitude as a float (e.g., 12.9875).'},
-               'method': 'GET',
-               'args': {'url': "https://api.open-meteo.com/v1/forecast",
-                         'params': {'current_weather': 'true',
-                                    'latitude': '{latitude}',
-                                    'longitude': '{longitude}'
-                                    }},
-               'examples': [("What is the weather in NYC?"),
+    tools[2]['examples'] = [("What is the weather in NYC?"),
                             ("What's Milan's wind-speed?")
-                            ]}]
+                            ]
     return tools
 
-
-generic_tools = buildGenericTools()
 
 class Agent:
     def __init__(self, openai_key, tools, verbose = 4):
         self.verbose = verbose
 
-        self.set_tools(generic_tools + tools)
+        self.set_tools(buildGenericTools(GENERIC_TOOLS) + tools)
         
          # set all the API resource keys to make calls 
-        set_api_key(OPENAI_DEFAULT_KEY,"OPENAI_API_KEY")
+        set_api_key(openai_key,"OPENAI_API_KEY")
         set_api_key(GOOGLE_MAPS_KEY, "GOOGLE_MAPS_KEY")
         set_api_key(SERPAPI_KEY, "SERPAPI_KEY")
         set_api_key(WOLFRAM_KEY, "WOLFRAM_KEY")
@@ -341,7 +315,7 @@ class Agent:
 # print_op(google(' {"question": ""}'))
 if __name__ == "__main__":
     tools = []
-    a = Agent(openai.api_key, tools, verbose = 1)
+    a = Agent(openai.api_key, tools, verbose=1)
     mem = []
     last = ""
     while True:

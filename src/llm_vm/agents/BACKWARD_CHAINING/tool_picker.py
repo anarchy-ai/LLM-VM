@@ -1,4 +1,8 @@
-from utils import *
+try:    
+    from .utils import *
+except:
+     from utils import *
+     
 from labels import *
 import string
 import re
