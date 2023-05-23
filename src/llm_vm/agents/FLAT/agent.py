@@ -1,10 +1,12 @@
+import os 
+import sys 
 import re
 import random
 from agent_helper.business_logic import promptf
 from agent_helper.labels import *
 from agent_helper.utils import *
 from agent_helper.tools import *
-from agent_helper.keys import * 
+from keys import *
 
 
 random_fixed_seed = random.Random(4)
@@ -16,7 +18,7 @@ class Agent:
         self.bot_instructions = f"<{L_BOT_INSTRUCTIONS}>{bot_instructions}<{L_BOT_INSTRUCTIONS}>" if bot_instructions else ""
         
         # set the openai key to make calls to the API
-        set_openai_key(openai_key)
+        set_api_key(openai_key, "OPEN_API_KEY")
 
     def set_tools(self, tools):
         self.tools = []
@@ -72,7 +74,6 @@ if __name__ == "__main__":
                                                                                                               'open_now': 'true', 'location': '{location}', 'term': '{term}', 'price': '{price}'}, 'data': {},
                        'headers': {'authorization': 'Bearer OaEqVSw9OV6llVnvh9IJo92ZCnseQ9tftnUUVwjYXTNzPxDjxRafYkz99oJKI9WHEwUYkiwULXjoBcLJm7JhHj479Xqv6C0lKVXS7N91ni-nRWpGomaPkZ6Z1T0GZHYx',
                                    'accept': 'application/json'}}}]
-
 
     label = Agent(OPENAI_DEFAULT_KEY, tools, verbose=4)
     conversation_history = []

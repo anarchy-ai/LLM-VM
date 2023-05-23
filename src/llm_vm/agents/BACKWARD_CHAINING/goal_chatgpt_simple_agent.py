@@ -9,7 +9,14 @@ import requests
 from labels import *
 
 from utils import *
-from keys import * 
+
+# Get the current file's directory to grab the python files with common functionality in the utils/ folder
+current_dir = os.path.dirname(os.path.abspath(__file__))
+grandparent_dir = os.path.dirname(os.path.dirname(current_dir))
+utils_dir = os.path.join(grandparent_dir, 'utils/')
+sys.path.append(utils_dir)
+
+from keys import *
 from tool_picker import *
 from disambiguate import *
 from extract import *

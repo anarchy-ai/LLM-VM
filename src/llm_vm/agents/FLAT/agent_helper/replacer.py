@@ -1,5 +1,5 @@
 import re
-from agent_helper.keys import DICT_KEY_REGEX_TO_FIND_PURE_INTERPOLATIONS
+from keys import DICT_KEY_REGEX_TO_FIND_PURE_INTERPOLATIONS
 
 ###
 # Use this regex to find if a variable is a pure interpolation.
