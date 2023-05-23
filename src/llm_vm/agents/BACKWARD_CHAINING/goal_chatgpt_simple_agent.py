@@ -1,4 +1,6 @@
 # run standalone like "python3 -m matt_agent.goal_chatgpt_simple_agent"
+import os 
+import sys
 from urllib.parse import urlencode
 import urllib.parse as urlparse
 import openai
@@ -6,16 +8,14 @@ import json
 from gpt_index import Document, LLMPredictor, GPTSimpleVectorIndex, PromptHelper, GPTTreeIndex
 import requests
 
-from labels import *
-
-from utils import *
-
 # Get the current file's directory to grab the python files with common functionality in the utils/ folder
 current_dir = os.path.dirname(os.path.abspath(__file__))
 grandparent_dir = os.path.dirname(os.path.dirname(current_dir))
 utils_dir = os.path.join(grandparent_dir, 'utils/')
 sys.path.append(utils_dir)
 
+from labels import *
+from utils import *
 from keys import *
 from tool_picker import *
 from disambiguate import *
