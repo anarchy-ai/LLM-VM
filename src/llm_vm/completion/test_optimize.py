@@ -103,8 +103,6 @@ if __name__ == "__main__":
     load_dotenv()
     openai.api_key = os.getenv('OPENAI_KEY')
     anarchy_key = os.getenv('ANARCHY_KEY')
-    print("key:", openai.api_key)
-    #optimizer = LocalOptimizer(MIN_TRAIN_EXS=2)
     optimizer = HostedOptimizer(openai_key = openai.api_key, 
                                 anarchy_key = anarchy_key, 
                                 MIN_TRAIN_EXS=2)
