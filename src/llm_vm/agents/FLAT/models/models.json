@@ -1,0 +1,214 @@
+[
+    {
+        "split_questions": {
+            "model_name": "davinci:ft-anarchy-2023-04-02-23-12-07",
+            "model_files": [
+                "file-Ura3UauWeQOhwrT7h2ndYw05",
+                "file-s8pkVHCey8H9oKnlMtL2P19d"
+            ],
+            "elapsed_time_s": 794
+        },
+        "tool_picker": {
+            "model_name": "davinci:ft-anarchy-2023-04-02-23-16-54",
+            "model_files": [
+                "file-AXNbL54VovzmPTXyXEd2Lxmu",
+                "file-ZTpCFzZkKUUxsKzgNZ8sa6ox"
+            ],
+            "elapsed_time_s": 286
+        },
+        "TIMESTAMP": 1680477417,
+        "DATE": "Sun Apr  2 16:16:57 2023",
+        "OPENAI_KEY": "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"
+    },
+    {
+        "split_questions": {
+            "model_name": "davinci:ft-anarchy-2023-04-03-07-50-30",
+            "model_files": [
+                "file-G4XLzTQLy52xNga9z6lJ82QV",
+                "file-u9rrKPyM1O6b8TQBh575YYL5"
+            ],
+            "elapsed_time_s": 8932
+        },
+        "tool_picker": {
+            "model_name": "davinci:ft-anarchy-2023-04-03-08-40-53",
+            "model_files": [
+                "file-PxsLY4UjRxs3q5TncYF5RGg2",
+                "file-7WgAMusvrmZZJfbMqTZKZj8P"
+            ],
+            "elapsed_time_s": 12788
+        },
+        "TIMESTAMP": 1680512090,
+        "DATE": "Mon Apr  3 01:54:50 2023",
+        "OPENAI_KEY": "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"
+    },
+    {
+        "split_questions": {
+            "model_name": "davinci:ft-anarchy-2023-04-03-20-44-35",
+            "model_files": [
+                "file-MEZl1g0MsMAZaQLS2E5xUSWh",
+                "file-KYlqvSJNqAtuoAuK69PdHFa8"
+            ],
+            "elapsed_time_s": 5986
+        },
+        "tool_picker": {
+            "model_name": "davinci:ft-anarchy-2023-04-04-02-54-37",
+            "model_files": [
+                "file-QUZuBh4hhfaRD8q2E7HYwEAx",
+                "file-vInfWWSK3SPTK0dc1VgFmjvI"
+            ],
+            "elapsed_time_s": 10884
+        },
+        "TIMESTAMP": 1680559577,
+        "DATE": "Mon Apr  3 15:06:17 2023"
+    },
+    {
+        "tool_picker": {
+            "model_name": "davinci:ft-anarchy-2023-04-04-20-43-19",
+            "model_files": [
+                "file-bhjTGTwp1p5uoMoRAes2rnMw",
+                "file-Jw2NJSv86irE7NaOsEyro5YU"
+            ],
+            "elapsed_time_s": 2468
+        },
+        "TIMESTAMP": 1680641008,
+        "DATE": "Tue Apr  4 13:43:28 2023",
+        "OPENAI_KEY": "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"
+    },
+    {
+        "tool_picker": {
+            "model_name": "tool_picker_EXXX",
+            "model_files": [],
+            "elapsed_time_s": 0
+        },
+        "TIMESTAMP": 1680642521,
+        "DATE": "Tue Apr  4 14:08:41 2023",
+        "OPENAI_KEY": "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"
+    },
+    {
+        "tool_picker": {
+            "model_name": "tool_picker_EXXX",
+            "model_files": [],
+            "elapsed_time_s": 0
+        },
+        "TIMESTAMP": 1680642559,
+        "DATE": "Tue Apr  4 14:09:19 2023",
+        "OPENAI_KEY": "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"
+    },
+    {
+        "tool_picker": {
+            "model_name": "tool_picker_EXXX",
+            "model_files": [],
+            "elapsed_time_s": 0
+        },
+        "TIMESTAMP": 1680642913,
+        "DATE": "Tue Apr  4 14:15:13 2023",
+        "OPENAI_KEY": "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"
+    },
+    {
+        "tool_picker": {
+            "model_name": "tool_picker_EXXX",
+            "model_files": [],
+            "elapsed_time_s": 0
+        },
+        "TIMESTAMP": 1680645150,
+        "DATE": "Tue Apr  4 14:52:30 2023",
+        "OPENAI_KEY": "y"
+    },
+    {
+        "tool_picker": {
+            "model_name": "davinci:ft-anarchy-2023-04-04-22-16-09",
+            "model_files": [
+                "file-91Jg0g5fG7sneeDLuoVPE3iL",
+                "file-8HWSAXYSC0TtwKo7G2fRrdJs"
+            ],
+            "elapsed_time_s": 1380
+        },
+        "TIMESTAMP": 1680646585,
+        "DATE": "Tue Apr  4 15:16:25 2023",
+        "OPENAI_KEY": "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"
+    },
+    {
+        "split_questions": {
+            "model_name": "davinci:ft-anarchy-2023-04-05-06-37-58",
+            "model_files": [
+                "file-9oNhoKkKhn1PM1AAdDSf7nxy",
+                "file-oebgFcMh3u5P7fTm1tkvjEU0"
+            ],
+            "elapsed_time_s": 588
+        },
+        "tool_picker": {
+            "model_name": "davinci:ft-anarchy-2023-04-05-06-54-44",
+            "model_files": [
+                "file-A4T6sxqIfUyCXkYwXRiADAXI",
+                "file-aFyYKYo1QWUVqI60CSOLZSpv"
+            ],
+            "elapsed_time_s": 1501
+        },
+        "use_memory": {
+            "model_name": "davinci:ft-anarchy-2023-04-05-06-44-46",
+            "model_files": [
+                "file-Cay5WZw29df8h3kre8E8CBZD",
+                "file-xFSuU3aIiBOqmEQ43w04LlvA"
+            ],
+            "elapsed_time_s": 931
+        },
+        "TIMESTAMP": 1680677686,
+        "DATE": "Tue Apr  4 23:54:46 2023",
+        "OPENAI_KEY": "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"
+    },
+    {
+        "split_questions": {
+            "model_name": "davinci:ft-anarchy-2023-04-07-00-04-22",
+            "model_files": [
+                "file-ukrKBFIrbqvmxL5fudqz2hkk",
+                "file-QDP5BMWoaX2KD2LnkP04Xwad"
+            ],
+            "elapsed_time_s": 836
+        },
+        "tool_picker": {
+            "model_name": "davinci:ft-anarchy-2023-04-07-00-10-00",
+            "model_files": [
+                "file-ZiB9FZ3H6JzoMR6VIhdRq2pS",
+                "file-I7cz3Nan8N54IZ7hnEsk2Rpg"
+            ],
+            "elapsed_time_s": 1169
+        },
+        "use_memory": {
+            "model_name": "davinci:ft-anarchy-2023-04-07-00-06-40",
+            "model_files": [
+                "file-hZ7jaBKzyJ5vtpAVm8zGi76V",
+                "file-9LuodKExIiiqD8eN7SFatPqJ"
+            ],
+            "elapsed_time_s": 972
+        },
+        "TIMESTAMP": 1680826205,
+        "DATE": "Thu Apr  6 17:10:05 2023",
+        "OPENAI_KEY": "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"
+    },
+    {
+        "guess_api_input": {
+            "model_name": "davinci:ft-anarchy-2023-04-14-10-35-50",
+            "model_files": [
+                "file-j4w24CCtf4lnQh5T4T1T4OTy",
+                "file-GDNdRstd7RziaAYYsgZvL8JY"
+            ],
+            "elapsed_time_s": 275
+        },
+        "TIMESTAMP": 1681468553,
+        "DATE": "Fri Apr 14 12:35:53 2023",
+        "OPENAI_KEY": "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"
+    },
+    {
+        "guess_api_input": {
+            "model_name": "davinci:ft-anarchy-2023-04-14-11-17-29",
+            "model_files": [
+                "file-bRI4Jnb6hmB9sPUOvWGuIkpr",
+                "file-Z7qqMKrWF4t0JVT2QJJv9ley"
+            ],
+            "elapsed_time_s": 381
+        },
+        "TIMESTAMP": 1681471057,
+        "DATE": "Fri Apr 14 13:17:37 2023",
+        "OPENAI_KEY": "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"
+    }
+]
