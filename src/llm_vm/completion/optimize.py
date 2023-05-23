@@ -7,6 +7,12 @@ import json
 import tempfile
 import abc
 import requests
+import hashlib
+
+def generate_hash(input_string):
+    sha256_hash = hashlib.sha256()
+    sha256_hash.update(str(input_string).encode('utf-8'))
+    return int(sha256_hash.hexdigest(), 16) % 10**18
 
 def asyncStart(foo):
     t = [None, None]
@@ -194,7 +200,7 @@ class LocalOptimizer(Optimizer):
                     'call_small' : str(self.call_small).split(' ')[1], # HACKS 
                     'call_big' : str(self.call_big).split(' ')[1],
                     }) if c_id is None else c_id
-        c_id = hash(c_id)
+        c_id = generate_hash(c_id)
 
         completion = None
         if self.storage.get_model(c_id) is not None:
