@@ -18,7 +18,7 @@
         },
         "TIMESTAMP": 1680477417,
         "DATE": "Sun Apr  2 16:16:57 2023",
-        "OPENAI_KEY": "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"
+        "OPENAI_KEY": "${OPENAI_API_KEY}"
     },
     {
         "split_questions": {
@@ -39,7 +39,7 @@
         },
         "TIMESTAMP": 1680512090,
         "DATE": "Mon Apr  3 01:54:50 2023",
-        "OPENAI_KEY": "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"
+        "OPENAI_KEY": "${OPENAI_API_KEY}"
     },
     {
         "split_questions": {
@@ -72,7 +72,7 @@
         },
         "TIMESTAMP": 1680641008,
         "DATE": "Tue Apr  4 13:43:28 2023",
-        "OPENAI_KEY": "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"
+        "OPENAI_KEY": "${OPENAI_API_KEY}"
     },
     {
         "tool_picker": {
@@ -82,7 +82,7 @@
         },
         "TIMESTAMP": 1680642521,
         "DATE": "Tue Apr  4 14:08:41 2023",
-        "OPENAI_KEY": "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"
+        "OPENAI_KEY": "${OPENAI_API_KEY}"
     },
     {
         "tool_picker": {
@@ -92,7 +92,7 @@
         },
         "TIMESTAMP": 1680642559,
         "DATE": "Tue Apr  4 14:09:19 2023",
-        "OPENAI_KEY": "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"
+        "OPENAI_KEY": "${OPENAI_API_KEY}"
     },
     {
         "tool_picker": {
@@ -102,7 +102,7 @@
         },
         "TIMESTAMP": 1680642913,
         "DATE": "Tue Apr  4 14:15:13 2023",
-        "OPENAI_KEY": "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"
+        "OPENAI_KEY": "${OPENAI_API_KEY}"
     },
     {
         "tool_picker": {
@@ -125,7 +125,7 @@
         },
         "TIMESTAMP": 1680646585,
         "DATE": "Tue Apr  4 15:16:25 2023",
-        "OPENAI_KEY": "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"
+        "OPENAI_KEY": "${OPENAI_API_KEY}"
     },
     {
         "split_questions": {
@@ -154,7 +154,7 @@
         },
         "TIMESTAMP": 1680677686,
         "DATE": "Tue Apr  4 23:54:46 2023",
-        "OPENAI_KEY": "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"
+        "OPENAI_KEY": "${OPENAI_API_KEY}"
     },
     {
         "split_questions": {
@@ -183,7 +183,7 @@
         },
         "TIMESTAMP": 1680826205,
         "DATE": "Thu Apr  6 17:10:05 2023",
-        "OPENAI_KEY": "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"
+        "OPENAI_KEY": "${OPENAI_API_KEY}"
     },
     {
         "guess_api_input": {
@@ -196,7 +196,7 @@
         },
         "TIMESTAMP": 1681468553,
         "DATE": "Fri Apr 14 12:35:53 2023",
-        "OPENAI_KEY": "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"
+        "OPENAI_KEY": "${OPENAI_API_KEY}"
     },
     {
         "guess_api_input": {
@@ -209,6 +209,6 @@
         },
         "TIMESTAMP": 1681471057,
         "DATE": "Fri Apr 14 13:17:37 2023",
-        "OPENAI_KEY": "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"
+        "OPENAI_KEY": "${OPENAI_API_KEY}"
     }
 ]

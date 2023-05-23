@@ -3,7 +3,7 @@ import sys
 import re
 import random
 from agent_helper.business_logic import promptf
-from agent_helper.labels import *
+from labels import *
 from agent_helper.utils import *
 from agent_helper.tools import *
 from keys import *
@@ -18,7 +18,7 @@ class Agent:
         self.bot_instructions = f"<{L_BOT_INSTRUCTIONS}>{bot_instructions}<{L_BOT_INSTRUCTIONS}>" if bot_instructions else ""
         
         # set the openai key to make calls to the API
-        set_api_key(openai_key, "OPEN_API_KEY")
+        set_api_key(openai_key, "OPENAI_API_KEY")
 
     def set_tools(self, tools):
         self.tools = []

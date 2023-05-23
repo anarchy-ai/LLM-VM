@@ -8,6 +8,7 @@ utils_dir = os.path.join(grandparent_dir, 'utils/')
 sys.path.append(utils_dir)
 
 from keys import * 
+from labels import *
 from utils import *
 from urllib.parse import urlencode
 import urllib.parse as urlparse
@@ -19,10 +20,7 @@ try:
     from .bothandler import question_split,tool_picker,memory_check, replace_variables_for_values
 except:
     from bothandler import question_split,tool_picker,memory_check, replace_variables_for_values
-try:
-    from .labels import *
-except:
-    from labels import *
+
 
 
 def prepPrintPromptContext(p):
