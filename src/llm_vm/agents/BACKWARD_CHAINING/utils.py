@@ -54,7 +54,7 @@ def call_OptGPT(state, stable_context, dynamic_prompt, **kargs):
     if completion is None or len(training_exs[0]) < MAX_TRAIN_EXS:
         def promiseCompletion():
             best_completion = call_ChatGPT(state, MSG("system", prompt), gpt4=True, **kargs)
-            new_data = checkpoint[0] + [(dymaic_prompt, best_completion)]
+            new_data = checkpoint[0] + [(dynamic_prompt, best_completion)]
             context_store[stable_context] = (new_data, checkpoint[1], context_store[stable_context][2])
 
             if len(training_exs) >= MIN_TRAIN_EXS and not context_store[stable_context][2]:

@@ -9,17 +9,22 @@ sys.path.append(utils_dir)
 
 from keys import * 
 from labels import *
-from utils import *
+from tools import * 
 from urllib.parse import urlencode
 import urllib.parse as urlparse
 import json
 
 import random
+# import spacy
+# nlp =  spacy.load("en_core_web_md")
+
 from math import sqrt, pow, exp
 try:
     from .bothandler import question_split,tool_picker,memory_check, replace_variables_for_values
+    from .utils import * 
 except:
     from bothandler import question_split,tool_picker,memory_check, replace_variables_for_values
+    from utils import * 
 
 
 
@@ -33,19 +38,10 @@ random_fixed_seed = random.Random(4)
 
 QUALITY = 0.2
 
-def buildGenericTools():
-    tools = []
+def buildGenericTools(tools):
 
-    # wolfram
-    tools += [{'description': "The tool returns the results of free-form queries similar to those used for wolfram alpha. This is useful for complicated math or live data retrieval.  Can be used to get the current date.",
-               'dynamic_params': {"q": 'The natural language input query'},
-               'method': 'GET',
-               'args': {'url': "https://www.googleapis.com/customsearch/v1",
-                         'params': {'key': WOLFRAM_KEY,
-                                    'cx' : '921b66f0c701a4528',
-                                    'q': '{q}'}
-                        },
-               'examples': [([("What's the most popular spot to vacation if you are in Germany?", "Mallorca"),
+    # wolfram 
+    tools[0]['examples'] = [([("What's the most popular spot to vacation if you are in Germany?", "Mallorca"),
                               ("What's the date", "July 7, 2009"),
                               ], "How crowded is it there now?", '{"q": "How many tourists visit Mallorca each July?"}'),
 
@@ -57,18 +53,10 @@ def buildGenericTools():
 
                             ([], "Is 5073 raised to the 3rd power divisible by 73?",
                              '{"q": "Is 5073^3 divisible by 73?"}')
-                            ]}]
+                        ]
     
     # geopy
-    tools += [{'description': "Find the driving distance and time to travel between two cities.",
-               'dynamic_params': {"origins": 'the origin city', "destinations": 'the destination city'},
-               'method': 'GET',
-               'args': {'url': "https://maps.googleapis.com/maps/api/distancematrix/json",
-                         'params': {'key': GOOGLE_MAPS_KEY,
-                                    'origins': '{origins}',
-                                    'destinations': '{destinations}'}
-                        },
-               'examples': [([("I feel like taking a drive today to zurich can you help?", "Yes!  Where are you now?"),
+    tools[1]['examples'] = [([("I feel like taking a drive today to zurich can you help?", "Yes!  Where are you now?"),
                               ], "I'm in Paris.", '{"origins": "Paris", "destinations": "Zurich"}'),
                             ([], "How long would it take to get between South Africa and Kenya.",
                              '{"origins": "South Africa", "destinations": "Kenya"}'),
@@ -76,18 +64,10 @@ def buildGenericTools():
                               ("Thats really cool!", "Damn right."),
                               ("Where do they migrate each year?", "Alaska"),
                               ], "How many miles would they travel while doing that?", '{"origins": "San Luis Obispo", "destinations": "Alaska"}')
-                            ]}]
-    # weather
-    tools += [{'description': 'Find the weather at a location and returns it in celcius.',
-               'dynamic_params': {"latitude": 'latitude of as a float',
-                                  "longitude": 'the longitude as a float'},
-               'method': 'GET',
-               'args': {'url': "https://api.open-meteo.com/v1/forecast",
-                         'params': {'current_weather': 'true',
-                                    'latitude': '{latitude}',
-                                    'longitude': '{longitude}'
-                                    }},
-               'examples': [([("Are you allergic to seafood?", "I'm just an AI. I have no body."),
+                            ]
+    
+    # weather 
+    tools[2]['examples'] = [([("Are you allergic to seafood?", "I'm just an AI. I have no body."),
                               ("What city is Obama in?", "NYC"),
                               ("What is the latitude of NYC?", "40.7128° N"),
                               ("What is the longitude of NYC?",
@@ -96,11 +76,8 @@ def buildGenericTools():
                             ([("What is the longitude of Milan?", "9.1900° E"),
                               ("What is the latitude of Milan?", "45.4642° N"),
                               ], "What is the weather in Milan?", '{"longitude": 45.4642, "latitude": 9.1900}')
-                            ]}]
+                            ]
     return tools
-
-
-generic_tools = buildGenericTools()
  
 def squared_sum(x):
   """ return 3 rounded square rooted value """
@@ -118,7 +95,7 @@ class Agent:
     def __init__(self, openai_key, tools, bot_str="", verbose = 4):
         self.verbose = verbose
         self.price=0
-        self.set_tools(generic_tools + tools)
+        self.set_tools(buildGenericTools(GENERIC_TOOLS) + tools)
         if bot_str=="":
             self.bot_str=bot_str
         else:
@@ -394,9 +371,14 @@ class Agent:
 
 # print_op(google(' {"question": ""}'))
 if __name__ == "__main__":
-  
     
-    
+        '''
+        # nytimes
+        tools += [{'url': "https://api.nytimes.com/svc/mostpopular/v2/viewed/1.json?api-key=YAKJdTt2RhGZfFNSwEfZTmQmloUGmMjL",
+                'description': "use this tool to find the top news stories of the day", 
+                'params': [],
+                'examples' : []}] 
+        '''
         #tools = [{'method': 'GET',"description":"use this tool to find the price of stocks",'args' : {"url":"https://finnhub.io/api/v1/quote",'params': { 'token' :'cfi1v29r01qq9nt1nu4gcfi1v29r01qq9nt1nu50'} },"dynamic_params":{"symbol":"the symbol of the stock"}}]
         tools =  [{'method': 'GET', "dynamic_params":{ 'location': 'This string indicates the geographic area to be used when searching for businesses. \
         Examples: "New York City", "NYC", "350 5th Ave, New York, NY 10118".', 'term': 'Search term, e.g. "food" or "restaurants". The \
@@ -406,23 +388,8 @@ if __name__ == "__main__":
         'headers': {'authorization': 'Bearer OaEqVSw9OV6llVnvh9IJo92ZCnseQ9tftnUUVwjYXTNzPxDjxRafYkz99oJKI9WHEwUYkiwULXjoBcLJm7JhHj479Xqv6C0lKVXS7N91ni-nRWpGomaPkZ6Z1T0GZHYx', 
         'accept': 'application/json'}}}]
         
-        '''
-        # nytimes
-        tools += [{'url': "https://api.nytimes.com/svc/mostpopular/v2/viewed/1.json?api-key=YAKJdTt2RhGZfFNSwEfZTmQmloUGmMjL",
-                'description': "use this tool to find the top news stories of the day", 
-                'params': [],
-                'examples' : []}] 
-        '''
-
-        # a = Agent(OPENAI_DEFAULT_KEY, tools,verbose=3)
-        # mem = []
-        # last = ""
-        # while True:
-        #     inp = input(last+"Human: ")
-        #     ret = a.run(inp, mem)
-        #     mem = ret[1]
-        #     last = "AI: "+str(ret[0])+ "\n"
-        label = Agent(OPENAI_DEFAULT_KEY, tools, verbose=4)
+            
+        label = Agent(OPENAI_DEFAULT_KEY, tools, verbose=1)
         conversation_history = []
         last = ""
         while True:
