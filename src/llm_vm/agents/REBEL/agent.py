@@ -233,8 +233,9 @@ class Agent:
 
     
         if self.verbose > -1:
-            print_op("Expected GPT-3.5 Price: {:.4f}".format(self.price))
+            print_op("GPT-3.5 Price = ~{:.1f} cents".format(self.price * 100))
 
+        # return (answer, memory + [(question, answer)], calls, debug_return, has_friendly_tags)
         return (thought, memory + [(question, thought)])
 
     def makeInteraction(self, p,a, Q = "HUMAN", A = "AI", INTERACTION = INTERACTION):
@@ -413,11 +414,19 @@ if __name__ == "__main__":
                 'examples' : []}] 
         '''
 
-        a = Agent(OPENAI_DEFAULT_KEY, tools,verbose=3)
-        mem = []
+        # a = Agent(OPENAI_DEFAULT_KEY, tools,verbose=3)
+        # mem = []
+        # last = ""
+        # while True:
+        #     inp = input(last+"Human: ")
+        #     ret = a.run(inp, mem)
+        #     mem = ret[1]
+        #     last = "AI: "+str(ret[0])+ "\n"
+        label = Agent(OPENAI_DEFAULT_KEY, tools, verbose=4)
+        conversation_history = []
         last = ""
         while True:
             inp = input(last+"Human: ")
-            ret = a.run(inp, mem)
-            mem = ret[1]
-            last = "AI: "+str(ret[0])+ "\n"
+            return_value = label.run(inp, conversation_history)
+            conversation_history = return_value[1]
+            last = "AI: "+str(return_value[0]) + "\n"
