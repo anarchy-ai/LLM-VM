@@ -1,15 +1,19 @@
+import os
+import sys
+
+# Get the current file's directory to grab the python files with common functionality in the utils/ folder
+current_dir = os.path.dirname(os.path.abspath(__file__))
+grandparent_dir = os.path.dirname(os.path.dirname(current_dir))
+utils_dir = os.path.join(grandparent_dir, 'utils/')
+sys.path.append(utils_dir)
+
 from keys import * 
 from utils import *
-import sys
 from urllib.parse import urlencode
 import urllib.parse as urlparse
-# import openai
 import json
-# import requests
-import os
+
 import random
-# import spacy
-# nlp =  spacy.load("en_core_web_md")
 from math import sqrt, pow, exp
 try:
     from .bothandler import question_split,tool_picker,memory_check, replace_variables_for_values
