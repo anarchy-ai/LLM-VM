@@ -125,7 +125,7 @@ class Agent:
             self.bot_str = "<GLOBAL>"+bot_str+"<GLOBAL>"
 
         # set all the API resource keys to make calls 
-        set_api_key(OPENAI_DEFAULT_KEY,"OPENAI_API_KEY")
+        set_api_key(openai_key,"OPENAI_API_KEY")
         set_api_key(GOOGLE_MAPS_KEY, "GOOGLE_MAPS_KEY")
         set_api_key(SERPAPI_KEY, "SERPAPI_KEY")
         set_api_key(WOLFRAM_KEY, "WOLFRAM_KEY")
