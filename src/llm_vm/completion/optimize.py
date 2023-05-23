@@ -224,18 +224,16 @@ class LocalOptimizer(Optimizer):
                             training_file.close()
                             fine_tuning_job = openai.FineTune.create(training_file= upload_response.id)
 
-                            print(f"Fine-tuning job: {fine_tuning_job}")
+                            print(f"Fine-tuning job created: {fine_tuning_job}")
                             job_id = fine_tuning_job["id"]
-                            print(f"Fine-tuning job created with ID: {job_id}")
 
                             while True:
                                 fine_tuning_status = openai.FineTune.retrieve(id=job_id)
                                 status = fine_tuning_status["status"]
                                 print(f"Fine-tuning job status: {status}")
-                                print(f"Deeper Fine-tuning job status: {fine_tuning_status}")
                                 if status in ["succeeded", "completed", "failed"]:
                                     break
-                                time.sleep(60)
+                                time.sleep(30)
 
                             new_model_id = fine_tuning_status.fine_tuned_model
 

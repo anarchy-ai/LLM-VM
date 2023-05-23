@@ -104,10 +104,10 @@ if __name__ == "__main__":
     openai.api_key = os.getenv('OPENAI_KEY')
     anarchy_key = os.getenv('ANARCHY_KEY')
     print("key:", openai.api_key)
-    optimizer = LocalOptimizer(MIN_TRAIN_EXS=2)
-    #optimizer = HostedOptimizer(openai_key = openai.api_key, 
-    #                            anarchy_key = anarchy_key, 
-    #                            MIN_TRAIN_EXS=2)
+    #optimizer = LocalOptimizer(MIN_TRAIN_EXS=2)
+    optimizer = HostedOptimizer(openai_key = openai.api_key, 
+                                anarchy_key = anarchy_key, 
+                                MIN_TRAIN_EXS=2)
     i = 0
     for h in haskell.splitlines():
         print("At: ", i)
@@ -115,6 +115,8 @@ if __name__ == "__main__":
             print(optimizer.complete("Please convert into haskell:", h + "\nHaskell:", max_tokens = 100, temperature = 0.0))
         except Exception as e:
             print('E:', e)
-        if i > 3 and i < 8:
-            time.sleep(500)
+
+        time.sleep(2)
+        if i > 3 and i < 20:
+            time.sleep(120)
         i += 1
