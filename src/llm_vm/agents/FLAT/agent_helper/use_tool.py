@@ -1,3 +1,6 @@
+import os 
+import sys 
+
 import requests
 from gpt_index import Document, GPTTreeIndex
 from agent_helper.utils import print_op, make_interaction, print_big
@@ -5,7 +8,14 @@ from agent_helper.requests.call_llm import call_llm
 from agent_helper.replacer import replace_variables_for_values
 from typings import *
 from agent_helper.bothandler import prompt_for_answer, prompt_for_instructions
-from agent_helper.labels import *
+
+# Get the current file's directory to grab the python files with common functionality in the utils/ folder
+current_dir = os.path.dirname(os.path.abspath(__file__))
+grandparent_dir = os.path.dirname(os.path.dirname(os.path.dirname(current_dir)))
+utils_dir = os.path.join(grandparent_dir, 'utils/')
+sys.path.append(utils_dir)
+
+from labels import *
 from agent_helper.tools import CUSTOM_TOOL_ANSWER_EMBEDDING
 import json
 

@@ -1,9 +1,7 @@
 import openai
-openai.api_key = ""
 import re
 
-      
-
+    
 def tool_picker(tools_list, question, starting_tool_num):
     
     tools=""

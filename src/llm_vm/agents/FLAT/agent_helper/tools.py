@@ -8,7 +8,7 @@ utils_dir = os.path.join(grandparent_dir, 'utils/')
 sys.path.append(utils_dir)
 
 from keys import *
-from agent_helper.labels import *
+from labels import *
 from typings import *
 from agent_helper.utils import verbose_answer
 

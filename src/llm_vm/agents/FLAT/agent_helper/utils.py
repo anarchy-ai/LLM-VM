@@ -1,8 +1,16 @@
 import traceback
 import os
+import sys
 import re
 import openai
-from .labels import *
+
+# Get the current file's directory to grab the python files with common functionality in the utils/ folder
+current_dir = os.path.dirname(os.path.abspath(__file__))
+grandparent_dir = os.path.dirname(os.path.dirname(os.path.dirname(current_dir)))
+utils_dir = os.path.join(grandparent_dir, 'utils/')
+sys.path.append(utils_dir)
+
+from labels import *
 import random
 from Levenshtein import distance as lev
 from typings import *

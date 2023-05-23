@@ -1,5 +1,14 @@
 import json
-from agent_helper.labels import *
+import os 
+import sys
+
+# Get the current file's directory to grab the python files with common functionality in the utils/ folder
+current_dir = os.path.dirname(os.path.abspath(__file__))
+grandparent_dir = os.path.dirname(os.path.dirname(os.path.dirname(current_dir)))
+utils_dir = os.path.join(grandparent_dir, 'utils/')
+sys.path.append(utils_dir)
+
+from labels import *
 from typings import *
 from agent_helper.utils import make_interaction
 from datetime import datetime
