@@ -111,7 +111,10 @@ if __name__ == "__main__":
     i = 0
     for h in haskell.splitlines():
         print("At: ", i)
-        print(optimizer.complete("Please convert into haskell:", h + "\nHaskell:", max_tokens = 100, temperature = 0.0))
+        try:
+            print(optimizer.complete("Please convert into haskell:", h + "\nHaskell:", max_tokens = 100, temperature = 0.0))
+        except Exception as e:
+            print('E:', e)
         if i > 3 and i < 8:
             time.sleep(200)
         i += 1
