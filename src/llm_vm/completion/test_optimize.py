@@ -116,5 +116,5 @@ if __name__ == "__main__":
         except Exception as e:
             print('E:', e)
         if i > 3 and i < 8:
-            time.sleep(200)
+            time.sleep(500)
         i += 1
