@@ -6,8 +6,10 @@ This is still in BETA.  Very little attention has been paid to package structure
 
 ## Running/Testing
 ```bash
-$ echo "OPENAI_KEY=<YOUROPENAIKEY>" >> .env
-$ echo "OPENAI_KEY=<YOUROPENAIKEY>" >> .env
+$ echo "OPENAI_API_KEY=<YOUR_OPEN_AI_KEY>" >> .env
+$ echo "GOOGLE_MAPS_KEY=<YOUR_GOOGLE_MAPS_KEY>" >> .env
+$ echo "SERPAPI_KEY=<YOUR_ANARCHY_KEY>" >> .env
+$ echo "WOLFRAM_KEY=<YOUR_WOLFRAM_KEY>" >> .env
 $ pip3 --install requirements.txt
 $ python3 src/llm_vm/completion/test_optimize.py
 ```
