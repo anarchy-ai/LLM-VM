@@ -72,8 +72,8 @@ class local_ephemeral:
 
 def CALL_BIG(prompt, gpt4=False, **kwargs):
     cur_prompt = [{'role': "system", 'content' : prompt}]
-    print("CUR_PROMPT:", cur_prompt)
-    print("KWARGS:", kwargs)
+    print("CUR_PROMPT:", cur_prompt, flush=True)
+    print("KWARGS:", kwargs, flush=True)
     ans = openai.ChatCompletion.create(
         messages=cur_prompt,
         model="gpt-3.5-turbo-0301" if not gpt4 else 'gpt-4',
@@ -204,8 +204,9 @@ class LocalOptimizer(Optimizer):
 
         completion = None
         if self.storage.get_model(c_id) is not None:
-            print("Using the new model!")
-            completion = self.call_small(dynamic_prompt.strip(), model=self.storage.get_model(c_id), **kwargs)
+            model = self.storage.get_model(c_id)
+            print("Using the new model:", model, flush=True)
+            completion = self.call_small(dynamic_prompt.strip(), model=model, **kwargs)
             
         training_exs = self.storage.get_data(c_id)
         
@@ -219,10 +220,10 @@ class LocalOptimizer(Optimizer):
                     new_datapoint = (dynamic_prompt.strip(), train_completion)
                     self.storage.add_example(c_id, new_datapoint)
                     training_exs = self.storage.get_data(c_id)
-                    print(f"Considering Fine-tuning")
+                    print("Considering Fine-tuning", flush=True)
 
                     if len(training_exs) >= self.MIN_TRAIN_EXS and not self.storage.get_training_in_progress_set_true(c_id):
-                        print(f"Actually Fine-tuning")
+                        print("Actually Fine-tuning", flush=True)
                         def train_with():
                             old_model = self.storage.get_model(c_id)
                             training_file = create_jsonl_file(self.storage.get_data(c_id))
@@ -230,7 +231,7 @@ class LocalOptimizer(Optimizer):
                             training_file.close()
                             fine_tuning_job = openai.FineTune.create(training_file= upload_response.id)
 
-                            print(f"Fine-tuning job created: {fine_tuning_job}")
+                            print(f"Fine-tuning job created: {fine_tuning_job}", flush=True)
                             job_id = fine_tuning_job["id"]
 
                             while True:
