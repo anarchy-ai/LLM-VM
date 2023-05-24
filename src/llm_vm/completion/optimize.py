@@ -203,10 +203,10 @@ class LocalOptimizer(Optimizer):
         c_id = generate_hash(c_id)
 
         completion = None
-        if self.storage.get_model(c_id) is not None:
-            model = self.storage.get_model(c_id)
+        model = self.storage.get_model(c_id)
+        if model is not None:
             print("Using the new model:", model, flush=True)
-            completion = self.call_small(dynamic_prompt.strip(), model=model, **kwargs)
+            completion = self.call_small(prompt = dynamic_prompt.strip(), model=model, **kwargs)
             
         training_exs = self.storage.get_data(c_id)
         
