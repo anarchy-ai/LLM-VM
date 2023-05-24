@@ -35,7 +35,7 @@ except:
     from contained import *
 
 
-def buildGenericTools(tools):
+def buildGenericTools(tools=GENERIC_TOOLS):
 
     # wolfram (math & live facts)
     tools[0]['examples'] = [("How many people are in Germany?"),
@@ -62,7 +62,7 @@ class Agent:
     def __init__(self, openai_key, tools, verbose = 4):
         self.verbose = verbose
 
-        self.set_tools(buildGenericTools(GENERIC_TOOLS) + tools)
+        self.set_tools(tools)
         
          # set all the API resource keys to make calls 
         set_api_key(openai_key,"OPENAI_API_KEY")
@@ -207,11 +207,11 @@ class Agent:
             if tool_to_use is None:
                 return None
 
-
             try:
                 del tools_left[tool_to_use]
             except:
                 pass
+
 
             tool = self.tools[tool_to_use]
 
@@ -320,7 +320,7 @@ class Agent:
 # print_op(google(' {"question": ""}'))
 if __name__ == "__main__":
     tools = []
-    a = Agent(openai.api_key, tools, verbose=1)
+    a = Agent(openai.api_key, buildGenericTools(GENERIC_TOOLS) + tools, verbose=1)
     mem = []
     last = ""
     while True:

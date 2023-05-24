@@ -9,12 +9,15 @@ sys.path.append(utils_dir)
 
 from keys import * 
 from labels import *
+from print_types import * 
 from tools import * 
 from urllib.parse import urlencode
 import urllib.parse as urlparse
 import json
 
 import random
+
+# UNCOMMENT THESE IMPORTS SO THAT SUBQUESTION PORTION CAN WORK (NLP CURRENTLY NOT RECOGNIZED)
 # import spacy
 # nlp =  spacy.load("en_core_web_md")
 
@@ -38,10 +41,12 @@ random_fixed_seed = random.Random(4)
 
 QUALITY = 0.2
 
-def buildGenericTools(tools):
+def buildGenericTools(tools=GENERIC_TOOLS):
+
+    new_tools = tools
 
     # wolfram 
-    tools[0]['examples'] = [([("What's the most popular spot to vacation if you are in Germany?", "Mallorca"),
+    new_tools[0]['examples'] = [([("What's the most popular spot to vacation if you are in Germany?", "Mallorca"),
                               ("What's the date", "July 7, 2009"),
                               ], "How crowded is it there now?", '{"q": "How many tourists visit Mallorca each July?"}'),
 
@@ -56,7 +61,7 @@ def buildGenericTools(tools):
                         ]
     
     # geopy
-    tools[1]['examples'] = [([("I feel like taking a drive today to zurich can you help?", "Yes!  Where are you now?"),
+    new_tools[1]['examples'] = [([("I feel like taking a drive today to zurich can you help?", "Yes!  Where are you now?"),
                               ], "I'm in Paris.", '{"origins": "Paris", "destinations": "Zurich"}'),
                             ([], "How long would it take to get between South Africa and Kenya.",
                              '{"origins": "South Africa", "destinations": "Kenya"}'),
@@ -67,7 +72,7 @@ def buildGenericTools(tools):
                             ]
     
     # weather 
-    tools[2]['examples'] = [([("Are you allergic to seafood?", "I'm just an AI. I have no body."),
+    new_tools[2]['examples'] = [([("Are you allergic to seafood?", "I'm just an AI. I have no body."),
                               ("What city is Obama in?", "NYC"),
                               ("What is the latitude of NYC?", "40.7128° N"),
                               ("What is the longitude of NYC?",
@@ -77,7 +82,7 @@ def buildGenericTools(tools):
                               ("What is the latitude of Milan?", "45.4642° N"),
                               ], "What is the weather in Milan?", '{"longitude": 45.4642, "latitude": 9.1900}')
                             ]
-    return tools
+    return new_tools
  
 def squared_sum(x):
   """ return 3 rounded square rooted value """
@@ -95,7 +100,7 @@ class Agent:
     def __init__(self, openai_key, tools, bot_str="", verbose = 4):
         self.verbose = verbose
         self.price=0
-        self.set_tools(buildGenericTools(GENERIC_TOOLS) + tools)
+        self.set_tools(tools)
         if bot_str=="":
             self.bot_str=bot_str
         else:
@@ -130,6 +135,7 @@ class Agent:
             if not 'dynamic_params' in tool:
                 tool['dynamic_params'] = {}
             self.tools += [tool]
+        
 
 
     def use_tool(self, tool, gpt_suggested_input, question, memory, facts, query=""):
@@ -210,7 +216,7 @@ class Agent:
 
     
         if self.verbose > -1:
-            print_op("GPT-3.5 Price = ~{:.1f} cents".format(self.price * 100))
+            print_big("GPT-3.5 Price = ~{:.1f} cents".format(self.price * 100))
 
         # return (answer, memory + [(question, answer)], calls, debug_return, has_friendly_tags)
         return (thought, memory + [(question, thought)])
@@ -243,7 +249,7 @@ class Agent:
     def promptf(self, question, memory, facts, split_allowed=True, spaces=0):
         for i in range(spaces):
             print(" ",end="")
-        print(question)
+
         mem = "".join([self.makeInteraction(p,a, "P", "AI", INTERACTION = "Human-AI") for p,a in memory]) \
             + "".join([self.makeInteraction(p,a, "P", "AI", INTERACTION = "AI-AI") for p,a in facts])
     
@@ -287,23 +293,28 @@ class Agent:
             prompt=MSG("system","You are a good and helpful bot"+self.bot_str)
             prompt+=MSG("user",mem+"\nQ:"+question+"\nANSWER Q, DO NOT MAKE UP INFORMATION.")
             a = call_ChatGPT(self, prompt, stop="</AI>", max_tokens = 256).strip()
-            print(a.replace("\n",""))
+            print_big("NO DATA TOOLS USED, ANSWERED FROM MEMORY")
             return (a.replace("\n",""), [(question, a)])
            
 
         tool_to_use=tool_picker(self.tools,question,0)
+
+        # TODO: UNCOMMENT PRINT STATEMENT WHEN SPACY WORKS FOR INTERFACE CONSISTENCY (NEEDS TO BE TESTED)
+        # print_big(
+        #     "".join([f'{"✓" if self.tools.index(tool) == tool_to_use else " "} {self.tools.index(tool)}.- {tool["description"]}\n' for tool in self.tools]) +
+        #     f"\n> Question: {question}\n> Raw answer: '{tool_to_use}'\n> Tool ID: {tool_to_use}", "LIST OF DATA TOOLS"
+        # )
+
         self.price+=tool_to_use[0]
         try:
             tool_to_use=int(tool_to_use[1])
         except:
             tool_to_use=len(self.tools)   
-        if self.verbose > 0:
-            print_op("TOOL_TO_USE:", tool_to_use)
         if tool_to_use==len(self.tools):
             prompt=MSG("system","You are a good and helpful bot"+self.bot_str)
             prompt+=MSG("user",mem+"\nQ:"+question+"\nUsing this information, what is the answer to Q?")
             a = call_ChatGPT(self, prompt, stop="</AI>", max_tokens = 256).strip()
-            print(a.replace("\n",""))
+
             return (a.replace("\n",""), [(question, a)])
         tool_input = self.make_sub(list(enumerate(self.tools)),
                                     memory, facts, 
@@ -322,7 +333,7 @@ class Agent:
         answer = self.use_tool(self.tools[tool_to_use], tool_input, question, memory, facts, query=query)
         for i in range(spaces):
             print(" ",end="")
-        print(answer.replace("/n",""))
+
         return (answer, [(question, answer)])
 
     def call_gpt(self, cur_prompt: str, stop: str, max_tokens = 20, quality = "best", temperature = 0.0):
@@ -380,7 +391,10 @@ if __name__ == "__main__":
                 'examples' : []}] 
         '''
         #tools = [{'method': 'GET',"description":"use this tool to find the price of stocks",'args' : {"url":"https://finnhub.io/api/v1/quote",'params': { 'token' :'cfi1v29r01qq9nt1nu4gcfi1v29r01qq9nt1nu50'} },"dynamic_params":{"symbol":"the symbol of the stock"}}]
-        tools =  [{'method': 'GET', "dynamic_params":{ 'location': 'This string indicates the geographic area to be used when searching for businesses. \
+        
+        tools = buildGenericTools()
+
+        tools +=  [{'method': 'GET', "dynamic_params":{ 'location': 'This string indicates the geographic area to be used when searching for businesses. \
         Examples: "New York City", "NYC", "350 5th Ave, New York, NY 10118".', 'term': 'Search term, e.g. "food" or "restaurants". The \
         term may also be the business\'s name, such as "Starbucks"'},"description":"This tool searches for a business on yelp.  It's useful for finding restaurants and \
         whatnot.",'args' :{'url': 'https://api.yelp.com/v3/businesses/search', 'cert': '', 'json': {}, 'params': {'limit': '1', 
