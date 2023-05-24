@@ -112,7 +112,7 @@ if __name__ == "__main__":
     for h in haskell.splitlines():
         print("At: ", i)
         try:
-            print(optimizer.complete("Please convert this line into haskell:", h + "\nHaskell:", max_tokens = 100, temperature = 0.0))
+            print(optimizer.complete("Please convert this line to haskell:", h + "\nHaskell:", max_tokens = 100, temperature = 0.0))
         except Exception as e:
             print('E:', e)
 
