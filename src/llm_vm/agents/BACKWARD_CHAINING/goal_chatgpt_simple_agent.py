@@ -1,4 +1,5 @@
 # run standalone like "python3 -m matt_agent.goal_chatgpt_simple_agent"
+from operator import index
 import os 
 import sys
 from urllib.parse import urlencode
@@ -15,6 +16,7 @@ utils_dir = os.path.join(grandparent_dir, 'utils/')
 sys.path.append(utils_dir)
 
 from keys import *
+from print_types import * 
 from labels import *
 from tools import * 
 from typings import * 
@@ -178,7 +180,7 @@ class Agent:
         ans = self.promptf(question, memory, "used to respond to the human")
         
         if self.verbose > -1:
-            print_op("Expected Price: ${:.4f}".format(self.price))
+            print_big("Expected Price = ${:.4f}".format(self.price))
 
         if ans is None:
             ans = ("Can't answer this from context!", [])
@@ -190,7 +192,7 @@ class Agent:
 
     def promptf(self, question, memory, utility):
 
-        if self.verbose > -1:
+        if self.verbose > 2:
             print_op("OrigQ:", question)
 
         #d_question = disambiguate(self, question, memory)
@@ -198,8 +200,8 @@ class Agent:
         tools_left = dict((i,i) for i in range(0, len(self.tools)))
 
         while len(tools_left.keys()) > 0:
-            print_op("MEM:", memory)
-            print_op("QQ:", question)
+            # print_op("MEM:", memory)
+            # print_op("QQ:", question)
             tool_to_use = choose_tool(self, memory, question, tools_left)
 
             if tool_to_use is None:
@@ -213,7 +215,10 @@ class Agent:
 
             tool = self.tools[tool_to_use]
 
-            print_op("TOOL_TO_USE:", tool_to_use, " ", tool['description'])
+            print_big(
+            "".join([f'{"✓" if self.tools.index(tool) == tool_to_use else " "} {self.tools.index(tool)}.- {tool["description"]}\n' for tool in self.tools]) +
+            f"\n> Question: {question}\n> Raw answer: '{tool_to_use}'\n> Tool ID: {tool_to_use}", "LIST OF DATA TOOLS"
+            )
 
             tool_tup = (tool_to_use, tool)
 
@@ -306,7 +311,7 @@ class Agent:
                                   max_tokens = 1000, 
                                   temperature = 0.0, gpt4=True)
 
-            if self.verbose > 0:
+            if self.verbose > 2:
                 print_op("Q:", question)
                 print_op("I:", tool_inputs)
                 print_op("A:", answer)

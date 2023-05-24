@@ -82,6 +82,5 @@ if __name__ == "__main__":
         inp = input(last+"Human: ")
         return_value = label.run(inp, conversation_history)
         conversation_history = return_value[1]
-        print("ENTIRE RETURN VALUE IS", return_value)
         print(return_value[2])
         last = "AI: "+str(return_value[0]) + "\n"
