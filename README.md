@@ -73,6 +73,7 @@ $ python3 src/llm_vm/completion/test_optimize.py
 ```
 
 There are three agents: FLAT, REBEL, and BACKWARD_CHAINING. 
+
 Run the agents separately by going into the `src/llm_vm/agents/<AGENT_FOLDER>` and running the file that is 
 titled `agent.py`. 
 
