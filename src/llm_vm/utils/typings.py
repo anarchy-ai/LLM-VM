@@ -1,3 +1,8 @@
+"""
+This file contains various machine learning classes and variables 
+for training and API calls to OpenAI. 
+"""
+
 from typing import Tuple, List, Dict, TypedDict, Union, Any, Optional
 from enum import Enum
 

@@ -1,3 +1,8 @@
+"""
+This file contains common tools (JSON API request objects) that are used
+for all the agents to retrieve information for questions across various topics. 
+"""
+
 import os 
 import sys
 

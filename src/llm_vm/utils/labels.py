@@ -1,3 +1,6 @@
+"""
+This file contains a list of constants that represent tags for JSON objects. 
+"""
 
 # REBEL & BACKWARD_CHAINING LABELS 
 TOOL_ID = "ID"
