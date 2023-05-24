@@ -1,3 +1,15 @@
+"""
+This Python script runs the REBEL agent, which takes into account of multiple questions within a 
+single user input. 
+The user is prompted to enter a question, to which the AI responds. 
+If multiple questions are present, the script splits these into different subquestions and retrieves 
+answers from the respective API.  
+The script also takes into account of previous prompts as context, in case the user may 
+enter related questions later.  
+The user will also see messages regarding which API for information was chosen and the 
+price of the API call.  
+"""
+
 import os
 import sys
 

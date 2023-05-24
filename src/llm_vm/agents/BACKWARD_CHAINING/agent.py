@@ -1,3 +1,13 @@
+"""
+This Python script runs the BACKWARD_CHAINING agent, which takes into account of stable context
+and dynamic parameters to feed into the LLM model for more accurate results.  
+The script also takes into account of previous prompts in its memory as context for questions the 
+user may input later. 
+The user is prompted to enter a question, to which the AI responds. 
+The user will also see messages regarding which API for information was chosen and the 
+price of the API call.  
+"""
+
 # run standalone like "python3 -m matt_agent.goal_chatgpt_simple_agent"
 from operator import index
 import os 
