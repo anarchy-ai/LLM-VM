@@ -1,10 +1,10 @@
-from REBEL.agent import * 
-from BACKWARD_CHAINING.goal_chatgpt_simple_agent import * 
+import REBEL.agent 
+import BACKWARD_CHAINING.agent
+import keys  
 
 def call_agent():
     print("Try out any agent!")
 
-    
     # stores user input for which agent to try out 
     model_choice = 0 
 
@@ -18,15 +18,17 @@ def call_agent():
 
     # FLAT 
     if model_choice == 1:
+        # TODO: Add agent call here when FLAT is fixed
         pass
     # REBEL
     elif model_choice == 2:
-        tools = buildGenericTools()
-        agent = Agent(OPENAI_DEFAULT_KEY, tools, verbose = 1)
+        tools = REBEL.agent.buildGenericTools()
+        agent = REBEL.agent.Agent(keys.OPENAI_DEFAULT_KEY, tools, verbose = 1)
     # BACKWARD_CHAINING 
     elif model_choice == 3:
-        tools = buildGenericTools()
-        agent = Agent(OPENAI_DEFAULT_KEY, tools, verbose = 1)
+        tools = BACKWARD_CHAINING.agent.buildGenericTools()
+        agent = BACKWARD_CHAINING.agent.Agent(keys.OPENAI_DEFAULT_KEY, tools, verbose = 1)
+        pass
 
     pass 
 
