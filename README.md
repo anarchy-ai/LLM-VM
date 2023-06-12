@@ -5,10 +5,11 @@ This is an LLM agnostic JIT for natural language. Specifically, it uses LLMs to 
 This is still in BETA.  Very little attention has been paid to package structure.  Expect it to change.
 
 ## Running/Testing
+The following instructions assume you have a venv running. See https://docs.python.org/3/library/venv.html for help.
 
 ```bash
 $ echo "OPENAI_KEY=<YOUROPENAIKEY>" >> .env
-$ pip3 --install requirements.txt
+$ pip3 install -r requirements.txt
 $ python3 src/llm_vm/completion/test_optimize.py
 ```
 
