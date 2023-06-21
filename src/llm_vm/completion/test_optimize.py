@@ -100,7 +100,10 @@ def create_jsonl_file(data_list: list, file_name: str, compress: bool = True) ->
 '''
 
 if __name__ == "__main__":
-    load_dotenv()
+    try:
+        load_dotenv()
+    except:
+        pass
     openai.api_key = os.getenv('OPENAI_KEY')
     anarchy_key = os.getenv('ANARCHY_KEY')
     print("key:", openai.api_key)
@@ -109,6 +112,9 @@ if __name__ == "__main__":
     #                            anarchy_key = anarchy_key, 
     #                            MIN_TRAIN_EXS=2)
     i = 0
+
+    optimizer.complete("What is the currency in ","myanmmar", temperature = 0.0)
+    '''
     for h in haskell.splitlines():
         print("At: ", i)
         try:
@@ -120,3 +126,4 @@ if __name__ == "__main__":
         if i > 3 and i < 20:
             time.sleep(120)
         i += 1
+    '''

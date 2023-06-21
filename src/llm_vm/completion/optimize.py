@@ -164,7 +164,7 @@ class LocalOptimizer(Optimizer):
         completion, train = self.complete_delay_train(stable_context, dynamic_prompt, **kwargs)
         train()
         return completion
-
+    
     def complete_delay_train(self, stable_context, dynamic_prompt, c_id = None, **kwargs):
         """
         Runs a completion using the string stable_context+dynamic_prompt.  Returns an optional training closure to use if the 
@@ -191,7 +191,6 @@ class LocalOptimizer(Optimizer):
         """
         assert dynamic_prompt.strip() != ""
         assert stable_context.strip() != ""
-
         prompt = (stable_context + dynamic_prompt).strip()
         c_id = str({'stable_context' : stable_context, 
                     'args' : kwargs, 
@@ -207,7 +206,7 @@ class LocalOptimizer(Optimizer):
         if model is not None:
             print("Using the new model:", model, flush=True)
             completion = self.call_small(prompt = dynamic_prompt.strip(), model=model, **kwargs)
-            
+     
         training_exs = self.storage.get_data(c_id)
         
         best_completion_promise = None
@@ -216,14 +215,29 @@ class LocalOptimizer(Optimizer):
             def promiseCompletion():
                 best_completion = self.call_big(prompt, **kwargs)
                 def actual_train(use_completion = None):
-                    train_completion = best_completion if use_completion is None else use_completion
-                    new_datapoint = (dynamic_prompt.strip(), train_completion)
-                    self.storage.add_example(c_id, new_datapoint)
-                    training_exs = self.storage.get_data(c_id)
-                    print("Considering Fine-tuning", flush=True)
+                    def data_synthesis(prompt, response, **kwargs):
+                        final_prompt = '{"prompt": "' +prompt+'"  , "response": "' +response+'" }'+'\nGenerate 100 more JSONS each with a prompt and response field like the given one. The content of the prompt and response fields must be similar to the given JSON. Seperate each JSON with a ,.'
+                        data=self.call_big(final_prompt , kwargs)
+                        datapoints = []
+                        data = '{ "datapoints": ['+data+']}'
+                        print(data)
+                        data = json.loads(data)
+                        for i in data["datapoints"]:
+                            datapoints.append((i["prompt"],i["response"]))
+                        return datapoints
 
+                    train_completion = best_completion if use_completion is None else use_completion
+                    new_datapoint = (prompt.strip(), train_completion)
+                    self.storage.add_example(c_id, new_datapoint)
+                    for j in data_synthesis(prompt,best_completion):
+                        self.storage.add_example(c_id, j)
+                    training_exs = self.storage.get_data(c_id)
+                    
+                    print("Considering Fine-tuning", flush=True)
+                    
                     if len(training_exs) >= self.MIN_TRAIN_EXS and not self.storage.get_training_in_progress_set_true(c_id):
                         print("Actually Fine-tuning", flush=True)
+                        print("Training examples:",str(len(training_exs)))
                         def train_with():
                             old_model = self.storage.get_model(c_id)
                             training_file = create_jsonl_file(self.storage.get_data(c_id))
@@ -255,10 +269,13 @@ class LocalOptimizer(Optimizer):
                 return (best_completion, actual_train)
 
             best_completion_promise = asyncStart(promiseCompletion)
+
             if completion is None:
                 # crazy story: succeed_train gets set before this anyway if it makes sense to set it!
                 completion, succeed_train = asyncAwait(best_completion_promise)
-            
+            print(completion)
+        
+
         def succeed_train_closure(use_completion = None):
             def promise():
                 if succeed_train is not None:
@@ -271,6 +288,9 @@ class LocalOptimizer(Optimizer):
             return asyncStart(promise)
 
         return completion, succeed_train_closure
+    
+   
+    
 
 def create_jsonl_file(data_list):
     out = tempfile.TemporaryFile('w+')
@@ -278,3 +298,5 @@ def create_jsonl_file(data_list):
         out.write(json.dumps({'prompt': a, 'completion': b}) + "\n")
     out.seek(0)
     return out
+
+
