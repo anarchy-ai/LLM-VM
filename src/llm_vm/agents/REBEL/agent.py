@@ -1,13 +1,13 @@
 """
-This Python script runs the REBEL agent, which takes into account of multiple questions within a 
-single user input. 
-The user is prompted to enter a question, to which the AI responds. 
-If multiple questions are present, the script splits these into different subquestions and retrieves 
-answers from the respective APIs.  
-The script also takes into account of previous prompts as history, in case the user may 
-enter related questions later.  
-The user will also see messages regarding which API for information was chosen and the 
-price of the API call.  
+This Python script runs the REBEL agent, which takes into account of multiple questions within a
+single user input.
+The user is prompted to enter a question, to which the AI responds.
+If multiple questions are present, the script splits these into different subquestions and retrieves
+answers from the respective APIs.
+The script also takes into account of previous prompts as history, in case the user may
+enter related questions later.
+The user will also see messages regarding which API for information was chosen and the
+price of the API call.
 """
 
 import os
@@ -30,8 +30,9 @@ import json
 import random
 
 # UNCOMMENT THESE IMPORTS SO THAT SUBQUESTION PORTION CAN WORK (NLP CURRENTLY NOT RECOGNIZED)
-# import spacy
-# nlp =  spacy.load("en_core_web_md")
+import spacy
+
+nlp = spacy.load("en_core_web_md")
 
 from math import sqrt, pow, exp
 
@@ -80,26 +81,26 @@ def buildGenericTools(tools=GENERIC_TOOLS):
                 ("What's the date", "July 7, 2009"),
             ],
             "How crowded is it there now?",
-            '{"q": "How many tourists visit Mallorca each July?"}',
+            '{"input": "How many tourists visit Mallorca each July?"}',
         ),
         (
             [
                 ("What is the circumference of a basketball?", "750mm"),
             ],
             "What is the volume of a basketball?",
-            '{"q": "What is the volume of a ball with circumference 750mm?"}',
+            '{"input": "What is the volume of a ball with circumference 750mm?"}',
         ),
         (
             [
                 ("What's the fastest a ford explorer can drive?", "160mph"),
             ],
             "What is that multiplied by seventy?",
-            '{"q": "160 x 70"}',
+            '{"input": "160 x 70"}',
         ),
         (
             [],
             "Is 5073 raised to the 3rd power divisible by 73?",
-            '{"q": "Is 5073^3 divisible by 73?"}',
+            '{"input": "Is 5073^3 divisible by 73?"}',
         ),
     ]
 
@@ -452,10 +453,16 @@ class Agent:
         tool_to_use = tool_picker(self.tools, question, 0)
 
         # TODO: UNCOMMENT PRINT STATEMENT WHEN SPACY WORKS FOR INTERFACE CONSISTENCY (NEEDS TO BE TESTED)
-        # print_big(
-        #     "".join([f'{"✓" if self.tools.index(tool) == tool_to_use else " "} {self.tools.index(tool)}.- {tool["description"]}\n' for tool in self.tools]) +
-        #     f"\n> Question: {question}\n> Raw answer: '{tool_to_use}'\n> Tool ID: {tool_to_use}", "LIST OF DATA TOOLS"
-        # )
+        print_big(
+            "".join(
+                [
+                    f'{"✓" if self.tools.index(tool) == tool_to_use else " "} {self.tools.index(tool)}.- {tool["description"]}\n'
+                    for tool in self.tools
+                ]
+            )
+            + f"\n> Question: {question}\n> Raw answer: '{tool_to_use}'\n> Tool ID: {tool_to_use}",
+            "LIST OF DATA TOOLS",
+        )
 
         self.price += tool_to_use[0]
         try:
