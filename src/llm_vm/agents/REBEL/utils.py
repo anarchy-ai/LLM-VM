@@ -166,3 +166,84 @@ def replace_variables_for_values(
                 formatted_value = value
         replaced_dict[formatted_key] = formatted_value
     return replaced_dict
+
+
+def tool_api_call(self, tool, gpt_suggested_input, question, memory, facts, query=""):
+    if query == "":
+        query = question
+
+    if gpt_suggested_input[0] != "{":
+        gpt_suggested_input = "{" + gpt_suggested_input
+    if gpt_suggested_input[-1] != "}":
+        gpt_suggested_input += "}"
+
+    if self.verbose > 1:
+        print_op("GPT SUGGESTED INPUT:", gpt_suggested_input)
+
+    parsed_gpt_suggested_input = json.loads(gpt_suggested_input)
+
+    # make sure all of the suggested fields exist in the tool desc
+    for i in parsed_gpt_suggested_input.keys():
+        if i not in tool["dynamic_params"].keys():
+            raise Exception("Bad Generated Input")
+    tool_args = replace_variables_for_values(tool["args"], parsed_gpt_suggested_input)
+
+    url = tool_args["url"]
+    if self.verbose > -1:
+        print_op(tool["method"] + ":", url)
+
+    if "auth" in tool_args and isinstance(tool_args["auth"], dict):
+        auths = list(tool_args["auth"].items())
+        if len(auths) > 0:
+            tool_args["auth"] = list(tool_args["auth"].items())[0]
+        else:
+            del tool_args["auth"]
+
+    # Remove those parameters that are not part of Python's `requests` function.
+    tool_args.pop("jsonParams", None)
+    tool_args.pop("urlParams", None)
+
+    if self.verbose > -1:
+        print_op("ARGS: ", tool_args)
+
+    resp = (requests.get if tool["method"] == "GET" else requests.post)(**tool_args)
+
+    # print_op("FINAL URL: (" + tool["method"] + ") ", resp.url)
+
+    actual_call = str(tool_args)
+
+    if resp.status_code in [404, 401, 500]:
+        er = " => " + str(resp.status_code)
+        return "This tool isn't working currently" + er
+
+    ret = str(resp.text)
+    if self.verbose > 4:
+        print(ret)
+    try:
+        ret = str(json.loads(ret))
+    except:
+        pass
+
+    if len(ret) > 10000:
+        ret = ret[0:10000]
+    mem = "".join(
+        [
+            self.makeInteraction(p, a, "P", "AI", INTERACTION="Human-AI")
+            for p, a in memory
+        ]
+    ) + "".join(
+        [self.makeInteraction(p, a, "P", "AI", INTERACTION="AI-AI") for p, a in facts]
+    )
+
+    prompt = MSG("system", "You are a good and helpful bot" + self.bot_str)
+    prompt += MSG(
+        "user",
+        mem
+        + "\nQ:"
+        + query
+        + "\n An api call about Q returned:\n"
+        + ret
+        + "\nUsing this information, what is the answer to Q?",
+    )
+    a = call_ChatGPT(self, prompt, stop="</AI>", max_tokens=256).strip()
+    return a
