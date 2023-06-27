@@ -8,6 +8,8 @@ import tempfile
 import abc
 import requests
 import hashlib
+import pickle
+import data_synthesis
 
 def generate_hash(input_string):
     sha256_hash = hashlib.sha256()
@@ -35,6 +37,14 @@ class local_ephemeral:
     def get_data(self, c_id):
         self.init_if_null(c_id)
         return self.training_store[c_id]["data"]
+    
+    def load_data(self,file):
+        #using pickle files right now, in the future we will have to use databases
+        self.training_store = pickle.load(file)
+
+    def store_data(self,file):
+         #using pickle files right now, in the future we will have to use databases
+        pickle.dump(self.training_store,file)
 
     def add_example(self, c_id, example):
         self.init_if_null(c_id)
@@ -159,13 +169,14 @@ class LocalOptimizer(Optimizer):
         self.MAX_TRAIN_EXS = MAX_TRAIN_EXS
         self.call_small = call_small
         self.call_big = call_big
+        self.data_synthesizer = data_synthesis.DataSynthesis(0,100)
 
-    def complete(self, stable_context, dynamic_prompt, **kwargs):
-        completion, train = self.complete_delay_train(stable_context, dynamic_prompt, **kwargs)
+    def complete(self, stable_context, dynamic_prompt, data_synthesis = False, **kwargs):
+        completion, train = self.complete_delay_train(stable_context, dynamic_prompt, run_data_synthesis=data_synthesis, **kwargs)
         train()
         return completion
-
-    def complete_delay_train(self, stable_context, dynamic_prompt, c_id = None, **kwargs):
+    
+    def complete_delay_train(self, stable_context, dynamic_prompt, run_data_synthesis = False, c_id = None, **kwargs):
         """
         Runs a completion using the string stable_context+dynamic_prompt.  Returns an optional training closure to use if the 
         caller decides that the completion was particularly good.
@@ -191,7 +202,6 @@ class LocalOptimizer(Optimizer):
         """
         assert dynamic_prompt.strip() != ""
         assert stable_context.strip() != ""
-
         prompt = (stable_context + dynamic_prompt).strip()
         c_id = str({'stable_context' : stable_context, 
                     'args' : kwargs, 
@@ -207,7 +217,7 @@ class LocalOptimizer(Optimizer):
         if model is not None:
             print("Using the new model:", model, flush=True)
             completion = self.call_small(prompt = dynamic_prompt.strip(), model=model, **kwargs)
-            
+     
         training_exs = self.storage.get_data(c_id)
         
         best_completion_promise = None
@@ -216,14 +226,24 @@ class LocalOptimizer(Optimizer):
             def promiseCompletion():
                 best_completion = self.call_big(prompt, **kwargs)
                 def actual_train(use_completion = None):
+                   
                     train_completion = best_completion if use_completion is None else use_completion
                     new_datapoint = (dynamic_prompt.strip(), train_completion)
                     self.storage.add_example(c_id, new_datapoint)
+                   
+                    if run_data_synthesis:
+                        if len(self.storage.get_data(c_id)) < 5:
+                            print("Data synthesis is not available right now, need more examples in storage.")
+                        else:
+                            for j in self.data_synthesizer.data_synthesis(self,prompt,best_completion):
+                                self.storage.add_example(c_id, j)
                     training_exs = self.storage.get_data(c_id)
+                    
                     print("Considering Fine-tuning", flush=True)
-
+                    
                     if len(training_exs) >= self.MIN_TRAIN_EXS and not self.storage.get_training_in_progress_set_true(c_id):
                         print("Actually Fine-tuning", flush=True)
+                        print("Training examples:",str(len(training_exs)))
                         def train_with():
                             old_model = self.storage.get_model(c_id)
                             training_file = create_jsonl_file(self.storage.get_data(c_id))
@@ -255,10 +275,13 @@ class LocalOptimizer(Optimizer):
                 return (best_completion, actual_train)
 
             best_completion_promise = asyncStart(promiseCompletion)
+
             if completion is None:
                 # crazy story: succeed_train gets set before this anyway if it makes sense to set it!
                 completion, succeed_train = asyncAwait(best_completion_promise)
-            
+            print(completion)
+        
+
         def succeed_train_closure(use_completion = None):
             def promise():
                 if succeed_train is not None:
@@ -271,6 +294,9 @@ class LocalOptimizer(Optimizer):
             return asyncStart(promise)
 
         return completion, succeed_train_closure
+    
+   
+    
 
 def create_jsonl_file(data_list):
     out = tempfile.TemporaryFile('w+')
@@ -278,3 +304,5 @@ def create_jsonl_file(data_list):
         out.write(json.dumps({'prompt': a, 'completion': b}) + "\n")
     out.seek(0)
     return out
+
+
