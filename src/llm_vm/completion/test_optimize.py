@@ -113,7 +113,7 @@ if __name__ == "__main__":
     #                            MIN_TRAIN_EXS=2)
     i = 0
 
-    optimizer.complete("What is the currency in ","myanmmar", temperature = 0.0)
+    optimizer.complete("Answer question Q.","Q: What is the currency in myanmmar", temperature = 0.0, data_synthesis = True)
     '''
     for h in haskell.splitlines():
         print("At: ", i)

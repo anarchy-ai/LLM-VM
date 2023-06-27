@@ -8,6 +8,8 @@ import tempfile
 import abc
 import requests
 import hashlib
+import pickle
+import data_synthesis
 
 def generate_hash(input_string):
     sha256_hash = hashlib.sha256()
@@ -35,6 +37,14 @@ class local_ephemeral:
     def get_data(self, c_id):
         self.init_if_null(c_id)
         return self.training_store[c_id]["data"]
+    
+    def load_data(self,file):
+        #using pickle files right now, in the future we will have to use databases
+        self.training_store = pickle.load(file)
+
+    def store_data(self,file):
+         #using pickle files right now, in the future we will have to use databases
+        pickle.dump(self.training_store,file)
 
     def add_example(self, c_id, example):
         self.init_if_null(c_id)
@@ -159,13 +169,14 @@ class LocalOptimizer(Optimizer):
         self.MAX_TRAIN_EXS = MAX_TRAIN_EXS
         self.call_small = call_small
         self.call_big = call_big
+        self.data_synthesizer = data_synthesis.DataSynthesis(0,100)
 
-    def complete(self, stable_context, dynamic_prompt, **kwargs):
-        completion, train = self.complete_delay_train(stable_context, dynamic_prompt, **kwargs)
+    def complete(self, stable_context, dynamic_prompt, data_synthesis = False, **kwargs):
+        completion, train = self.complete_delay_train(stable_context, dynamic_prompt, run_data_synthesis=data_synthesis, **kwargs)
         train()
         return completion
     
-    def complete_delay_train(self, stable_context, dynamic_prompt, c_id = None, **kwargs):
+    def complete_delay_train(self, stable_context, dynamic_prompt, run_data_synthesis = False, c_id = None, **kwargs):
         """
         Runs a completion using the string stable_context+dynamic_prompt.  Returns an optional training closure to use if the 
         caller decides that the completion was particularly good.
@@ -215,22 +226,17 @@ class LocalOptimizer(Optimizer):
             def promiseCompletion():
                 best_completion = self.call_big(prompt, **kwargs)
                 def actual_train(use_completion = None):
-                    def data_synthesis(prompt, response, **kwargs):
-                        final_prompt = '{"prompt": "' +prompt+'"  , "response": "' +response+'" }'+'\nGenerate 100 more JSONS each with a prompt and response field like the given one. The content of the prompt and response fields must be similar to the given JSON. Seperate each JSON with a ,.'
-                        data=self.call_big(final_prompt , kwargs)
-                        datapoints = []
-                        data = '{ "datapoints": ['+data+']}'
-                        print(data)
-                        data = json.loads(data)
-                        for i in data["datapoints"]:
-                            datapoints.append((i["prompt"],i["response"]))
-                        return datapoints
-
+                   
                     train_completion = best_completion if use_completion is None else use_completion
-                    new_datapoint = (prompt.strip(), train_completion)
+                    new_datapoint = (dynamic_prompt.strip(), train_completion)
                     self.storage.add_example(c_id, new_datapoint)
-                    for j in data_synthesis(prompt,best_completion):
-                        self.storage.add_example(c_id, j)
+                   
+                    if run_data_synthesis:
+                        if len(self.storage.get_data(c_id)) < 5:
+                            print("Data synthesis is not available right now, need more examples in storage.")
+                        else:
+                            for j in self.data_synthesizer.data_synthesis(self,prompt,best_completion):
+                                self.storage.add_example(c_id, j)
                     training_exs = self.storage.get_data(c_id)
                     
                     print("Considering Fine-tuning", flush=True)
