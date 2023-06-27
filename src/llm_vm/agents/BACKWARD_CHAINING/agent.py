@@ -19,7 +19,7 @@ import json
 from llama_index import (
     Document,
     LLMPredictor,
-    GPTSimpleVectorIndex,
+    GPTVectorStoreIndex,
     PromptHelper,
     GPTTreeIndex,
 )
