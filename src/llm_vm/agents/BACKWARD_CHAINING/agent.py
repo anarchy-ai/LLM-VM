@@ -16,7 +16,7 @@ from urllib.parse import urlencode
 import urllib.parse as urlparse
 import openai
 import json
-from gpt_index import (
+from llama_index import (
     Document,
     LLMPredictor,
     GPTSimpleVectorIndex,
