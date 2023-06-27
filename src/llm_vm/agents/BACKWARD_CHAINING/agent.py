@@ -145,77 +145,7 @@ class Agent:
         self.tools += tools
 
     def use_tool(self, tool, gpt_suggested_input, question, memory):
-        if self.verbose > 1:
-            print_op("GPT SUGGESTED INPUT:", gpt_suggested_input)
-
-        tool_args = deep_fmap(lambda s: s.format(**gpt_suggested_input), tool["args"])
-
-        url = tool_args["url"]
-        if self.verbose > -1:
-            print_op(tool["method"] + ":", url)
-
-        if "auth" in tool_args and isinstance(tool_args["auth"], dict):
-            auths = list(tool_args["auth"].items())
-            if len(auths) > 0:
-                tool_args["auth"] = list(tool_args["auth"].items())[0]
-            else:
-                del tool_args["auth"]
-
-        print_op("ARGS: ", tool_args)
-        resp = (requests.get if tool["method"] == "GET" else requests.post)(**tool_args)
-        print_op("FINAL URL: (" + tool["method"] + ") ", resp.url)
-
-        actual_call = str(tool_args)
-
-        if resp.status_code in [404, 401, 500]:
-            er = " => " + str(resp.status_code)
-            return (
-                "This tool isn't working currently" + er,
-                str(url) + er,
-                actual_call + er,
-            )
-
-        ret = str(resp.text)
-
-        if self.verbose > -1:
-            pass
-            # commented out, causes test cases to fail because the return json of some wolfram alpha searches contains character encodings that charmap does not know.
-            # leads to error being thrown.
-            # print_op("URL Response:", ret)
-
-        try:
-            ret = str(json.loads(ret))
-        except:
-            pass
-
-        if len(ret) > 8000:
-            prompt = f"<DOC>{ret}</DOC><QUERY>{question}</QUERY><RESULT>"
-
-            ret = call_ChatGPT(
-                self,
-                MSG("system", prompt),
-                max_tokens=40,
-                temperature=0,
-                stop="</RESULT>",
-                gpt4=True,
-            )
-            """
-            document = Document(ret)
-            try:
-                if self.verbose > 2:
-                    print_op("### Summarising with GPT Tree Index ...")
-                ret = GPTTreeIndex([document]).query(
-                    question, response_mode="tree_summarize")
-            except:
-                return "OpenAI is down!", url, actual_call
-
-            if self.verbose > 2:
-                print_op("SUMMARISED:", ret)
-
-            if str(ret).find("ANSWER: ") == 0:
-                ret = str(ret)[len("ANSWER: X."):].strip(" .")
-            """
-        return ret, url, actual_call
+        return tool_api_call(self, tool, gpt_suggested_input, question, memory)
 
     def run(self, question, memory):
         self.price = 0
