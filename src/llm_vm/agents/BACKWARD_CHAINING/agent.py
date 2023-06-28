@@ -94,6 +94,20 @@ class Agent:
         set_api_key(WOLFRAM_KEY, "WOLFRAM_KEY")
 
     def makeToolDesc(self, tool_id):
+        """
+        Creates a tool description that contains the relevant tags according to the dynamic params
+
+        Parameters
+        ----------
+        tool_id
+            the tool's enum value as specified in the DefaultTools class
+
+        Returns
+        ----------
+        String
+            a formatted string with tags containing the tool_id, description and params
+        """
+
         tool = self.tools[tool_id]
         params = (
             "{"
@@ -113,6 +127,19 @@ class Agent:
         )
 
     def set_tools(self, tools):
+        """
+        Adds all the available tools when the class is initialized.
+
+        Parameters
+        ----------
+        tools
+            a list of available tools. Each tool is defined within a Dict.
+
+        Returns
+        ----------
+        None
+        """
+
         self.tools = [
             {
                 "BUILTIN": "MEM",
@@ -145,9 +172,45 @@ class Agent:
         self.tools += tools
 
     def use_tool(self, tool, gpt_suggested_input, question, memory):
+        """
+        Calls the appropriate API based on the tool that's in use.
+
+        Parameters
+        ----------
+        tool
+            an integer refencing the selected tool
+        gpt_suggested_input
+            the input params for the selected tool as specified by the gpt response
+        question
+            the user's input question
+        memory
+            a list of tuples containing the conversation history
+
+        Returns
+        ----------
+        String
+            Response text after calling API tool and passing result into ChatGPT prompt
+        """
+
         return tool_api_call(self, tool, gpt_suggested_input, question, memory)
 
     def run(self, question, memory):
+        """
+        Runs the Agent on the given inputs
+
+        Parameters
+        ----------
+        question
+            the user's input question
+        memory
+            a list of tuples containing the conversation history
+
+        Returns
+        ----------
+        Tuple
+            a tuple containing the Agent's answer and a list of the conversation history
+        """
+
         self.price = 0
 
         # question = disambiguate(self, question, memory)
@@ -163,11 +226,51 @@ class Agent:
         return (ans[0], memory + [(question, ans[0])], ans[1], ans[2])
 
     def makeInteraction(self, p, a, Q="HUMAN", A="AI", INTERACTION=INTERACTION):
+        """
+        Formats the tool description to contain the relevant tags according to the dynamic params
+
+        Parameters
+        ----------
+        p
+            the question being asked
+        a
+            the gpt response
+        Q
+            the entity asking the question. Could be HUMAN or AI.
+        A
+            the entity answering the question. Could be HUMAN or AI.
+        INTERACTION
+            the type of interaction. Could be HUMAN-AI or AI-AI.
+
+        Returns
+        ----------
+        String
+            a formatted string with tags containing the type of interaction, the question and the gpt response
+        """
+
         return f"<{INTERACTION}><{Q}>{p}</{Q}><{A}>" + (
             f"{a}</{A}></{INTERACTION}>" if a is not None else ""
         )
 
     def promptf(self, question, memory, utility):
+        """
+        Formats the gpt prompt to include conversation history and logs responses to the console
+
+        Parameters
+        ----------
+        question
+            the user's input question
+        memory
+            a list of tuples containing the conversation history
+        utility
+            a string that's appended to the prompt to indicate the user input that gpt is responding to
+
+        Returns
+        ----------
+        Tuple
+            a tuple containing the gpt response and a list with the conversation history
+        """
+
         if self.verbose > 2:
             print_op("OrigQ:", question)
 
@@ -335,7 +438,7 @@ class Agent:
             )
 
             answer = call_ChatGPT(
-                self, prompt, max_tokens=1000, temperature=0.0, gpt4=True
+                self, prompt, max_tokens=1000, temperature=0.0, gpt4=False
             )
 
             if self.verbose > 2:
@@ -347,6 +450,7 @@ class Agent:
 
 # print_op(google(' {"question": ""}'))
 if __name__ == "__main__":
+    openai.api_key = os.environ["OPENAI_API_KEY"]
     tools = []
     a = Agent(openai.api_key, buildGenericTools(GENERIC_TOOLS) + tools, verbose=1)
     mem = []
