@@ -2,7 +2,7 @@ import json
 import openai
 import time
 import os
-from typings import *
+from typings_llm import *
 from models.helpers.check_model_status import check_model_status
 
 __START_LABEL    = " 🎛️  Creating model..."

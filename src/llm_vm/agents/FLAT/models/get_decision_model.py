@@ -1,4 +1,4 @@
-from typings import *
+from typings_llm import *
 import os
 import json
 

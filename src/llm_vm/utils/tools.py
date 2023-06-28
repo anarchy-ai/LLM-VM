@@ -14,23 +14,23 @@ sys.path.append(utils_dir)
 
 from keys import *
 from labels import *
-from typings import *
+from typings_llm import *
 
 CUSTOM_TOOL_ANSWER_EMBEDDING = "/answer_embedding"
 
 
 def __get_generic_tools():
     # wolfram
-    wolfram_tool = {
-        'description': "Useful to query questions about people, events, anything that can change, complicated math, live data retrieval, current date and other data.",
-        'id': DefaultTools.WOLFRAM.value,
-        'dynamic_params': {"input": 'The natural language input query'},
-        'method': 'GET',
-        'args': {
-            'url': "http://api.wolframalpha.com/v2/query",
-            'params': {'appid': WOLFRAM_KEY, 'input': '{input}'}
-        },
-    }
+    google_tool = {
+               'description': "The tool returns the results of free-form queries similar to those used for wolfram alpha. This is useful for complicated math or live data retrieval.  Can be used to get the current date.",
+               'dynamic_params': {"q": 'The natural language input query'},
+               'method': 'GET',
+               'args': {'url': "https://www.googleapis.com/customsearch/v1",
+                         'params': {'key': GOOGLE_KEY,
+                                    'cx' : GOOGLE_CX,
+                                    'q': '{q}'}
+                        }
+               }
 
     # geopy
     directions_tool = {
@@ -87,7 +87,7 @@ def __get_generic_tools():
         }
     }
 
-    return [wolfram_tool, directions_tool, weather_tool]
+    return [google_tool, directions_tool, weather_tool]
 
 
 GENERIC_TOOLS = __get_generic_tools()

@@ -1,4 +1,4 @@
-from typings import *
+from typings_llm import *
 import os
 import json
 from agent_helper.utils import verbose_answer

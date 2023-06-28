@@ -1,5 +1,5 @@
 import json
-from typings import *
+from typings_llm import *
 from agent_helper.utils import *
 from agent_helper.bothandler import question_split, pick_tool, check_can_answer_from_memory, generate_convo_history, prompt_for_answer, get_newest_decision_model
 from agent_helper.use_tool import use_tool

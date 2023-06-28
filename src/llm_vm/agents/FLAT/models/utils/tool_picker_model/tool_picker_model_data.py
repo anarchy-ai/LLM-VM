@@ -1,4 +1,4 @@
-from typings import *
+from typings_llm import *
 import json
 import os
 from agent_helper.tool_utils import get_training_tool_subset

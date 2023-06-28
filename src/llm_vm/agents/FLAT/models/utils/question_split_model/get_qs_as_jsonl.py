@@ -1,6 +1,6 @@
 from agent_helper.tool_utils import splitter_prompt
 from agent_helper.labels import *
-from typings import *
+from typings_llm import *
 from models.utils.question_split_model.question_split_model_data import question_splitter_data
 
 def __construct_question_split_jsonl(data: List[QuestionSplitModelData]) -> List[PromptModelEntry]:

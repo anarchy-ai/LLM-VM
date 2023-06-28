@@ -35,7 +35,7 @@ from keys import *
 from print_types import *
 from labels import *
 from tools import *
-from typings import *
+from typings_llm import *
 
 try:
     from .utils import *

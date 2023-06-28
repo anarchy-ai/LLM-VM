@@ -1,7 +1,7 @@
 import json
 from agent_helper.tool_utils import create_memory_prompt, make_tool_input_case
 from agent_helper.labels import *
-from typings import *
+from typings_llm import *
 from random import shuffle
 from models.utils.tool_input_model.tool_input_model_data import tool_input_data
 

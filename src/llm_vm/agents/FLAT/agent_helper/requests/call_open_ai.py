@@ -1,6 +1,6 @@
 import openai
 import os
-from typings import *
+from typings_llm import *
 
 def __tokens_to_dollars(usage) -> float:
     return float(usage)/1000*0.02

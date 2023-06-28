@@ -1,7 +1,7 @@
 import re
 import openai
 import random
-from typings import *
+from typings_llm import *
 from .requests.call_llm import call_llm
 
 from .tools import *

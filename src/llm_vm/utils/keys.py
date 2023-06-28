@@ -20,8 +20,8 @@ import openai
 
 OPENAI_DEFAULT_KEY =os.environ["OPENAI_API_KEY"]
 GOOGLE_MAPS_KEY = os.environ["GOOGLE_MAPS_KEY"]
-SERPAPI_KEY = os.environ["SERPAPI_KEY"]
-WOLFRAM_KEY = os.environ["WOLFRAM_KEY"]
+GOOGLE_KEY = os.environ["GOOGLE_KEY"]
+GOOGLE_CX = os.environ["GOOGLE_CX"]
 
 ###
 # Use this regex to find if a variable is a pure interpolation.
@@ -39,14 +39,14 @@ def set_api_key(key=OPENAI_DEFAULT_KEY, key_type="OPENAI_API_KEY"):
             There are four options:
                 - OPENAI_DEFAULT_KEY 
                 - GOOGLE_MAPS_KEY
-                - SERPAPI_KEY
-                - WOLFRAM_KEY 
+                - GOOGLE_KEY 
+                - GOOGLE_CX
     - key_type: The type of API key. Defaults to "OPENAI_API_KEY".
                 There are four options:
                 - OPENAI_API_KEY
                 - GOOGLE_MAPS_KEY
-                - SERPAPI_KEY
-                - WOLFRAM_KEY 
+                - GOOGLE_KEY
+                - GOOGLE_CX
     """
     os.environ[key_type]=key
 

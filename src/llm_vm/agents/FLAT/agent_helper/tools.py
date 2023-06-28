@@ -9,7 +9,7 @@ sys.path.append(utils_dir)
 
 from keys import *
 from labels import *
-from typings import *
+from typings_llm import *
 from agent_helper.utils import verbose_answer
 
 CUSTOM_TOOL_ANSWER_EMBEDDING = "/answer_embedding"

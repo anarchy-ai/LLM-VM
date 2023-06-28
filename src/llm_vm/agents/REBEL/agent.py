@@ -80,26 +80,26 @@ def buildGenericTools(tools=GENERIC_TOOLS):
                 ("What's the date", "July 7, 2009"),
             ],
             "How crowded is it there now?",
-            '{"input": "How many tourists visit Mallorca each July?"}',
+            '{"q": "How many tourists visit Mallorca each July?"}',
         ),
         (
             [
                 ("What is the circumference of a basketball?", "750mm"),
             ],
             "What is the volume of a basketball?",
-            '{"input": "What is the volume of a ball with circumference 750mm?"}',
+            '{"q": "What is the volume of a ball with circumference 750mm?"}',
         ),
         (
             [
                 ("What's the fastest a ford explorer can drive?", "160mph"),
             ],
             "What is that multiplied by seventy?",
-            '{"input": "160 x 70"}',
+            '{"q": "160 x 70"}',
         ),
         (
             [],
             "Is 5073 raised to the 3rd power divisible by 73?",
-            '{"input": "Is 5073^3 divisible by 73?"}',
+            '{"q": "Is 5073^3 divisible by 73?"}',
         ),
     ]
 
@@ -185,8 +185,8 @@ class Agent:
         # set all the API resource keys to make calls
         set_api_key(openai_key, "OPENAI_API_KEY")
         set_api_key(GOOGLE_MAPS_KEY, "GOOGLE_MAPS_KEY")
-        set_api_key(SERPAPI_KEY, "SERPAPI_KEY")
-        set_api_key(WOLFRAM_KEY, "WOLFRAM_KEY")
+        set_api_key(GOOGLE_KEY, "GOOGLE_KEY")
+        set_api_key(GOOGLE_CX, "GOOGLE_CX")
 
     def makeToolDesc(self, tool_id):
         """

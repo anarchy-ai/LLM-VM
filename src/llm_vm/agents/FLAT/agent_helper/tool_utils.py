@@ -9,7 +9,7 @@ utils_dir = os.path.join(grandparent_dir, 'utils/')
 sys.path.append(utils_dir)
 
 from labels import *
-from typings import *
+from typings_llm import *
 from agent_helper.utils import make_interaction
 from datetime import datetime
 from agent_helper.tools import GENERIC_TOOLS

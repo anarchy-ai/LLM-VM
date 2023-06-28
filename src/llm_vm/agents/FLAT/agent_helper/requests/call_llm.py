@@ -1,4 +1,4 @@
-from typings import *
+from typings_llm import *
 from agent_helper.requests.call_open_ai import call_open_ai
 
 def call_llm(llm_request: LLMCallParams) -> LLMCallReturnType:

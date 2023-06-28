@@ -1,6 +1,6 @@
 from agent_helper.tool_utils import create_memory_prompt
 from agent_helper.labels import *
-from typings import *
+from typings_llm import *
 from models.utils.answer_from_memory_model.answer_from_memory_model_data import answer_from_memory_data
 
 def __construct_answer_from_memory_jsonl(data: List[QuestionSplitModelData]) -> List[PromptModelEntry]:

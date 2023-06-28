@@ -13,7 +13,7 @@ sys.path.append(utils_dir)
 from labels import *
 import random
 from Levenshtein import distance as lev
-from typings import *
+from typings_llm import *
 from bs4 import BeautifulSoup
 
 
