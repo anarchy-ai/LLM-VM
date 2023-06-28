@@ -5,7 +5,6 @@ This is an LLM agnostic JIT for natural language. Specifically, it uses LLMs to 
 This is still in BETA.  Very little attention has been paid to package structure.  Expect it to change.
 
 ## Running/Testing
-<<<<<<< HEAD
 
 The following instructions assume you have a venv running. See <https://docs.python.org/3/library/venv.html> for help.
 
@@ -63,19 +62,14 @@ completion = optimizer.complete(
 print(completion)
 # Haskell:  
 # x = 5
-=======
 ```bash
-$ echo "OPENAI_API_KEY=<YOUR_OPEN_AI_KEY>" >> .env
-$ echo "GOOGLE_MAPS_KEY=<YOUR_GOOGLE_MAPS_KEY>" >> .env
-$ echo "SERPAPI_KEY=<YOUR_ANARCHY_KEY>" >> .env
-$ echo "WOLFRAM_KEY=<YOUR_WOLFRAM_KEY>" >> .env
+$ echo "OPENAI_KEY=<YOUROPENAIKEY>" >> .env
+$ echo "OPENAI_KEY=<YOUROPENAIKEY>" >> .env
 $ pip3 --install requirements.txt
 $ python3 src/llm_vm/completion/test_optimize.py
->>>>>>> dd5d692 (Renamed files for consistency and added some README documentation)
 ```
 
 There are three agents: FLAT, REBEL, and BACKWARD_CHAINING. 
-
 Run the agents separately by going into the `src/llm_vm/agents/<AGENT_FOLDER>` and running the file that is 
 titled `agent.py`. 
 

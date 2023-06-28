@@ -106,17 +106,9 @@ if __name__ == "__main__":
         pass
     openai.api_key = os.getenv('OPENAI_KEY')
     anarchy_key = os.getenv('ANARCHY_KEY')
-<<<<<<< HEAD
-    print("key:", openai.api_key)
-    optimizer = LocalOptimizer(MIN_TRAIN_EXS=2)
-    #optimizer = HostedOptimizer(openai_key = openai.api_key, 
-    #                            anarchy_key = anarchy_key, 
-    #                            MIN_TRAIN_EXS=2)
-=======
     optimizer = HostedOptimizer(openai_key = openai.api_key, 
                                 anarchy_key = anarchy_key, 
                                 MIN_TRAIN_EXS=2)
->>>>>>> 1346bd2 (Removed keys from public view; all three agents work in CLI)
     i = 0
 
     optimizer.complete("Answer question Q.","Q: What is the currency in myanmmar", temperature = 0.0, data_synthesis = True)
