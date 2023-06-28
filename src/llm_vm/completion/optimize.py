@@ -9,7 +9,11 @@ import abc
 import requests
 import hashlib
 import pickle
-import data_synthesis
+
+try:
+    import data_synthesis
+except:
+    from . import data_synthesis
 
 def generate_hash(input_string):
     sha256_hash = hashlib.sha256()
@@ -81,6 +85,7 @@ class local_ephemeral:
 
 
 def CALL_BIG(prompt, gpt4=False, **kwargs):
+    print("HERE",os.getenv("OPENAI_API_KEY"))
     cur_prompt = [{'role': "system", 'content' : prompt}]
     print("CUR_PROMPT:", cur_prompt, flush=True)
     print("KWARGS:", kwargs, flush=True)
@@ -163,17 +168,21 @@ class HostedOptimizer(Optimizer):
         
     
 class LocalOptimizer(Optimizer):
-    def __init__(self, storage=local_ephemeral(), MIN_TRAIN_EXS = 20, MAX_TRAIN_EXS = 2000, call_small = CALL_SMALL, call_big = CALL_BIG):
+    def __init__(self, storage=local_ephemeral(), MIN_TRAIN_EXS = 20, MAX_TRAIN_EXS = 2000, call_small = CALL_SMALL, call_big = CALL_BIG, openai_key=""):
         self.storage = storage
         self.MIN_TRAIN_EXS = MIN_TRAIN_EXS
         self.MAX_TRAIN_EXS = MAX_TRAIN_EXS
         self.call_small = call_small
         self.call_big = call_big
+        self.openai_key = openai_key
         self.data_synthesizer = data_synthesis.DataSynthesis(0,100)
 
-    def complete(self, stable_context, dynamic_prompt, data_synthesis = False, **kwargs):
+    def complete(self, stable_context, dynamic_prompt, data_synthesis = False, finetune = False, **kwargs):
+        openai.api_key = self.openai_key
         completion, train = self.complete_delay_train(stable_context, dynamic_prompt, run_data_synthesis=data_synthesis, **kwargs)
-        train()
+        print(finetune)
+        if finetune:
+            train()
         return completion
     
     def complete_delay_train(self, stable_context, dynamic_prompt, run_data_synthesis = False, c_id = None, **kwargs):
@@ -200,8 +209,11 @@ class LocalOptimizer(Optimizer):
         - succeed_train (function): A closure function that encapsulates the fine-tuning process, ready for 
         execution at a later time.  If you pass it a completion, it will use that, otherwise it will use the completion from the "best" model.
         """
-        assert dynamic_prompt.strip() != ""
-        assert stable_context.strip() != ""
+        assert dynamic_prompt.strip() != "" or stable_context.strip() != ""
+
+        if stable_context.strip() == "" :
+            print("Running with an empty context")
+        
         prompt = (stable_context + dynamic_prompt).strip()
         c_id = str({'stable_context' : stable_context, 
                     'args' : kwargs, 
@@ -225,6 +237,7 @@ class LocalOptimizer(Optimizer):
         if completion is None or len(training_exs) < self.MAX_TRAIN_EXS:
             def promiseCompletion():
                 best_completion = self.call_big(prompt, **kwargs)
+                
                 def actual_train(use_completion = None):
                    
                     train_completion = best_completion if use_completion is None else use_completion
