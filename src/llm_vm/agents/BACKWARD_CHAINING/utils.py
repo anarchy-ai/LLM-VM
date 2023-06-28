@@ -12,63 +12,87 @@ import sys
 import threading
 import time
 
+
 def asyncStart(foo):
     t = (None, None)
+
     def new_thread():
         t[0] = foo()
+
     t[1] = threading.Thread(target=new_thread)
     return t
+
 
 def asyncAwait(t):
     t[1].join()
     return t[0]
 
+
 def flatten(a):
     return sum(a, [])
+
 
 def print_op(*kargs, **kwargs):
     print(*kargs, **kwargs, flush=True)
 
 
 def prepPrintPromptContext(p):
-    return "--> "+p.replace("\n", "\n--> ") if len(p) > 0 else ""
+    return "--> " + p.replace("\n", "\n--> ") if len(p) > 0 else ""
+
 
 def MSG(u, c):
-    return [{'role': u, 'content' : c}]
+    return [{"role": u, "content": c}]
 
 
 context_store = {}
 MIN_TRAIN_EXS = 20
 MAX_TRAIN_EXS = 2000
 
+
 def call_OptGPT(state, stable_context, dynamic_prompt, **kargs):
     global context_store
 
     prompt = stable_context + dynamic_prompt
-    checkpoint = context_store[stable_context] if stable_context in context_store else ([], None, False)
+    checkpoint = (
+        context_store[stable_context]
+        if stable_context in context_store
+        else ([], None, False)
+    )
 
     completion = None
     if checkpoint[1] is not None:
         completion = call_gpt(state, prompt, model=checkpoint[1], **kargs)
 
     if completion is None or len(training_exs[0]) < MAX_TRAIN_EXS:
-        def promiseCompletion():
-            best_completion = call_ChatGPT(state, MSG("system", prompt), gpt4=True, **kargs)
-            new_data = checkpoint[0] + [(dynamic_prompt, best_completion)]
-            context_store[stable_context] = (new_data, checkpoint[1], context_store[stable_context][2])
 
-            if len(training_exs) >= MIN_TRAIN_EXS and not context_store[stable_context][2]:
+        def promiseCompletion():
+            best_completion = call_ChatGPT(
+                state, MSG("system", prompt), gpt4=True, **kargs
+            )
+            new_data = checkpoint[0] + [(dynamic_prompt, best_completion)]
+            context_store[stable_context] = (
+                new_data,
+                checkpoint[1],
+                context_store[stable_context][2],
+            )
+
+            if (
+                len(training_exs) >= MIN_TRAIN_EXS
+                and not context_store[stable_context][2]
+            ):
                 context_store[stable_context][2] = True
+
                 def train_with():
                     old_model = context_store[stable_context][1]
 
                     fine_tuning_job = openai.FineTune.create(
                         training_file=os.path.abspath(training_file),
-                        validation_file=os.path.abspath(validation_file))
+                        validation_file=os.path.abspath(validation_file),
+                    )
 
                     job_id = fine_tuning_job["id"]
                     print(f"Fine-tuning job created with ID: {job_id}")
-                    
+
                     while True:
                         fine_tuning_status = openai.FineTune.get_status(job_id)
                         status = fine_tuning_status["status"]
@@ -87,39 +111,42 @@ def call_OptGPT(state, stable_context, dynamic_prompt, **kargs):
                 asyncStart(train_with)
 
             return best_completion
-            
-        best_completion = asyncStart(promiseCompletion) # async?
+
+        best_completion = asyncStart(promiseCompletion)  # async?
         if completion is None:
             completion = asyncAwait(best_completion)
-    
-    return completion
-    
 
-def call_ChatGPT(state, cur_prompt, stop = None, max_tokens = 20, temperature = 0.2, gpt4 = False):
+    return completion
+
+
+def call_ChatGPT(
+    state, cur_prompt, stop=None, max_tokens=20, temperature=0.2, gpt4=False
+):
     if state.verbose > 1:
-        print_op("\nGPT input for {" +str(stop) + "} "+ str(len(cur_prompt)) + ".")
+        print_op("\nGPT input for {" + str(stop) + "} " + str(len(cur_prompt)) + ".")
     if state.verbose > 2:
         print_op(str(cur_prompt))
-        
+
     ppt = 0.002 if not gpt4 else 0.02
 
     def calcCost(p):
-        chars = sum((len(a['content']) for a in p))
+        chars = sum((len(a["content"]) for a in p))
         if state.verbose > 0:
             print_op("ASK_CHARS:", chars)
         c = (chars / 2700.0) * ppt
         if state.verbose > 2:
-            print_op("PrePrice: $"+str(c))
+            print_op("PrePrice: $" + str(c))
         return c
 
     cost = calcCost(cur_prompt)
     try:
         ans = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo-0301" if not gpt4 else 'gpt-4',
+            model="gpt-3.5-turbo-0301" if not gpt4 else "gpt-4",
             max_tokens=max_tokens,
             stop=stop,
             messages=cur_prompt,
-            temperature=temperature)
+            temperature=temperature,
+        )
 
     except Exception as e:
         state.price += cost
@@ -128,11 +155,11 @@ def call_ChatGPT(state, cur_prompt, stop = None, max_tokens = 20, temperature = 
 
         return "OpenAI is down!"
 
-    price = ppt * ans['usage']['total_tokens'] / 1000
+    price = ppt * ans["usage"]["total_tokens"] / 1000
     if state.verbose > 0:
-        print_op("Price: $"+str(price))
+        print_op("Price: $" + str(price))
     state.price += price
-    response_text = ans['choices'][0]['message']['content']
+    response_text = ans["choices"][0]["message"]["content"]
 
     if state.verbose > 2:
         print_op("GPT output:")
@@ -142,10 +169,11 @@ def call_ChatGPT(state, cur_prompt, stop = None, max_tokens = 20, temperature = 
     return response_text
 
 
-
-def call_gpt(state, cur_prompt: str, stop: str, max_tokens = 20, quality = "best", temperature = 0.0):
+def call_gpt(
+    state, cur_prompt: str, stop: str, max_tokens=20, quality="best", temperature=0.0
+):
     if state.verbose > 1:
-        print_op("\nGPT input for {" +stop + "} "+ str(len(cur_prompt)) + ".")
+        print_op("\nGPT input for {" + stop + "} " + str(len(cur_prompt)) + ".")
     if state.verbose > 2:
         print_op(prepPrintPromptContext(cur_prompt))
 
@@ -155,11 +183,12 @@ def call_gpt(state, cur_prompt: str, stop: str, max_tokens = 20, quality = "best
         print_op("ASK_TOKENS:", ask_tokens)
 
     if (ask_tokens) > 2049:
-        quality = 'best'
+        quality = "best"
 
-    model = { 'best' : ("text-davinci-003", 0.02), 
-              'okay' : ("text-curie-001", 0.002), 
-             }[quality]
+    model = {
+        "best": ("text-davinci-003", 0.02),
+        "okay": ("text-curie-001", 0.002),
+    }[quality]
 
     def calcCost(p):
         return (len(p) / 2700.0) * model[1]
@@ -172,18 +201,18 @@ def call_gpt(state, cur_prompt: str, stop: str, max_tokens = 20, quality = "best
             max_tokens=max_tokens,
             stop=stop,
             prompt=cur_prompt,
-            temperature=temperature
+            temperature=temperature,
         )
     except Exception as e:
         print_op("WTF:", e)
         state.price += cost
         return "OpenAI is down!"
 
-    response_text = ans['choices'][0]['text']
+    response_text = ans["choices"][0]["text"]
 
-    simpleprice = model[1] * ans['usage']['total_tokens'] / 1000
+    simpleprice = model[1] * ans["usage"]["total_tokens"] / 1000
     if state.verbose > 0:
-        print_op("SimplePrice: $"+str(simpleprice))
+        print_op("SimplePrice: $" + str(simpleprice))
     state.price += simpleprice
 
     if state.verbose > 2:
@@ -192,6 +221,7 @@ def call_gpt(state, cur_prompt: str, stop: str, max_tokens = 20, quality = "best
         print_op("GPT output fin.\n")
 
     return response_text
+
 
 def deep_fmap(lambdaFunc, json_data):
     if isinstance(json_data, list):
@@ -202,3 +232,77 @@ def deep_fmap(lambdaFunc, json_data):
         return {lambdaFunc(k): deep_fmap(lambdaFunc, v) for k, v in json_data.items()}
     else:
         return lambdaFunc(json_data)
+
+
+def tool_api_call(self, tool, gpt_suggested_input, question, memory):
+    if self.verbose > 1:
+        print_op("GPT SUGGESTED INPUT:", gpt_suggested_input)
+
+    tool_args = deep_fmap(lambda s: s.format(**gpt_suggested_input), tool["args"])
+
+    url = tool_args["url"]
+    if self.verbose > -1:
+        print_op(tool["method"] + ":", url)
+
+    if "auth" in tool_args and isinstance(tool_args["auth"], dict):
+        auths = list(tool_args["auth"].items())
+        if len(auths) > 0:
+            tool_args["auth"] = list(tool_args["auth"].items())[0]
+        else:
+            del tool_args["auth"]
+
+    print_op("ARGS: ", tool_args)
+    resp = (requests.get if tool["method"] == "GET" else requests.post)(**tool_args)
+    print_op("FINAL URL: (" + tool["method"] + ") ", resp.url)
+
+    actual_call = str(tool_args)
+
+    if resp.status_code in [404, 401, 500]:
+        er = " => " + str(resp.status_code)
+        return (
+            "This tool isn't working currently" + er,
+            str(url) + er,
+            actual_call + er,
+        )
+
+    ret = str(resp.text)
+
+    if self.verbose > -1:
+        pass
+        # commented out, causes test cases to fail because the return json of some wolfram alpha searches contains character encodings that charmap does not know.
+        # leads to error being thrown.
+        # print_op("URL Response:", ret)
+
+    try:
+        ret = str(json.loads(ret))
+    except:
+        pass
+
+    if len(ret) > 8000:
+        prompt = f"<DOC>{ret}</DOC><QUERY>{question}</QUERY><RESULT>"
+
+        ret = call_ChatGPT(
+            self,
+            MSG("system", prompt),
+            max_tokens=40,
+            temperature=0,
+            stop="</RESULT>",
+            gpt4=True,
+        )
+        """
+        document = Document(ret)
+        try:
+            if self.verbose > 2:
+                print_op("### Summarising with GPT Tree Index ...")
+            ret = GPTTreeIndex([document]).query(
+                question, response_mode="tree_summarize")
+        except:
+            return "OpenAI is down!", url, actual_call
+
+        if self.verbose > 2:
+            print_op("SUMMARISED:", ret)
+
+        if str(ret).find("ANSWER: ") == 0:
+            ret = str(ret)[len("ANSWER: X."):].strip(" .")
+        """
+    return ret, url, actual_call
