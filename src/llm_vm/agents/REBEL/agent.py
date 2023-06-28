@@ -189,6 +189,20 @@ class Agent:
         set_api_key(WOLFRAM_KEY, "WOLFRAM_KEY")
 
     def makeToolDesc(self, tool_id):
+        """
+        Creates the tool description to contain the relevant tags according to the dynamic params
+
+        Parameters
+        ----------
+        tool_id
+            the tool's enum value as specified in the DefaultTools class
+
+        Returns
+        ----------
+        String
+            a formatted string with tags containing the tool_id, description and params
+        """
+
         tool = self.tools[tool_id]
         params = (
             "{"
@@ -200,12 +214,25 @@ class Agent:
             else "{}"
         )
         return f"""<TOOL>
-<{TOOL_ID}>{str(tool_id)}</{TOOL_ID}>
-<{DESCRIPTION}>{tool['description']}</{DESCRIPTION}>
-<{PARAMS}>{params}</{PARAMS}>
-</TOOL>"""
+    <{TOOL_ID}>{str(tool_id)}</{TOOL_ID}>
+    <{DESCRIPTION}>{tool['description']}</{DESCRIPTION}>
+    <{PARAMS}>{params}</{PARAMS}>
+    </TOOL>"""
 
     def set_tools(self, tools):
+        """
+        Adds all the available tools when the class is initialized.
+
+        Parameters
+        ----------
+        tools
+            a list of available tools. Each tool is defined within a Dict.
+
+        Returns
+        ----------
+        None
+        """
+
         self.tools = []
         for tool in tools:
             if not "args" in tool:
@@ -219,11 +246,51 @@ class Agent:
             self.tools += [tool]
 
     def use_tool(self, tool, gpt_suggested_input, question, memory, facts, query=""):
+        """
+        Calls the appropriate API based on the tool that's in use.
+
+        Parameters
+        ----------
+        tool
+            an integer refencing the selected tool
+        gpt_suggested_input
+            the input params for the selected tool as specified by the gpt response
+        question
+            the user's input question
+        memory
+            a list of tuples containing the conversation history
+        facts
+            a list containing factual answers generated for each sub-question
+        query
+            the value of the ai_response_prompt key for the selected tool. If ai_response_prompt key is not available this will have same value as question parameter
+
+        Returns
+        ----------
+        String
+            Response text after calling API tool and passing result into ChatGPT prompt
+        """
+
         return tool_api_call(
             self, tool, gpt_suggested_input, question, memory, facts, query=query
         )
 
     def run(self, question, memory):
+        """
+        Runs the Agent on the given inputs
+
+        Parameters
+        ----------
+        question
+            the user's input question
+        memory
+            a list of tuples containing the conversation history
+
+        Returns
+        ----------
+        Tuple
+            a tuple containing the Agent's answer and a list of the conversation history
+        """
+
         self.price = 0
 
         thought, facts = self.promptf(
@@ -239,6 +306,28 @@ class Agent:
         return (thought, memory + [(question, thought)])
 
     def makeInteraction(self, p, a, Q="HUMAN", A="AI", INTERACTION=INTERACTION):
+        """
+        Formats the tool description to contain the relevant tags according to the dynamic params
+
+        Parameters
+        ----------
+        p
+            the question being asked
+        a
+            the gpt response
+        Q
+            the entity asking the question. Could be HUMAN or AI.
+        A
+            the entity answering the question. Could be HUMAN or AI.
+        INTERACTION
+            the type of interaction. Could be HUMAN-AI or AI-AI.
+
+        Returns
+        ----------
+        String
+            a formatted string with tags containing the type of interaction, the question and the gpt response
+        """
+
         return f"<>{INTERACTION}:<{Q}>{p}</{Q}>\n<{A}>" + (
             f"{a}</{A}>\n</>" if a is not None else ""
         )
@@ -257,6 +346,39 @@ class Agent:
         quality="best",
         max_tokens=20,
     ):
+        """
+        Formats the tool description to contain the relevant tags according to the dynamic params
+
+        Parameters
+        ----------
+        tools
+            a list of available tools. Each tool is defined within a Dict.
+        memory
+            a list of tuples containing the conversation history
+        facts
+            a list containing factual answers generated for each sub-question
+        question
+            the user's input question
+        subq
+            a lambda function that returns a question that's used to prompt gpt for the suggested input for the selected tool
+        answer_label
+            the format of the response
+        toolEx
+            a lambda function that returns an example for the selected tool
+        tool_to_use
+            an integer referencing the selected tool
+        bot_str
+            a string to be appended to the gpt prompt
+        quality
+            could be either "okay"-text-curie-001 or "best"-text-davinci-003
+        max_tokens
+            maximum number of tokens to be generated
+
+        Returns
+        ----------
+        String
+            a gpt text response containing the suggested input for the selected tool
+        """
         tool_context = "".join([self.makeToolDesc(t) for t, _ in tools])
         mem = "".join(
             [
@@ -301,6 +423,28 @@ class Agent:
         ).strip()
 
     def promptf(self, question, memory, facts, split_allowed=True, spaces=0):
+        """
+        Formats the gpt prompt to include conversation history, facts and logs responses to the console
+
+        Parameters
+        ----------
+        question
+            the user's input question
+        memory
+            a list of tuples containing the conversation history
+        facts
+            a list containing factual answers generated for each sub-question
+        split_allowed
+            a boolean to allow the question to be split into sub-questions if set to True
+        spaces
+            an integer to set the amount of spacing between printed logs
+
+        Returns
+        ----------
+        Tuple
+            a tuple containing the gpt response and a list with the conversation history
+        """
+
         for i in range(spaces):
             print(" ", end="")
 
@@ -427,6 +571,27 @@ class Agent:
     def call_gpt(
         self, cur_prompt: str, stop: str, max_tokens=20, quality="best", temperature=0.0
     ):
+        """
+        Calls OpenAI curie/davinci model
+
+        Parameters
+        ----------
+        cur_prompt
+            the tools enum value as specified by the DefaultTools class
+        stop
+            a string defining the stopping point for the text generation
+        max_tokens
+            maximum number of tokens to be generated
+        quality
+            could be either "okay"-text-curie-001 or "best"-text-davinci-003
+        temperature
+            controls randomness in generated text
+
+        Returns
+        ----------
+        String
+            a gpt response text
+        """
         if self.verbose > 2:
             print_op(prepPrintPromptContext(cur_prompt))
 
