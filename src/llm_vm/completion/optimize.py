@@ -3,6 +3,8 @@ import traceback
 import threading
 import time
 import os
+import sys
+import signal 
 import json
 import tempfile
 import abc
@@ -10,6 +12,20 @@ import requests
 import hashlib
 import pickle
 import data_synthesis
+
+job_id = None # we want to be able to cancel a fine_tune if you kill the program
+
+def exit_handler(signum, frame):
+    
+    if (None != job_id):
+        print("cancelling fine-tune if applicable")
+        openai.FineTune.cancel(id=job_id)
+        
+    print("user interrupt, exiting")
+    sys.exit()
+
+signal.signal(signal.SIGINT, exit_handler)
+
 
 def generate_hash(input_string):
     sha256_hash = hashlib.sha256()
@@ -176,7 +192,7 @@ class LocalOptimizer(Optimizer):
         train()
         return completion
     
-    def complete_delay_train(self, stable_context, dynamic_prompt, run_data_synthesis = False, c_id = None, **kwargs):
+    def complete_delay_train(self, stable_context, dynamic_prompt, run_data_synthesis = False, min_examples_for_synthesis = 5,c_id = None, **kwargs):
         """
         Runs a completion using the string stable_context+dynamic_prompt.  Returns an optional training closure to use if the 
         caller decides that the completion was particularly good.
@@ -232,7 +248,7 @@ class LocalOptimizer(Optimizer):
                     self.storage.add_example(c_id, new_datapoint)
                    
                     if run_data_synthesis:
-                        if len(self.storage.get_data(c_id)) < 5:
+                        if len(self.storage.get_data(c_id)) < min_examples_for_synthesis:
                             print("Data synthesis is not available right now, need more examples in storage.")
                         else:
                             for j in self.data_synthesizer.data_synthesis(self,prompt,best_completion):
@@ -252,8 +268,8 @@ class LocalOptimizer(Optimizer):
                             fine_tuning_job = openai.FineTune.create(training_file= upload_response.id)
 
                             print(f"Fine-tuning job created: {fine_tuning_job}", flush=True)
+                            global job_id # global state isn't great, but thats interrupt handlers
                             job_id = fine_tuning_job["id"]
-
                             while True:
                                 fine_tuning_status = openai.FineTune.retrieve(id=job_id)
                                 status = fine_tuning_status["status"]
@@ -261,7 +277,7 @@ class LocalOptimizer(Optimizer):
                                 if status in ["succeeded", "completed", "failed"]:
                                     break
                                 time.sleep(30)
-
+                            job_id = None #
                             new_model_id = fine_tuning_status.fine_tuned_model
 
                             print("New_model_id: ", new_model_id, flush=True)
