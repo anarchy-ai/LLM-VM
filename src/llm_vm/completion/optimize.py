@@ -176,7 +176,7 @@ class LocalOptimizer(Optimizer):
         train()
         return completion
     
-    def complete_delay_train(self, stable_context, dynamic_prompt, run_data_synthesis = False, c_id = None, **kwargs):
+    def complete_delay_train(self, stable_context, dynamic_prompt, run_data_synthesis = False, min_examples_for_synthesis = 1,c_id = None, **kwargs):
         """
         Runs a completion using the string stable_context+dynamic_prompt.  Returns an optional training closure to use if the 
         caller decides that the completion was particularly good.
@@ -232,7 +232,7 @@ class LocalOptimizer(Optimizer):
                     self.storage.add_example(c_id, new_datapoint)
                    
                     if run_data_synthesis:
-                        if len(self.storage.get_data(c_id)) < 5:
+                        if len(self.storage.get_data(c_id)) < min_examples_for_synthesis:
                             print("Data synthesis is not available right now, need more examples in storage.")
                         else:
                             for j in self.data_synthesizer.data_synthesis(self,prompt,best_completion):
