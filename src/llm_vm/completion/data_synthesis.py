@@ -17,10 +17,15 @@ class DataSynthesis:
         split_response = response.split(sep=example_delim)
         datum_failure = 0 
         bad_key_failure =0
+        resp_filter = {}
         for d in split_response:
             try: 
-                thedata = json.loads(d)
-                datapoints.append((thedata["prompt"],thedata["response"]))
+                the_data = json.loads(d)
+                the_tuple = (the_data["prompt"],the_data["response"])
+                if the_tuple in resp_filter:
+                    continue   # dont save a response if its already happened
+                resp_filter[the_tuple]=True  # for now we're treating the (Q,A) pair as a single value
+                datapoints.append(the_tuple)
             except json.decoder.JSONDecodeError as err: 
                 print(F'data_synthesis response parsing failed with: { err }',file=sys.stderr)
                 datum_failure+=1
