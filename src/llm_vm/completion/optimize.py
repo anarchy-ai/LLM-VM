@@ -213,7 +213,7 @@ class LocalOptimizer(Optimizer):
         self.MAX_TRAIN_EXS = MAX_TRAIN_EXS
         self.call_small = call_small
         self.call_big = call_big
-        self.data_synthesizer = data_synthesis.DataSynthesis(0, 100)
+        self.data_synthesizer = data_synthesis.DataSynthesis(0, 50)
 
     def complete(self, stable_context, dynamic_prompt, data_synthesis=False, **kwargs):
         completion, train = self.complete_delay_train(
