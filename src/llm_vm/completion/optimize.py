@@ -12,6 +12,7 @@ import requests
 import hashlib
 import pickle
 import data_synthesis
+import tiktoken
 
 job_id = None  # we want to be able to cancel a fine_tune if you kill the program
 
@@ -111,8 +112,20 @@ def CALL_BIG(prompt, gpt4=False, **kwargs):
         model="gpt-3.5-turbo-0301" if not gpt4 else "gpt-4",
         **kwargs,
     )
-
-    return ans["choices"][0]["message"]["content"]
+    if ans["choices"][0]["finish_reason"] == "stop":
+        return ans["choices"][0]["message"]["content"]
+    elif ans["choices"][0]["finish_reason"] == "length":
+        enc = tiktoken.get_encoding("cl100k_base")
+        num_tokens = len(enc.encode(ans["choices"][0]["message"]["content"]))
+        print(f"Max tokens generated: {num_tokens} tokens", file=sys.stderr)
+        return ans["choices"][0]["message"]["content"]
+    elif ans["choices"][0]["finish_reason"] == "content_filter":
+        print(
+            f"Error occurred while generating response. Your prompt was flagged by Open AI content moderation.",
+            file=sys.stderr,
+        )
+    else:
+        print("Error occurred while generating response.", file=sys.stderr)
 
 
 def CALL_SMALL(*args, **kwargs):
