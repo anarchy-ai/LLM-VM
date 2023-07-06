@@ -24,7 +24,7 @@ def exit_handler(signum, frame):
     if (None != job_id):
         print("cancelling fine-tune if applicable")
         openai.FineTune.cancel(id=job_id)
-        
+
     print("user interrupt, exiting")
     sys.exit()
 
@@ -230,14 +230,14 @@ class LocalOptimizer(Optimizer):
             print("Running with an empty context")
         
         prompt = (stable_context + dynamic_prompt).strip()
-        c_id = str({'stable_context' : stable_context, 
+        c_id_repr = str({'stable_context' : stable_context, 
                     'args' : kwargs, 
                     'MIN_TRAIN_EXS' : self.MIN_TRAIN_EXS, 
                     'MAX_TRAIN_EXS' : self.MAX_TRAIN_EXS,
                     'call_small' : str(self.call_small).split(' ')[1], # HACKS 
                     'call_big' : str(self.call_big).split(' ')[1],
                     }) if c_id is None else c_id
-        c_id = generate_hash(c_id)
+        c_id = generate_hash(c_id_repr)
 
         completion = None
         model = self.storage.get_model(c_id)
