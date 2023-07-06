@@ -43,6 +43,10 @@ class DataSynthesis:
         datapoints = []
         print(response, file=sys.stderr)
         split_response = response.split(sep=example_delim)
+        print(
+            f"Generated {len(split_response)}/{self.examples_to_generate} examples.",
+            file=sys.stderr,
+        )
         datum_failure = 0
         bad_key_failure = 0
         resp_filter = {}
