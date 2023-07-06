@@ -10,6 +10,32 @@ class DataSynthesis:
     def data_synthesis(
         self, optimizer, prompt, response, example_delim="<Datum-Separator/>", **kwargs
     ):
+        """
+        This method generates QA pairs using the larger LLM(gpt 3.5/4) to be used as training data for the smaller LLM(curie/davinci)
+
+        Parameters
+        ----------
+        optimizer
+            The Optimizer class to be used for fine-tuning. Could be either LocalOptimizer or HostedOptimizer
+
+        prompt
+            A question to be used as a one-shot QA example for the larger LLM prompt.
+
+        response
+            A verified answer to the provided prompt question to be used in the one-shot QA example.
+
+        example_delim
+            A unique XML tag used to separate the generated JSON examples.
+
+        kwargs
+            Keyword arguments to be passed into the larger LLM call.
+
+        Returns
+        ----------
+        List
+            A list of tuples containing the QA pairs to be used for fine-tuning
+
+        """
         final_prompt = (
             '{"prompt": "'
             + prompt
