@@ -100,16 +100,32 @@ def create_jsonl_file(data_list: list, file_name: str, compress: bool = True) ->
 '''
 
 if __name__ == "__main__":
-    load_dotenv()
+    try:
+        load_dotenv()
+    except:
+        pass
     openai.api_key = os.getenv('OPENAI_KEY')
     anarchy_key = os.getenv('ANARCHY_KEY')
-    optimizer = HostedOptimizer(openai_key = openai.api_key, 
-                                anarchy_key = anarchy_key, 
-                                MIN_TRAIN_EXS=2)
+    print("key:", openai.api_key)
+    optimizer = LocalOptimizer(MIN_TRAIN_EXS=2)
+    #optimizer = HostedOptimizer(openai_key = openai.api_key, 
+    #                            anarchy_key = anarchy_key, 
+    #                            MIN_TRAIN_EXS=2)
     i = 0
+
+    optimizer.complete("Answer question Q. ","Q: What is the currency in myanmmar", \
+                 temperature = 0.0, data_synthesis = True,\
+                 min_examples_for_synthesis=1)
+    '''
     for h in haskell.splitlines():
         print("At: ", i)
-        print(optimizer.complete("Please convert into haskell:", h + "\nHaskell:", max_tokens = 100, temperature = 0.0))
-        if i > 4:
-            time.sleep(200)
+        try:
+            print(optimizer.complete("Please convert this line to some haskell:", h + "\nHaskell:", max_tokens = 100, temperature = 0.0))
+        except Exception as e:
+            print('E:', e)
+
+        time.sleep(2)
+        if i > 3 and i < 20:
+            time.sleep(120)
         i += 1
+    '''
