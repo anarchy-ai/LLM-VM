@@ -37,6 +37,9 @@ def optimizing_complete():
     data_synthesis = False
     finetune = False
     kwargs = {}
+    if "openai_key" not in data.keys():
+        return {"status":0, "resp":"No OpenAI key provided"}
+        
     if "temperature" in data.keys():
         if type(data["temperature"]) != float and type(data["temperature"]) != int:
             return {"status":0, "resp":"Wrong Data Type for temperature"}
@@ -63,32 +66,16 @@ def optimizing_complete():
     except:
         raise Exception("No OpenAI Key Provided")
     
-    optimizer = LocalOptimizer(MIN_TRAIN_EXS=2,openai_key=openai.api_key)
-    completion = optimizer.complete(static_context,dynamic_prompt,data_synthesis=data_synthesis,finetune = finetune, **kwargs)
-
+    optimizer.openai_key = openai.api_key
+    try:
+        completion = optimizer.complete(static_context,dynamic_prompt,data_synthesis=data_synthesis,finetune = finetune, **kwargs)
+    except:
+        return {"status":0, "resp":"An error occured"}
+    
     return {"completion":completion, "status": 200}
 
 
-@app.route('/get_dataset', methods=['POST']) 
-def optimizing():
-    data = json.loads(request.data)
-    static_context = data["context"]
-    kwargs = {}
-    if "temperature" in data.keys():
-        if type(data["temperature"]) != float and type(data["temperature"]) != int:
-            return {"status":0, "resp":"Wrong Data Type for temperature"}
-        else:
-            kwargs.update({"temperature":data["temperature"]})
-    c_id = str({'stable_context' : static_context, 
-                    'args' : kwargs, 
-                    'MIN_TRAIN_EXS' : optimizer.MIN_TRAIN_EXS, 
-                    'MAX_TRAIN_EXS' : optimizer.MAX_TRAIN_EXS,
-                    'call_small' : str(optimizer.call_small).split(' ')[1], # HACKS 
-                    'call_big' : str(optimizer.call_big).split(' ')[1],
-                    })
-    c_id = generate_hash(c_id)
-    return {"dataset": optimizer.storage.get_data(c_id)}
 
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=3002)
+    app.run(host="192.168.1.75", port=3002)
