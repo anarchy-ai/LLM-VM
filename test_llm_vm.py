@@ -1,6 +1,6 @@
 from llm_vm import llm_vm as l
 
-openai_key = "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"
+openai_key = ""
 ret = l.complete("Who are the top 10 greatest soccer players", "", openai_key)
 assert type(ret) == str
 ret = l.complete("Who are the top 10 greatest soccer players", "", "")
