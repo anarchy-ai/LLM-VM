@@ -62,7 +62,7 @@ class DataSynthesis:
                 datapoints.append(the_tuple)
             except json.decoder.JSONDecodeError as err:
                 print(
-                    f"data_synthesis response parsing failed with: { err }",
+                    f"data_synthesis response parsing failed with: { err } \n Expected a valid JSON Object but received {d}",
                     file=sys.stderr,
                 )
                 datum_failure += 1
