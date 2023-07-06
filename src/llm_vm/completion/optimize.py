@@ -307,7 +307,7 @@ class LocalOptimizer(Optimizer):
                             )
                         else:
                             for j in self.data_synthesizer.data_synthesis(
-                                self, prompt, best_completion
+                                self, prompt, best_completion, **kwargs
                             ):
                                 self.storage.add_example(c_id, j)
                     training_exs = self.storage.get_data(c_id)
