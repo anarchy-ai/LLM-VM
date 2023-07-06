@@ -6,14 +6,31 @@ This is still in BETA.  Very little attention has been paid to package structure
 
 ## Running/Testing
 
-The following instructions assume you have a venv running. See <https://docs.python.org/3/library/venv.html> for help.
+To run and test this repository you need to start a flask server. To start the flask server use: 
 
 ```bash
-echo "OPENAI_KEY=<YOUROPENAIKEY>" >> .env
 pip3 install -r requirements.txt
-python3 src/llm_vm/completion/test_optimize.py
+python app.py
 ```
 
+This will start a flask server as http://192.168.1.75:3002 and will create an endpoint http://192.168.1.75:3002/completion. Post requests can be sent to this endpoint in the following format:
+
+```
+{
+    "prompt":"What is 2+2",
+    "context":"Answer the math problem with just a number.",
+    "openai_key": <OPENAI-KEY>,
+    "temperature":0,
+    "finetune": true,
+    "data_synthesis: true
+}
+```
+If no temperature, finetune, or data_synthesis are provided, these values will default to 0, false, and false. 
+
+To access the completion endpoint programmatically, after starting up the server on your machine, import llm_vm.py into your code and call the completion function. To test that the server is working correctly, after starting it, run 
+```
+python test_llm_vm.py
+```
 ### Optimizing Text Generation
 
 The code in `src/llm_vm/completion/` provides an optimizing text generation framework. It allows storing models and fine-tuning them on new data to improve generations over time.
