@@ -42,7 +42,7 @@ class DataSynthesis:
                 resp_filter[the_tuple]=True  # for now we're treating the (Q,A) pair as a single value
                 datapoints.append(the_tuple)
             except json.decoder.JSONDecodeError as err: 
-                print(F'data_synthesis response parsing failed with: { err }',file=sys.stderr)
+                print(F'data_synthesis response parsing failed with: { err } \nExpected a valid JSON Object but received {d}',file=sys.stderr)
                 datum_failure+=1
             except LookupError as err : # i have no evidence that this will happen
                 print(F'data_synthesis key lookup failed with: { err }',file=sys.stderr)
