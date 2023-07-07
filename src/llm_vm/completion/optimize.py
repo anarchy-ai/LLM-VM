@@ -206,7 +206,7 @@ class LocalOptimizer(Optimizer):
         self.call_small = call_small
         self.call_big = call_big
         self.openai_key = openai_key
-        self.data_synthesizer = data_synthesis.DataSynthesis(0,100)
+        self.data_synthesizer = data_synthesis.DataSynthesis(0,50)
 
     def complete(self, stable_context, dynamic_prompt, data_synthesis = False, finetune = False, **kwargs):
         openai.api_key = self.openai_key
