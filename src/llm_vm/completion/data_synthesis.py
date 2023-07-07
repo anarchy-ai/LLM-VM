@@ -12,8 +12,8 @@ class DataSynthesis:
         Parameters
         ----------
         - optimizer (class): The Optimizer class to use for fine-tuning. Could be either LocalOptimizer or HostedOptimizer.
-        - prompt (str): A question to be used as a one-shot QA example for the larger LLM prompt.
-        - response (str): A verified answer to the provided prompt question to be used in the one-shot QA example.
+        - prompt (str | list ): A question to be used as a one-shot QA example for the larger LLM prompt.
+        - response (str | list): A verified answer to the provided prompt question to be used in the one-shot QA example.
         - example_delim (str): A unique XML tag used to separate the generated JSON examples.
         - **kwargs: Additional keyword arguments to be passed into the `call_big` method.
 
@@ -21,10 +21,21 @@ class DataSynthesis:
         ----------
         - List: A list of tuples containing the QA pairs to be used for fine-tuning.
         """
-        final_prompt = '{"prompt": "' +prompt+'"  , "response": "' +response+'" }'+ \
-            '\nGenerate '+str(self.examples_to_generate)+F""" more JSONS each with a prompt and response field like the given one. 
-            The content of the prompt and response fields must be similar to the given JSON. 
-            Separate each JSON with the XML tag {example_delim}."""
+        final_prompt = None
+        if type(prompt) is str:
+            final_prompt = '{"prompt": "' +prompt+'"  , "response": "' +response+'" }'+ \
+                '\nGenerate '+str(self.examples_to_generate)+F""" more JSONS each with a prompt and response field like the given one. 
+                The content of the prompt and response fields must be similar to the given JSON. 
+                Separate each JSON with the XML tag {example_delim}."""
+        elif type(prompt) is list:
+            json_str = ""
+            for idx,p in enumerate(prompt):
+               example_str = '{"prompt": "' + p +'"  , "response": "' + response[idx] +'" } \n'
+               json_str.append(example_str)
+            final_prompt = json_str + 'Generate '+str(self.examples_to_generate)+F""" more JSONS each with a prompt and response field like the given one. 
+                The content of the prompt and response fields must be similar to the given JSON. 
+                Separate each JSON with the XML tag {example_delim}."""
+
         data = None       
         response=optimizer.call_big(final_prompt , **kwargs)
         datapoints = []
