@@ -26,7 +26,7 @@ class DataSynthesis:
             The content of the prompt and response fields must be similar to the given JSON. 
             Separate each JSON with the XML tag {example_delim}."""
         data = None       
-        response=optimizer.call_big(final_prompt , kwargs)
+        response=optimizer.call_big(final_prompt , **kwargs)
         datapoints = []
         print(response,file=sys.stderr)
         split_response = response.split(sep=example_delim)
