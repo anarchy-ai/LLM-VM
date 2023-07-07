@@ -6,6 +6,21 @@ class DataSynthesis:
          self.variance = variance
          self.examples_to_generate = examples_to_generate
      def data_synthesis(self, optimizer, prompt, response,example_delim="<Datum-Separator/>", **kwargs):
+        """
+        This method generates QA pairs using the larger LLM to be used as training data for fine-tuning the smaller LLM.
+
+        Parameters
+        ----------
+        - optimizer (class): The Optimizer class to use for fine-tuning. Could be either LocalOptimizer or HostedOptimizer.
+        - prompt (str): A question to be used as a one-shot QA example for the larger LLM prompt.
+        - response (str): A verified answer to the provided prompt question to be used in the one-shot QA example.
+        - example_delim (str): A unique XML tag used to separate the generated JSON examples.
+        - **kwargs: Additional keyword arguments to be passed into the `call_big` method.
+
+        Returns
+        ----------
+        - List: A list of tuples containing the QA pairs to be used for fine-tuning.
+        """
         final_prompt = '{"prompt": "' +prompt+'"  , "response": "' +response+'" }'+ \
             '\nGenerate '+str(self.examples_to_generate)+F""" more JSONS each with a prompt and response field like the given one. 
             The content of the prompt and response fields must be similar to the given JSON. 
