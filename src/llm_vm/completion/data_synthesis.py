@@ -31,8 +31,8 @@ class DataSynthesis:
             json_str = ""
             for idx,p in enumerate(prompt):
                example_str = '{"prompt": "' + p +'"  , "response": "' + response[idx] +'" } \n'
-               json_str.append(example_str)
-            final_prompt = json_str + 'Generate '+str(self.examples_to_generate)+F""" more JSONS each with a prompt and response field like the given one. 
+               json_str += example_str
+            final_prompt = json_str + 'Generate '+str(self.examples_to_generate)+F""" more JSONS each with a prompt and response field like the given examples. 
                 The content of the prompt and response fields must be similar to the given JSON. 
                 Separate each JSON with the XML tag {example_delim}."""
 
