@@ -12,10 +12,9 @@ import requests
 import hashlib
 import pickle
 
-try:
-    import data_synthesis
-except:
-    from . import data_synthesis
+#we need to package-ify so this works 
+import data_synthesis
+
 
 job_id = None # we want to be able to cancel a fine_tune if you kill the program
 
