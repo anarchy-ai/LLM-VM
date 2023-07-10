@@ -7,7 +7,7 @@ import importlib
 import openai
 import os
 import hashlib
-from src.llm_vm.completion.optimize import LocalOptimizer
+from llm_vm.completion.optimize import LocalOptimizer
 
 
 # from test_agent import run_test
@@ -29,7 +29,7 @@ def generate_hash(input_string):
 def home():
     return '''home'''
 
-@app.route('/complete', methods=['POST']) 
+@app.route('/v1/complete', methods=['POST']) 
 def optimizing_complete():
     data = json.loads(request.data)
     static_context = data["context"]
@@ -75,7 +75,9 @@ def optimizing_complete():
     return {"completion":completion, "status": 200}
 
 
-
+def main_server_entry_point():
+    # make this more configurable soon
+    app.run(host="192.168.1.75", port=3002)
 
 if __name__ == '__main__':
     app.run(host="192.168.1.75", port=3002)

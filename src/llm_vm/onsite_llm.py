@@ -2,7 +2,7 @@
 # merely ones that are easy to load and test on small machines
 
 import abc
-from abc import ABC,abstractmethod,property
+from abc import ABC,abstractmethod
 
 from transformers import AutoTokenizer, OPTForCausalLM,BloomForCausalLM,LlamaTokenizer, LlamaForCausalLM
 
@@ -17,7 +17,7 @@ class Base_Onsite_LLM(ABC):
             self.model_uri= model_uri_override 
         self.model=model_loader()
 
-    @abstractmethod
+    # @abstractmethod
     @property
     def model_uri(self):
         pass
@@ -61,10 +61,10 @@ generate_ids = model.generate(inputs.input_ids, max_length=30)
 tokenizer.batch_decode(generate_ids, skip_special_tokens=True, clean_up_tokenization_spaces=False)[0]
 """
     def __init__(self,model_uri_override=None): # tokenizer_kw_args=None,model_kw_args=None
-        self.model_uri = if (model_uri_override is None): 
-                            "facebook/opt-350m"
-                         else: 
-                            model_uri_override
+        if (model_uri_override is None): 
+                self.model_uri="facebook/opt-350m"
+        else: 
+                self.model_uri=model_uri_override
         self.tokenizer=self.tokenizer_loader()
         self.model= self.model_loader()
 
@@ -74,7 +74,7 @@ tokenizer.batch_decode(generate_ids, skip_special_tokens=True, clean_up_tokeniza
         return AutoTokenizer.from_pretrained(self.model_uri)
     def generate(prompt,max_length=100,**kwargs): # both tokenizer and model take kwargs :( 
         inputs=self.tokenizer(prompt,return_tensors="pt")
-        generate_ids=self.model.generate(inputs.input_ids,max_length=max_length)
+        generate_ids=self.model.generate(self,inputs.input_ids,max_length=max_length)
         resp= self.tokenizer.batch_decode(generate_ids,skip_special_tokens=True,clean_up_tokenization_spaces=False)[0]
         # need to drop the len(prompt) prefix with these sequences generally 
         return resp[len(prompt):]

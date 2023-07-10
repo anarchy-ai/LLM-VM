@@ -3,7 +3,7 @@ import os
 import openai
 import sys
 
-from optimize import *
+from llm_vm.completion.optimize import *
 
 haskell = '''
 def call_gpt(state, cur_prompt: str, stop: str, max_tokens = 20, quality = "best", temperature = 0.0):
@@ -99,8 +99,8 @@ def create_jsonl_file(data_list: list, file_name: str, compress: bool = True) ->
     return file_name, open(file_name, "rb")
 '''
 
-if __name__ == "__main__":
-    try:
+def run_test_stub():
+        try:
         load_dotenv()
     except:
         pass
@@ -116,6 +116,9 @@ if __name__ == "__main__":
     optimizer.complete("Answer question Q. ","Q: What is the currency in myanmmar", \
                  temperature = 0.0, data_synthesis = True,\
                  min_examples_for_synthesis=1)
+
+if __name__ == "__main__":
+    run_test_stub()
     '''
     for h in haskell.splitlines():
         print("At: ", i)
