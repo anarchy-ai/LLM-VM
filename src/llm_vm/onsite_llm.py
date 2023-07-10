@@ -66,10 +66,10 @@ tokenizer.batch_decode(generate_ids, skip_special_tokens=True, clean_up_tokeniza
         self.model= self.model_loader()
 
     def model_loader(self):
-        return OPTForCausalLM.from_pretrained(self.model_uri)
+        return  OPTForCausalLM.from_pretrained(self.model_uri)
     def tokenizer_loader(self):
         return AutoTokenizer.from_pretrained(self.model_uri)
-    def generate(prompt,max_length=100,**kwargs): # both tokenizer and model take kwargs :( 
+    def generate(self,prompt,max_length=100,**kwargs): # both tokenizer and model take kwargs :( 
         inputs=self.tokenizer(prompt,return_tensors="pt")
         generate_ids=self.model.generate(inputs.input_ids,max_length=max_length)
         resp= self.tokenizer.batch_decode(generate_ids,skip_special_tokens=True,clean_up_tokenization_spaces=False)[0]
@@ -158,3 +158,6 @@ generation_output = model.generate(
 print(tokenizer.decode(generation_output[0]))
  """
 
+if __name__ == '__main__':
+    small_opt = Small_Local_OPT()
+    small_opt.generate('sing me the song of my people')
