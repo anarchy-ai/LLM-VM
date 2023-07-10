@@ -60,11 +60,8 @@ generate_ids = model.generate(inputs.input_ids, max_length=30)
 
 tokenizer.batch_decode(generate_ids, skip_special_tokens=True, clean_up_tokenization_spaces=False)[0]
 """
-    def __init__(self,model_uri_override=None): # tokenizer_kw_args=None,model_kw_args=None
-        self.model_uri = if (model_uri_override is None): 
-                            "facebook/opt-350m"
-                         else: 
-                            model_uri_override
+    def __init__(self,model_uri_override="facebook/opt-350m"): # tokenizer_kw_args=None,model_kw_args=None
+        self.model_uri =model_uri_override 
         self.tokenizer=self.tokenizer_loader()
         self.model= self.model_loader()
 
