@@ -18,7 +18,7 @@ app = flask.Flask(__name__)
 CORS(app)
 app.config["DEBUG"] = True
 
-from llm_vm.llm_vm_server import routes
+from llm_vm.server import routes
 app.register_blueprint(routes.bp)
 
 def main_server_entry_point():
@@ -29,3 +29,6 @@ def generate_hash(input_string):
     sha256_hash = hashlib.sha256()
     sha256_hash.update(str(input_string).encode('utf-8'))
     return int(sha256_hash.hexdigest(), 16) % 10**18
+
+if __name__ == '__main__':
+    app.run(port=3002)

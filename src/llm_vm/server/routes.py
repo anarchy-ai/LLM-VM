@@ -2,8 +2,7 @@ from flask import request, Blueprint
 import json
 import os
 import openai
-from llm_vm.llm_vm_server.main import optimizer
-from agents.REBEL import agent
+from llm_vm.agents.REBEL import agent
 
 bp = Blueprint('bp',__name__)
 @bp.route('/', methods=['GET'])
