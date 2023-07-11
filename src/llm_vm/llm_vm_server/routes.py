@@ -2,7 +2,7 @@ from flask import request, Blueprint
 import json
 import os
 import openai
-from llmvm_server.main import optimizer
+from llm_vm_server.main import optimizer
 from agents.REBEL import agent
 
 bp = Blueprint('bp',__name__)

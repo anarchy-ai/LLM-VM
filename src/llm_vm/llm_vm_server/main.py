@@ -18,7 +18,7 @@ app = flask.Flask(__name__)
 CORS(app)
 app.config["DEBUG"] = True
 
-from llmvm_server import routes
+from llm_vm_server import routes
 app.register_blueprint(routes.bp)
 
 def main_server_entry_point():
