@@ -4,35 +4,35 @@
 import abc
 from abc import ABC,abstractmethod
 
-from transformers import AutoTokenizer, OPTForCausalLM,BloomForCausalLM,LlamaTokenizer, LlamaForCausalLM
+from transformers import AutoTokenizer, OPTForCausalLM,BloomForCausalLM,LlamaTokenizer, LlamaForCausalLM, GPTNeoForCausalLM, GPT2Tokenizer
 
 # on a larger machine GPTNeoXForCausalLM, GPTNeoXTokenizerFast
 
 # print("yup")
 
 # something like this interface 
-# class Base_Onsite_LLM(ABC):
-#     def __init__(self,model_uri_override=None,tokenizer_kw_args=None,model_kw_args=None):
-#         if model_uri_override != None:
-#             self.model_uri= model_uri_override 
-#         self.model=model_loader()
+class Base_Onsite_LLM(ABC):
+    def __init__(self,model_uri_override=None,tokenizer_kw_args=None,model_kw_args=None):
+        if model_uri_override != None:
+            self.model_uri= model_uri_override 
+        self.model=model_loader()
 
-#     # @abstractmethod
-#     @property
-#     def model_uri(self):
-#         pass
+    # @abstractmethod
+    @property
+    def model_uri(self):
+        pass
 
-#     @model_uri.setter
-#     def model_uri(self,val):
-#         self.model_uri=val # ummm, is this correct?
+    @model_uri.setter
+    def model_uri(self,val):
+        self.model_uri=val # ummm, is this correct?
 
-#     @abstractmethod
-#     def model_loader(self):
-#         pass
+    @abstractmethod
+    def model_loader(self):
+        pass
 
-#     @abstractmethod
-#     def tokenizer_loader(self):
-#         pass
+    @abstractmethod
+    def tokenizer_loader(self):
+        pass
 
     # def generate() # this is where the meat and potatoes should live?
 
@@ -81,8 +81,8 @@ tokenizer.batch_decode(generate_ids, skip_special_tokens=True, clean_up_tokeniza
 
 
 # below are the scripts for the other models 
-
-"""
+class Small_Local_Bloom:
+    """
 import torch
 
 from transformers import AutoTokenizer,AutoModel, BloomForCausalLM
@@ -105,10 +105,27 @@ gen_tokens = model.generate(
 )
 gen_text = tokenizer.batch_decode(gen_tokens)[0]
 
- """
-
- # 
 """
+    def __init__(self,model_uri_override="bigscience/bloom-560m"): # tokenizer_kw_args=None,model_kw_args=None
+        self.model_uri = model_uri_override
+        self.tokenizer=self.tokenizer_loader()
+        self.model= self.model_loader()
+
+    def model_loader(self):
+        return BloomForCausalLM.from_pretrained(self.model_uri)
+    def tokenizer_loader(self):
+        return AutoTokenizer.from_pretrained(self.model_uri)
+    def generate(self,prompt,max_length=100,**kwargs): # both tokenizer and model take kwargs :( 
+        inputs=self.tokenizer(prompt,return_tensors="pt")
+        generate_ids=self.model.generate(inputs.input_ids,max_length=max_length)
+        resp= self.tokenizer.batch_decode(generate_ids,skip_special_tokens=True,clean_up_tokenization_spaces=False)[0]
+        # need to drop the len(prompt) prefix with these sequences generally 
+        return resp[len(prompt):]
+
+ #
+
+class Small_Local_Neo:
+    """
 from transformers import GPTNeoForCausalLM, GPT2Tokenizer
 
 model = GPTNeoForCausalLM.from_pretrained("EleutherAI/gpt-neo-1.3B")
@@ -132,10 +149,24 @@ gen_text = tokenizer.batch_decode(gen_tokens)[0]
 gen_text[len(prompt):] # might need to trim leading \n 
 
 """
+    def __init__(self,model_uri_override="EleutherAI/gpt-neo-1.3B"): # tokenizer_kw_args=None,model_kw_args=None
+        self.model_uri = model_uri_override
+        self.tokenizer=self.tokenizer_loader()
+        self.model= self.model_loader()
 
+    def model_loader(self):
+        return GPTNeoForCausalLM.from_pretrained(self.model_uri)
+    def tokenizer_loader(self):
+        return GPT2Tokenizer.from_pretrained(self.model_uri)
+    def generate(self,prompt,max_length=100,**kwargs): # both tokenizer and model take kwargs :( 
+        inputs=self.tokenizer(prompt,return_tensors="pt")
+        generate_ids=self.model.generate(inputs.input_ids,max_length=max_length)
+        resp= self.tokenizer.batch_decode(generate_ids,skip_special_tokens=True,clean_up_tokenization_spaces=False)[0]
+        # need to drop the len(prompt) prefix with these sequences generally 
+        return resp[len(prompt):]
 #
-
-"""
+class Small_Local_LLama:
+    """
 import torch
 from transformers import LlamaTokenizer, LlamaForCausalLM
 model_path = 'openlm-research/open_llama_3b'
@@ -157,7 +188,23 @@ generation_output = model.generate(
 
 print(tokenizer.decode(generation_output[0]))
  """
+    def __init__(self,model_uri_override="openlm-research/open_llama_3b"): # tokenizer_kw_args=None,model_kw_args=None
+        self.model_uri = model_uri_override
+        self.tokenizer=self.tokenizer_loader()
+        self.model= self.model_loader()
 
+    def model_loader(self):
+        return LlamaForCausalLM.from_pretrained(self.model_uri)
+    def tokenizer_loader(self):
+        return LlamaTokenizer.from_pretrained(self.model_uri)
+    def generate(self,prompt,max_length=100,**kwargs): # both tokenizer and model take kwargs :( 
+        inputs=self.tokenizer(prompt,return_tensors="pt")
+        # the example calls for max_new_tokens
+        generate_ids=self.model.generate(inputs.input_ids,max_length=max_length)
+        resp= self.tokenizer.batch_decode(generate_ids,skip_special_tokens=True,clean_up_tokenization_spaces=False)[0]
+        # need to drop the len(prompt) prefix with these sequences generally 
+        return resp[len(prompt):]
+    
 if __name__ == '__main__':
-    small_opt = Small_Local_OPT()
+    small_opt = Small_Local_LLama()
     print(small_opt.generate('What do you get when you guzzle down sweets?'))
