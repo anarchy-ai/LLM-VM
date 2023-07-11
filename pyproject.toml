@@ -23,7 +23,7 @@ dependencies = [
 
 [project.scripts] # these names are just placeholders 
 llm_vm_test_optimize = "llm_vm.completion.test_optimize:run_test_stub"
-llm_vm_server = "llm_vm.server:main_server_entry_point"
+llm_vm_server = "llm_vm.server.main:main_server_entry_point"
 
 
 # package_dir = {}
