@@ -11,13 +11,13 @@ Which tool (number only), if any, would you use to answer the following question
 
 {question}
     '''
-    count=starting_tool_num
-    for i in range(len(tools_list)-starting_tool_num):
-        tools+="tool "+str(i+starting_tool_num)+": "+str(tools_list[starting_tool_num+i]["description"])+"\n"
+    count=0
+    tools_list =  tools_list[starting_tool_num:]
+    for i in tools_list:
+        tools+="tool "+str(count)+": "+str(i["description"])+"\n"
         count+=1
     tools+="tool "+str(count)+": "+str("Use this tool when the question can be answered without using any tool or if the question is a greeting or a casual conversation. Also if we need to convert languages other than english, use this tool.")+"\n"
     prompt=prompt.format(**{"tools":tools,"question":question})
-
     ans = openai.Completion.create(
         model="text-davinci-002",
         max_tokens=256,
@@ -26,7 +26,7 @@ Which tool (number only), if any, would you use to answer the following question
         temperature=0.4
     )
 
-    return (calcCost(prompt),re.sub("[^0-9]", "",ans['choices'][0]['text'].strip()))
+    return (calcCost(prompt),str(int(re.sub("[^0-9]", "",ans['choices'][0]['text'].strip()))+starting_tool_num))
    
 
 def calcCost(p):

@@ -18,10 +18,7 @@ E.g.: WOLFRAM_KEY=an-encypted-key
 import os
 import openai
 
-OPENAI_DEFAULT_KEY =os.environ["OPENAI_API_KEY"]
-GOOGLE_MAPS_KEY = os.environ["GOOGLE_MAPS_KEY"]
-GOOGLE_KEY = os.environ["GOOGLE_KEY"]
-GOOGLE_CX = os.environ["GOOGLE_CX"]
+
 
 ###
 # Use this regex to find if a variable is a pure interpolation.
@@ -30,7 +27,7 @@ GOOGLE_CX = os.environ["GOOGLE_CX"]
 DICT_KEY_REGEX_TO_FIND_PURE_INTERPOLATIONS = "^\{[a-zA-Z0-9\.\-_]+\}$"
 
 
-def set_api_key(key=OPENAI_DEFAULT_KEY, key_type="OPENAI_API_KEY"):
+def set_api_key(key, key_type="OPENAI_API_KEY"):
     """
     Set the API key in the environment variable.
 

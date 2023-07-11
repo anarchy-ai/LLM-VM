@@ -42,7 +42,7 @@ try:
         memory_check,
         replace_variables_for_values,
     )
-    from .utils import *
+    
 except:
     from bothandler import (
         question_split,
@@ -50,6 +50,10 @@ except:
         memory_check,
         replace_variables_for_values,
     )
+
+try:
+    from .utils import *
+except:
     from utils import *
 
 
@@ -66,7 +70,7 @@ random_fixed_seed = random.Random(4)
 QUALITY = 0.2
 
 
-def buildGenericTools(tools=GENERIC_TOOLS):
+def buildExampleTools(tools=GENERIC_TOOLS):
     new_tools = tools
 
     # wolfram
@@ -176,7 +180,8 @@ class Agent:
     def __init__(self, openai_key, tools, bot_str="", verbose=4):
         self.verbose = verbose
         self.price = 0
-        self.set_tools(tools)
+        self.tools = []
+        self.set_tools(buildExampleTools()+tools)
         if bot_str == "":
             self.bot_str = bot_str
         else:
@@ -184,9 +189,6 @@ class Agent:
 
         # set all the API resource keys to make calls
         set_api_key(openai_key, "OPENAI_API_KEY")
-        set_api_key(GOOGLE_MAPS_KEY, "GOOGLE_MAPS_KEY")
-        set_api_key(GOOGLE_KEY, "GOOGLE_KEY")
-        set_api_key(GOOGLE_CX, "GOOGLE_CX")
 
     def makeToolDesc(self, tool_id):
         """
@@ -233,7 +235,6 @@ class Agent:
         None
         """
 
-        self.tools = []
         for tool in tools:
             if not "args" in tool:
                 tool["args"] = {}
@@ -297,6 +298,7 @@ class Agent:
             question,
             memory,
             [],
+            0
         )
 
         if self.verbose > -1:
@@ -422,7 +424,7 @@ class Agent:
             self, prompt, stop=f"</{RESPONSE}>", max_tokens=max_tokens
         ).strip()
 
-    def promptf(self, question, memory, facts, split_allowed=True, spaces=0):
+    def promptf(self, question, memory, facts, level, split_allowed=True, max_level=3):
         """
         Formats the gpt prompt to include conversation history, facts and logs responses to the console
 
@@ -434,10 +436,14 @@ class Agent:
             a list of tuples containing the conversation history
         facts
             a list containing factual answers generated for each sub-question
+        level
+            param indicating the current recursive level
+
         split_allowed
             a boolean to allow the question to be split into sub-questions if set to True
-        spaces
-            an integer to set the amount of spacing between printed logs
+        
+        max_level
+            param that indicates the maximum recursive level we want to allow. 
 
         Returns
         ----------
@@ -445,8 +451,6 @@ class Agent:
             a tuple containing the gpt response and a list with the conversation history
         """
 
-        for i in range(spaces):
-            print(" ", end="")
 
         mem = "".join(
             [
@@ -462,10 +466,9 @@ class Agent:
 
         if split_allowed:
             subq = question_split(question, self.tools, mem)
-            for i in range(spaces):
-                print(" ", end="")
+        
             subq_final = []
-            print(subq[1])
+        
             if len(subq[1]) == 1:
                 split_allowed = False
 
@@ -476,6 +479,9 @@ class Agent:
                     else:
                         split_allowed = False
 
+            if level==max_level:
+                split_allowed = False
+
             self.price += subq[0]
             new_facts = []
 
@@ -484,8 +490,8 @@ class Agent:
                     subq_final[i],
                     memory,
                     facts,
+                    level+1,
                     split_allowed=split_allowed,
-                    spaces=spaces + 4,
                 )
                 facts = facts + new_facts
                 mem = "".join(
@@ -513,14 +519,14 @@ class Agent:
             print_big("NO DATA TOOLS USED, ANSWERED FROM MEMORY")
             return (a.replace("\n", ""), [(question, a)])
 
-        tool_to_use = tool_picker(self.tools, question, 0)
+        tool_to_use = tool_picker(self.tools, question, 3)
 
-        # TODO: UNCOMMENT PRINT STATEMENT WHEN SPACY WORKS FOR INTERFACE CONSISTENCY (NEEDS TO BE TESTED)
+        
         print_big(
             "".join(
                 [
                     f'{"✓" if self.tools.index(tool) == tool_to_use else " "} {self.tools.index(tool)}.- {tool["description"]}\n'
-                    for tool in self.tools
+                    for tool in self.tools[3:0]
                 ]
             )
             + f"\n> Question: {question}\n> Raw answer: '{tool_to_use}'\n> Tool ID: {tool_to_use}",
@@ -532,7 +538,7 @@ class Agent:
             tool_to_use = int(tool_to_use[1])
         except:
             tool_to_use = len(self.tools)
-        if tool_to_use == len(self.tools):
+        if tool_to_use >= len(self.tools):
             prompt = MSG("system", "You are a good and helpful bot" + self.bot_str)
             prompt += MSG(
                 "user",
@@ -560,124 +566,30 @@ class Agent:
         query = question
         if "ai_response_prompt" in self.tools[tool_to_use].keys():
             query = self.tools[tool_to_use]["ai_response_prompt"]
-        answer = self.use_tool(
-            self.tools[tool_to_use], tool_input, question, memory, facts, query=query
-        )
-        for i in range(spaces):
-            print(" ", end="")
+        try:
+            answer = self.use_tool(
+                self.tools[tool_to_use], tool_input, question, memory, facts, query=query
+            )
+        except:
+            prompt = MSG("system", "You are a good and helpful bot" + self.bot_str)
+            prompt += MSG(
+                "user",
+                mem + "\nQ:" + question + "\nANSWER Q, DO NOT MAKE UP INFORMATION.",
+            )
+            answer = call_ChatGPT(self, prompt, stop="</AI>", max_tokens=256).strip()
+        
 
         return (answer, [(question, answer)])
-
-    def call_gpt(
-        self, cur_prompt: str, stop: str, max_tokens=20, quality="best", temperature=0.0
-    ):
-        """
-        Calls OpenAI curie/davinci model
-
-        Parameters
-        ----------
-        cur_prompt
-            the tools enum value as specified by the DefaultTools class
-        stop
-            a string defining the stopping point for the text generation
-        max_tokens
-            maximum number of tokens to be generated
-        quality
-            could be either "okay"-text-curie-001 or "best"-text-davinci-003
-        temperature
-            controls randomness in generated text
-
-        Returns
-        ----------
-        String
-            a gpt response text
-        """
-        if self.verbose > 2:
-            print_op(prepPrintPromptContext(cur_prompt))
-
-        ask_tokens = max_tokens + len(cur_prompt) / 2.7
-
-        if self.verbose > 0:
-            print_op("ASK_TOKENS:", ask_tokens)
-
-        if (ask_tokens) > 2049:
-            quality = "best"
-
-        model = {
-            "best": ("text-davinci-003", 0.02),
-            "okay": ("text-curie-001", 0.002),
-        }[quality]
-
-        def calcCost(p):
-            return (len(p) / 2700.0) * model[1]
-
-        try:
-            self.price += calcCost(cur_prompt)
-
-            ans = openai.Completion.create(
-                model=model[0],
-                max_tokens=max_tokens,
-                stop=stop,
-                prompt=cur_prompt,
-                temperature=temperature,
-            )
-        except Exception as e:
-            print_op("WTF:", e)
-            return "OpenAI is down!"
-
-        response_text = ans["choices"][0]["text"]
-        self.price += calcCost(response_text)
-
-        if self.verbose > 2:
-            print_op("GPT output:")
-            print_op(prepPrintPromptContext(response_text))
-            print_op("GPT output fin.\n")
-
-        return response_text
 
 
 # print_op(google(' {"question": ""}'))
 if __name__ == "__main__":
-    """
-    # nytimes
-    tools += [{'url': "https://api.nytimes.com/svc/mostpopular/v2/viewed/1.json?api-key=YAKJdTt2RhGZfFNSwEfZTmQmloUGmMjL",
-            'description': "use this tool to find the top news stories of the day",
-            'params': [],
-            'examples' : []}]
-    """
-    # tools = [{'method': 'GET',"description":"use this tool to find the price of stocks",'args' : {"url":"https://finnhub.io/api/v1/quote",'params': { 'token' :'cfi1v29r01qq9nt1nu4gcfi1v29r01qq9nt1nu50'} },"dynamic_params":{"symbol":"the symbol of the stock"}}]
+    
+    
 
-    tools = buildGenericTools()
+    tools = buildExampleTools()
 
-    tools += [
-        {
-            "method": "GET",
-            "dynamic_params": {
-                "location": 'This string indicates the geographic area to be used when searching for businesses. \
-        Examples: "New York City", "NYC", "350 5th Ave, New York, NY 10118".',
-                "term": 'Search term, e.g. "food" or "restaurants". The \
-        term may also be the business\'s name, such as "Starbucks"',
-            },
-            "description": "This tool searches for a business on yelp.  It's useful for finding restaurants and \
-        whatnot.",
-            "args": {
-                "url": "https://api.yelp.com/v3/businesses/search",
-                "cert": "",
-                "json": {},
-                "params": {
-                    "limit": "1",
-                    "open_now": "true",
-                    "location": "{location}",
-                    "term": "{term}",
-                },
-                "data": {},
-                "headers": {
-                    "authorization": "Bearer OaEqVSw9OV6llVnvh9IJo92ZCnseQ9tftnUUVwjYXTNzPxDjxRafYkz99oJKI9WHEwUYkiwULXjoBcLJm7JhHj479Xqv6C0lKVXS7N91ni-nRWpGomaPkZ6Z1T0GZHYx",
-                    "accept": "application/json",
-                },
-            },
-        }
-    ]
+    
 
     label = Agent(OPENAI_DEFAULT_KEY, tools, verbose=1)
     conversation_history = []

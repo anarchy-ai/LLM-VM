@@ -11,6 +11,7 @@ import re
 import sys
 
 
+
 def flatten(a):
     return sum(a, [])
 
@@ -181,7 +182,6 @@ def tool_api_call(self, tool, gpt_suggested_input, question, memory, facts, quer
         print_op("GPT SUGGESTED INPUT:", gpt_suggested_input)
 
     parsed_gpt_suggested_input = json.loads(gpt_suggested_input)
-
     # make sure all of the suggested fields exist in the tool desc
     for i in parsed_gpt_suggested_input.keys():
         if i not in tool["dynamic_params"].keys():
