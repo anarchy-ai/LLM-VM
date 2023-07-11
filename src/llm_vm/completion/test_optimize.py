@@ -3,7 +3,7 @@ import os
 import openai
 import sys
 
-from optimize import *
+from llm_vm.completion.optimize import *
 
 haskell = '''
 def call_gpt(state, cur_prompt: str, stop: str, max_tokens = 20, quality = "best", temperature = 0.0):
@@ -99,23 +99,26 @@ def create_jsonl_file(data_list: list, file_name: str, compress: bool = True) ->
     return file_name, open(file_name, "rb")
 '''
 
-if __name__ == "__main__":
+def run_test_stub():
     try:
         load_dotenv()
     except:
         pass
-    openai.api_key = os.getenv('OPENAI_KEY')
-    anarchy_key = os.getenv('ANARCHY_KEY')
+    openai_api_key = os.getenv('OPENAI_API_KEY')
+    openai.api_key =openai_api_key
+    # anarchy_key = os.getenv('ANARCHY_KEY')
     print("key:", openai.api_key)
-    optimizer = LocalOptimizer(MIN_TRAIN_EXS=2)
+    optimizer = LocalOptimizer(MIN_TRAIN_EXS=1,openai_key=openai_api_key)
     #optimizer = HostedOptimizer(openai_key = openai.api_key, 
     #                            anarchy_key = anarchy_key, 
     #                            MIN_TRAIN_EXS=2)
     i = 0
-
     optimizer.complete("Answer question Q. ","Q: What is the currency in myanmmar", \
                  temperature = 0.0, data_synthesis = True,\
-                 min_examples_for_synthesis=1)
+                 min_examples_for_synthesis=0,finetune=True)
+    
+if __name__ == "__main__":
+    run_test_stub()
     '''
     for h in haskell.splitlines():
         print("At: ", i)

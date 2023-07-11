@@ -1,0 +1,45 @@
+
+[project]
+name = "llm_vm"
+version = "0.1.0"
+description = "Taming LLMs to do whatever you want"
+authors = [
+    {name = "Anarchy Team", email = "matt@anarchy.ai"},
+]
+
+requires-python = ">=3.11" # this could be lower if need be
+readme = "README.md"
+license = {text = "MIT"}
+dependencies = [
+    "python-dotenv>=1.0.0",
+    "openai>=0.27.6",
+    "numpy>=1.24",
+    "transformers>=4.29.0",
+    "flask>=2.3.2"
+]
+
+[project.scripts] # these names are just placeholders 
+llm_vm_test_optimize = "llm_vm.completion.test_optimize:run_test_stub"
+llm_vm_server = "llm_vm.app:main_server_entry_point"
+
+
+# package_dir = {}
+
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+
+# these are strawman configs
+[tool.black]
+line-length = 140
+target-version = ["py37"] # what does this do?
+skip-string-normalization = true
+
+
+[tool.poetry]
+# does poetry make sense as a tool to use?
+# ... this is also the default anyways
+packages = [
+    { include = "llm_vm", from = "src" },
+]
