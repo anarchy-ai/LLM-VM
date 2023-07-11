@@ -11,30 +11,32 @@ from transformers import AutoTokenizer, OPTForCausalLM,BloomForCausalLM,LlamaTok
 # print("yup")
 
 # something like this interface 
-# class Base_Onsite_LLM(ABC):
-#     def __init__(self,model_uri_override=None,tokenizer_kw_args=None,model_kw_args=None):
-#         if model_uri_override != None:
-#             self.model_uri= model_uri_override 
-#         self.model=model_loader()
+class Base_Onsite_LLM(ABC):
+    def __init__(self,model_uri_override=None,tokenizer_kw_args=None,model_kw_args=None):
+        if model_uri_override != None:
+            self.model_uri= model_uri_override 
+        self.model=model_loader()
+        self.tokenizer=tokenizer_loader()
 
-#     # @abstractmethod
-#     @property
-#     def model_uri(self):
-#         pass
+    # @abstractmethod
+    @property
+    def model_uri(self):
+        pass
 
-#     @model_uri.setter
-#     def model_uri(self,val):
-#         self.model_uri=val # ummm, is this correct?
+    @model_uri.setter
+    def model_uri(self,val):
+        self.model_uri=val # ummm, is this correct?
 
-#     @abstractmethod
-#     def model_loader(self):
-#         pass
+    @abstractmethod
+    def model_loader(self):
+        pass
 
-#     @abstractmethod
-#     def tokenizer_loader(self):
-#         pass
-
-    # def generate() # this is where the meat and potatoes should live?
+    @abstractmethod
+    def tokenizer_loader(self):
+        pass
+    @abstractmethod
+    def generate() # this is where the meat and potatoes should live?
+        pass 
 
 """
 this factorization isn't necessarily the greatest, nor should it be viewed

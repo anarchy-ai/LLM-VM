@@ -15,12 +15,15 @@ dependencies = [
     "openai>=0.27.6",
     "numpy>=1.24",
     "transformers>=4.29.0",
-    "flask>=2.3.2"
+    "flask>=2.3.2",
+    "sentencepiece>=0.1.99"
 ]
+
+
 
 [project.scripts] # these names are just placeholders 
 llm_vm_test_optimize = "llm_vm.completion.test_optimize:run_test_stub"
-llm_vm_server = "llm_vm.app:main_server_entry_point"
+llm_vm_server = "llm_vm.server:main_server_entry_point"
 
 
 # package_dir = {}

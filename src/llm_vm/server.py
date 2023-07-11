@@ -1,3 +1,5 @@
+from llm_vm.server import app
+
 import flask
 from flask import request, jsonify
 import json
@@ -7,10 +9,13 @@ import importlib
 import openai
 import os
 import hashlib
-from src.llm_vm.completion.optimize import LocalOptimizer
+
 # from test_agent import run_test
 from flask_cors import CORS
 from contextlib import contextmanager
+
+import llm_vm.server.routes as routes 
+from llm_vm.completion.optimize import LocalOptimizer
 
 optimizer = LocalOptimizer(MIN_TRAIN_EXS=2,openai_key=None)
 # Flask Configuration
@@ -18,14 +23,17 @@ app = flask.Flask(__name__)
 CORS(app)
 app.config["DEBUG"] = True
 
-from app import routes
+
 app.register_blueprint(routes.bp)
 
+
+# we are gonna want 
 def main_server_entry_point():
     # make this more configurable soon
     app.run(host="192.168.1.75", port=3002)
 
-def generate_hash(input_string):
-    sha256_hash = hashlib.sha256()
-    sha256_hash.update(str(input_string).encode('utf-8'))
-    return int(sha256_hash.hexdigest(), 16) % 10**18
+
+# we can reenable this if needed, but really use the cli_entry-points in pyproject.toml please
+# if __name__ == '__main__':
+#     # app.run(host="192.168.1.75",port=3002) # run at specified IP
+#     main_server_entry_point() # for running local

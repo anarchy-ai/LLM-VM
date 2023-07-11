@@ -9,8 +9,8 @@ This is still in BETA.  Very little attention has been paid to package structure
 To run and test this repository you need to start a flask server. To start the flask server use: 
 
 ```bash
-pip3 install -r requirements.txt
-python app.py
+pip3 install .
+llm_vm_server
 ```
 
 This will start a flask server as http://192.168.1.75:3002 and will create an endpoint http://192.168.1.75:3002/completion. Post requests can be sent to this endpoint in the following format:
@@ -45,7 +45,7 @@ To use the REBEL endpoint with tools, add a tool in the following way. We have u
 }
 
 ```
-To access the completion endpoint programmatically, after starting up the server on your machine, import llm_vm.py into your code and call the completion function. Currently, we do not support tools through the programmatic completion fucntion. To test that the server is working correctly, after starting it, run 
+To access the completion endpoint programmatically, after starting up the server on your machine, import llm_vm.py into your code and call the completion function. Currently, we do not support tools through the programmatic completion function. To test that the server is working correctly, after starting it, run 
 ```
 python test_llm_vm.py
 ```
