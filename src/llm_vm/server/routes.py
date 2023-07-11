@@ -3,7 +3,7 @@ import json
 import os
 import openai
 from app import optimizer
-from src.llm_vm.agents.REBEL import agent
+from llm_vm.agents.REBEL import agent
 
 bp = Blueprint('bp',__name__)
 @bp.route('/', methods=['GET'])
