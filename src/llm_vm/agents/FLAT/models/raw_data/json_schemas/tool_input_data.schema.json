@@ -1,0 +1,70 @@
+{
+    "type": "object",
+    "properties": {
+        "data": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "question": {
+                        "title": "Question to guess the parameters for.",
+                        "description": "The Question is the _subquestion_ for which the LLM must choose a valid JSON input for the API, to answer it.",
+                        "type": "string"
+                    },
+                    "answer": {
+                        "title": "The correct API input",
+                        "description": "Specify a dictionary (i.e. an object) with the correct API properties",
+                        "type": "object"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "params": {
+                        "type": "object"
+                    },
+                    "mem": {
+                        "title": "Conversation history / Question split history",
+                        "anyOf": [
+                            {
+                                "type": "array",
+                                "items": {
+                                    "anyOf": [
+                                        {
+                                            "title": "Two elements means: [question, answer]",
+                                            "type": "array",
+                                            "minItems": 2,
+                                            "maxItems": 2,
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        {
+                                            "title": "Three elements means: [question, answer, previous_api_result (object)]",
+                                            "type": "array",
+                                            "minItems": 3,
+                                            "maxItems": 3,
+                                            "items": [
+                                                {"type": "string"},
+                                                {"type": "string"},
+                                                {"type": "object"}
+                                            ]
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                },
+                "required": [
+                    "question",
+                    "answer",
+                    "params",
+                    "description"
+                ]
+            }
+        }
+    },
+    "required": [
+        "data"
+    ]
+}

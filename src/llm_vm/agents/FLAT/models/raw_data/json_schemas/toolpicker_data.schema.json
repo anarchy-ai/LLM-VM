@@ -1,0 +1,59 @@
+{
+    "type": "object",
+    "properties": {
+        "data": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "question": {
+                        "title": "Question to choose a best-tool for.",
+                        "description": "The Question is the _subquestion_ for which the LLM must choose a 'best tool' to answer it. Use simple, concise, 1-hop questions, and add also examples where the AI must use the conversation memory or where it 'does not know'.",
+                        "type": "string"
+                    },
+                    "answer": {
+                        "title": "The best tool to answer the question",
+                        "description": "Choose from the list of available tools which one is the best tool to answer the given question. Remember, these examples will train the model that decides the tool to answer for a given _subquestion_.",
+                        "$comment": "Get these values from 'ALL_TOOLS_MAP' and keep it in sync.",
+                        "enum": [
+                            "memory",
+                            "dont_know",
+                            "weather",
+                            "wolfram",
+                            "directions",
+                            "send_email",
+                            "create_doc",
+                            "share_doc",
+                            "book_table",
+                            "find_restaurant",
+                            "news",
+                            "order_food",
+                            "book_appointment",
+                            "check_appointment",
+                            "find_flight"
+                        ]
+                    },
+                    "mem": {
+                        "title": "Conversation history / Question split history",
+                        "type": "array",
+                        "items": {
+                            "type": "array",
+                            "minItems": 2,
+                            "maxItems": 2,
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                },
+                "required": [
+                    "question",
+                    "answer"
+                ]
+            }
+        }
+    },
+    "required": [
+        "data"
+    ]
+}

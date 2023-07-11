@@ -1,0 +1,677 @@
+{
+    "$schema": "./json_schemas/question_split_data.schema.json",
+    "data": [
+        {
+            "question": "Who was the maternal grandfather of george washington?",
+            "answer": [
+                "Who was George Washington's mother?",
+                "Who was her father?"
+            ]
+        },
+        {
+            "question": "Can you tell me what happened at Tesla recently, and email it to me at peter@inbox.com?",
+            "answer": [
+                "Get Tesla news",
+                "Send the Tesla news to peter@inbox.com"
+            ]
+        },
+        {
+            "mem": [
+                [
+                    "What is the capital of India",
+                    "Delhi"
+                ]
+            ],
+            "question": "What is the currency there?",
+            "answer": [
+                "What is the currency in India?"
+            ]
+        },
+        {
+            "question": "Think of a joke and send it to john@gmail.com",
+            "answer": [
+                "Think of a joke",
+                "Send the joke to john@gmail.com"
+            ]
+        },
+        {
+            "mem": [
+                [
+                    "I am in Miami",
+                    "Glad to hear that!"
+                ]
+            ],
+            "question": "How far am I from Atlanta?",
+            "answer": [
+                "Distance from Miami to Atlanta?"
+            ]
+        },
+        {
+            "mem": [
+                [
+                    "Who is James Bond?",
+                    "A secret agent"
+                ]
+            ],
+            "question": "Where is he from?",
+            "answer": [
+                "Where is James Bond from?"
+            ]
+        },
+        {
+            "question": "If I change 10kg of rice for 3kg of quinoa, is that a good deal?",
+            "answer": [
+                "Price of 1kg of rice?",
+                "Price of 1kg of quinoa?",
+                "Are 10kg of rice cheaper than 3kg of quinoa?"
+            ]
+        },
+        {
+            "question": "Is the distance between London and Paris greater than the distance between Boston and LA?",
+            "answer": [
+                "Distance from London to Paris?",
+                "Distance from Boston to Los Angeles?",
+                "Which of the two is greater?"
+            ]
+        },
+        {
+            "mem": [
+                [
+                    "I'm feeling very dizzy",
+                    "I recommend you to search for medical assistance"
+                ],
+                [
+                    "How far am I from the closest hospital?",
+                    "Where are you, currently?"
+                ]
+            ],
+            "question": "I'm at Cupertino Memorial Park",
+            "answer": [
+                "Directions from Cupertino Memorial Park to nearest hospital"
+            ]
+        },
+        {
+            "question": "Tell me the time, and whether it's later than 7PM",
+            "answer": [
+                "What time is it?",
+                "Is it later than 7PM?"
+            ]
+        },
+        {
+            "question": "Think of a random number. Is it bigger than 88?",
+            "answer": [
+                "Pick a random number",
+                "Is the number bigger than 88?"
+            ]
+        },
+        {
+            "mem": [
+                [
+                    "I have a list of numbers, 1-100. How many are divisible by 3?",
+                    "33 numbers are divisible by 3, a third of them"
+                ]
+            ],
+            "question": "pick one in that list, and tell me if it's bigger than 44",
+            "answer": [
+                "pick a number between 1 and 100",
+                "Is the number bigger than 44?"
+            ]
+        },
+        {
+            "mem": [
+                [
+                    "Do i have any meetings today?",
+                    "No, today you don't"
+                ]
+            ],
+            "question": "When is my next meeting?",
+            "answer": [
+                "What is the date today?",
+                "When is the next meeting?"
+            ]
+        },
+        {
+            "question": "What time is it?",
+            "answer": [
+                "What time is it?"
+            ]
+        },
+        {
+            "question": "What happened today in Germany's capital?",
+            "answer": [
+                "What is the capital of Germany?",
+                "News in the capital of Germany"
+            ]
+        },
+        {
+            "mem": [
+                [
+                    "what is that famous small summer red fruit?",
+                    "You probably refer to strawberries"
+                ],
+                [
+                    "Why are they so popular?",
+                    "Sweet, juicy, versatile, and healthy fruit with appealing appearance"
+                ]
+            ],
+            "question": "why are they so expensive this week?",
+            "answer": [
+                "why are strawberries expensive?"
+            ]
+        },
+        {
+            "mem": [
+                [
+                    "what do you know about salesforce?",
+                    "Salesforce is a customer relationship management [CRM] platform that allows businesses to manage their sales, marketing, customer service, and other related activities."
+                ],
+                [
+                    "do they have offices in San Francisco?",
+                    "Yes, Salesforce has its headquarters located in San Francisco, California"
+                ],
+                [
+                    "are they easy to find?",
+                    "Salesforce's headquarters is located in the heart of San Francisco's Financial District, and the building itself is quite large and distinctive, so it should be relatively easy to find."
+                ]
+            ],
+            "question": "who is the current CEO and since when?",
+            "answer": [
+                "Who is the current CEO of salesforce?",
+                "When did they become CEO?"
+            ]
+        },
+        {
+            "question": "Is it sunny in the capital of Kenya?",
+            "answer": [
+                "What is the capital of Kenya?",
+                "What is the weather there?"
+            ]
+        },
+        {
+            "question": "How much warmer is Athens compared to Helsinki?",
+            "answer": [
+                "Temperature in Athens?",
+                "Temperature in Helsinki?",
+                "By how many degrees is Athens warmer?"
+            ]
+        },
+        {
+            "mem": [
+                [
+                    "What was today's meeting about?",
+                    "In today's meeting it was discussed how to optimise transactions and reduce the amount of time that customer support spends on the phone"
+                ]
+            ],
+            "question": "Can you email this to nico@anarchy.ai and james@anarchy.ai?",
+            "answer": [
+                "Email meeting summary to nico@anarchy.ai",
+                "Email meeting summary to james@anarchy.ai"
+            ]
+        },
+        {
+            "mem": [
+                [
+                    "Recommend a restaurant near Times Square, New York",
+                    "Buydin Tacos has an excellent rating on Yelp"
+                ],
+                [
+                    "What is their phone number?",
+                    "The number for Buydin Tacos is +1 [541]-754-3010"
+                ]
+            ],
+            "question": "Are they open now?",
+            "answer": [
+                "What is the current time and date?",
+                "Opening times for Buydin Tacos, New York?",
+                "Is Buydin Tacos open now?"
+            ]
+        },
+        {
+            "mem": [
+                [
+                    "What is a websocket?",
+                    "A WebSocket is a protocol for two-way communication between a client and a server over a single, long-lived connection"
+                ]
+            ],
+            "question": "Summarize that in 10 words and share it with nico@email.com?",
+            "answer": [
+                "Summarize that in 10 words",
+                "share that with nico@email.com"
+            ]
+        },
+        {
+            "mem": [
+                [
+                    "What's a lawnmower?",
+                    "A lawnmower is a machine used for cutting and trimming grass."
+                ]
+            ],
+            "question": "Can you ellaborate on that and share it with nico@email.com?",
+            "answer": [
+                "Ellaborate the lanmower definition",
+                "share it with nico@email.com"
+            ]
+        },
+        {
+            "mem": [
+                [
+                    "How do i make an omelette?",
+                    "To make an omelette, beat eggs with salt and pepper, cook in a non-stick pan, fold in half and serve."
+                ]
+            ],
+            "question": "Can you summarise it in bullet points and share it on Slack?",
+            "answer": [
+                "Summarize that in bullet points",
+                "share that on the Slack app"
+            ]
+        },
+        {
+            "mem": [
+                [
+                    "What can i make with only flour and eggs?",
+                    "You can make pasta dough, doughnuts, simple egg-based batter, and many other things"
+                ],
+                [
+                    "How do I make the pasta dough?",
+                    "To make pasta dough with only flour and eggs, combine 1 cup of all-purpose flour with 2 large eggs in a mixing bowl and knead the mixture into a smooth dough"
+                ]
+            ],
+            "question": "Share that recipe by email with john.john@mycompany.com",
+            "answer": [
+                "Share pasta dough recipe by email with john.john@mycompany.com"
+            ]
+        },
+        {
+            "mem": [
+                [
+                    "What can i make with only flour and eggs?",
+                    "You can make pasta dough, doughnuts, simple egg-based batter, and many other things"
+                ],
+                [
+                    "How do I make the pasta dough?",
+                    "To make pasta dough with only flour and eggs, combine 1 cup of all-purpose flour with 2 large eggs in a mixing bowl and knead the mixture into a smooth dough"
+                ]
+            ],
+            "question": "Summarize it in 10 words and share it with john.john@mycompany.com",
+            "answer": [
+                "Summarize pasta dough recipe in 10 words",
+                "Share recipe with john.john@mycompany.com"
+            ]
+        },
+        {
+            "mem": [
+                [
+                    "What the hell is grafting?",
+                    "In grafting, a section of a stem or a bud called a scion is taken from a plant with desirable traits, such as a particular fruit or flower, and attached onto the stem or rootstock of another plant called the host. The host plant provides a root system and a base for the scion to grow on. Over time, the two plants grow together and form a single plant with the desirable traits of the scion and the root system of the host plant. Grafting is commonly used in fruit tree production, ornamental plants, and for creating disease-resistant plants."
+                ],
+                [
+                    "I see, so you can have a plant that makes two fruits?",
+                    "Yes, it is possible to have a plant that produces two different types of fruit by grafting a scion from one fruit tree onto the rootstock of another fruit tree. For example, it is possible to have a tree that produces both apples and pears, or a tree that produces both lemons and oranges, by grafting different scions onto the same rootstock."
+                ]
+            ],
+            "question": "Make a 30 word summary and email it to Mark",
+            "answer": [
+                "Summarize grafting in 30 words",
+                "Email that to Mark"
+            ]
+        },
+        {
+            "mem": [],
+            "question": "Summarize my notes from last week",
+            "answer": [
+                "Summarize my notes from last week"
+            ]
+        },
+        {
+            "mem": [],
+            "question": "Summarize my notes from last week and post them on Slack",
+            "answer": [
+                "Summarize my notes from last week",
+                "post my notes from last week on Slack"
+            ]
+        },
+        {
+            "mem": [
+                [
+                    "What was discussed this morning?",
+                    "The main focus was on productivity loss and budget cuts"
+                ]
+            ],
+            "question": "Share that on Drive and Slack",
+            "answer": [
+                "Share that on Drive",
+                "Share that on Slack"
+            ]
+        },
+        {
+            "mem": [
+                [
+                    "What happened at the weekly meeting this morning?",
+                    "Funding was discussed. The CEO is taking a sabbatical. Five new engineers will be hired before Christmas."
+                ]
+            ],
+            "question": "Share that on Drive with me",
+            "answer": [
+                "Share that on Drive with me"
+            ]
+        },
+        {
+            "mem": [
+                [
+                    "What was the Engineer's zoom call about?",
+                    "John Myers isn't happy at the company. We will order new laptops."
+                ]
+            ],
+            "question": "Email it to me",
+            "answer": [
+                "Email that to me"
+            ]
+        },
+        {
+            "mem": [
+                [
+                    "What was this morning's meeting about?",
+                    "During the meeting, the team discussed the project's timeline, allocated responsibilities, and brainstormed creative solutions, resulting in a clear plan of action"
+                ]
+            ],
+            "question": "Email a summary in bulletpoints to team@the-company.it",
+            "answer": [
+                "Summarise that in bulletpoints",
+                "Email the summary to team@the-company.it"
+            ]
+        },
+        {
+            "mem": [],
+            "question": "Show me my last note and email it to my team",
+            "answer": [
+                "Summarize my last note",
+                "Email my last note to my team"
+            ]
+        },
+        {
+            "mem": [
+                [
+                    "Show me my last note and email it to my team",
+                    "Sure! Here is your last note! I have sent it to your team via email. What else can I do for you?"
+                ]
+            ],
+            "question": "Send me a summary to my email",
+            "answer": [
+                "Summarize my last note",
+                "Email me the last note"
+            ]
+        },
+        {
+            "question": "What is the distance between New York and Los Angeles?",
+            "answer": [
+                "Distance from New York to Los Angeles?"
+            ]
+        },
+        {
+            "mem": [
+                [
+                    "What is the capital of Spain?",
+                    "Madrid"
+                ]
+            ],
+            "question": "What is its population?",
+            "answer": [
+                "Population of Madrid?"
+            ]
+        },
+        {
+            "question": "Can you order me a pizza and have it delivered to my house?",
+            "answer": [
+                "Order pizza",
+                "Delivery to my address"
+            ]
+        },
+        {
+            "mem": [
+                [
+                    "What is the price of Bitcoin?",
+                    "$60,000"
+                ],
+                [
+                    "What is the price of Ethereum?",
+                    "$2,000"
+                ]
+            ],
+            "question": "Which of them is more valuable?",
+            "answer": [
+                "What is more valuable, Bitcoin or Ethereum?"
+            ]
+        },
+        {
+            "question": "What is the capital of the biggest country in Oceania?",
+            "answer": [
+                "What is the biggest country in Oceania?",
+                "What is its capital?"
+            ]
+        },
+        {
+            "question": "What is the highest peak in the United States?",
+            "answer": [
+                "What is the highest peak in the United States?"
+            ]
+        },
+        {
+            "mem": [
+                [
+                    "What is the phone number for the nearest pizza place?",
+                    "555-1234"
+                ]
+            ],
+            "question": "Can you call the pizza place and order me a large pepperoni pizza?",
+            "answer": [
+                "Call pizza place",
+                "Order large pepperoni pizza"
+            ]
+        },
+        {
+            "mem": [
+                [
+                    "What is the weather in London?",
+                    "Partly cloudy with a chance of rain"
+                ]
+            ],
+            "question": "What about Paris?",
+            "answer": [
+                "Weather in Paris"
+            ]
+        },
+        {
+            "question": "Can you give me a recipe for lasagna?",
+            "answer": [
+                "Lasagna recipe"
+            ]
+        },
+        {
+            "question": "How many Euros can I get for 100 US Dollars?",
+            "answer": [
+                "Exchange rate between USD and EUR?",
+                "How many Euros is 100 USD worth?"
+            ]
+        },
+        {
+            "mem": [
+                [
+                    "What is the name of the actor who played Iron Man?",
+                    "Robert Downey Jr."
+                ]
+            ],
+            "question": "What other movies has he been in?",
+            "answer": [
+                "Movies with Robert Downey Jr."
+            ]
+        },
+        {
+            "question": "Can you book a hotel room for me in Paris?",
+            "answer": [
+                "Book hotel room in Paris"
+            ]
+        },
+        {
+            "question": "What is the capital of Australia and how far is it from Melbourne?",
+            "answer": [
+                "What is the capital of Australia?",
+                "What is the distance between there and Melbourne?"
+            ]
+        },
+        {
+            "mem": [
+                [
+                    "What is the tallest mountain in the world?",
+                    "Mount Everest is the tallest mountain in the world"
+                ]
+            ],
+            "question": "What is the second tallest?",
+            "answer": [
+                "What is the second tallest mountain in the world?"
+            ]
+        },
+        {
+            "question": "What is the population of Tokyo and how does it compare to New York City?",
+            "answer": [
+                "What is the population of Tokyo?",
+                "What is the population of New York City?",
+                "How do the populations of Tokyo and New York City compare?"
+            ]
+        },
+        {
+            "question": "Who won the Best Actor award at the last Oscars?",
+            "answer": [
+                "What is the current date?",
+                "When were the last Oscars before today?",
+                "Who won the Best Actor award at the last Oscars?"
+            ]
+        },
+        {
+            "mem": [
+                [
+                    "What is the tallest building in the world?",
+                    "The Burj Khalifa is currently the tallest building in the world"
+                ]
+            ],
+            "question": "When was it built, and where?",
+            "answer": [
+                "When was the Burj Khalifa built?",
+                "Where is the Burj Khalifa?"
+            ]
+        },
+        {
+            "question": "What is the difference between a crocodile and an alligator?",
+            "answer": [
+                "What is the difference between a crocodile and an alligator?"
+            ]
+        },
+        {
+            "mem": [
+                [
+                    "What is the most spoken language in the world?",
+                    "Mandarin Chinese"
+                ]
+            ],
+            "question": "Where is it spoken, and by whom?",
+            "answer": [
+                "Where is Mandarin spoken?",
+                "Which group speaks Mandarin"
+            ]
+        },
+        {
+            "question": "What is the current price of Bitcoin and how has it changed over the past week?",
+            "answer": [
+                "What is the current price of Bitcoin?",
+                "Bitcoin price historical data for the past week?"
+            ]
+        },
+        {
+            "mem": [
+                [
+                    "What is the tallest mountain in the world?",
+                    "Mount Everest is the tallest mountain in the world"
+                ]
+            ],
+            "question": "Is John available for a meeting this afternoon?",
+            "answer": [
+                "Is John available for a meeting this afternoon?"
+            ]
+        },
+        {
+            "mem": [
+                [
+                    "What is the population of Tokyo and how does it compare to New York City?",
+                    "Tokio has around 14 million people, whereas New York has around 8.5, roughly 5.5 million fewer people."
+                ]
+            ],
+            "question": "Is it raining in Berlin, Germany?",
+            "answer": [
+                "Weather in Berlin, Germany"
+            ]
+        },
+        {
+            "mem": [
+                [
+                    "What is the population of Tokyo and how does it compare to New York City?",
+                    "Tokio has around 14 million people, whereas New York has around 8.5, roughly 5.5 million fewer people."
+                ],
+                [
+                    "Is it raining in Berlin, Germany?",
+                    "No, it's currently sunny and 15C"
+                ]
+            ],
+            "question": "How are you?",
+            "answer": [
+                "How are you?"
+            ]
+        },
+        {
+            "mem": [
+                [
+                    "What is the tallest building in the world?",
+                    "The Burj Khalifa is currently the tallest building in the world"
+                ]
+            ],
+            "question": "I'm cold",
+            "answer": [
+                "I'm cold"
+            ]
+        },
+        {
+            "mem": [
+                [
+                    "Who played James Bond in Casino Royale?",
+                    "The British actor Daniel Craig"
+                ]
+            ],
+            "question": "How old is he, and is he married?",
+            "answer": [
+                "How old is Daniel Craig?",
+                "Is Daniel Craig married?"
+            ]
+        },
+        {
+            "question": "What's the price of Apple stock?",
+            "answer": [
+                "What's the price of AAPL stock?"
+            ]
+        },
+        {
+            "mem": [
+                [
+                    "What is the population of Berlin, and is it more or less than Chicago?",
+                    "Berlin has approximately 4 million people, compared to Chicago's 3 million. Therefore, Berlin has more citizens."
+                ],
+                [
+                    "Who won the most medals in the 2022 Winter Olympics?",
+                    "Norway, who claimed 37 medals in total, 16 of which Gold."
+                ]
+            ],
+            "question": "What's the weather in its capital?",
+            "answer": [
+                "What is the capital of Norway?",
+                "What's the weather in the capital of Norway?"
+            ]
+        }
+    ]
+}

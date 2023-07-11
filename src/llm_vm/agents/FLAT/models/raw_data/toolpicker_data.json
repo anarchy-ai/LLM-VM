@@ -1,0 +1,244 @@
+{
+    "$schema": "./json_schemas/toolpicker_data.schema.json",
+    "data": [
+        {
+            "question": "Who is current US president?",
+            "answer": "wolfram"
+        },
+        {
+            "mem": [
+                [
+                    "What is the capital of germany",
+                    "The capital is Berlin"
+                ],
+                [
+                    "how many people live there?",
+                    "3.6 million"
+                ]
+            ],
+            "question": "is it hot there?",
+            "answer": "weather"
+        },
+        {
+            "mem": [
+                [
+                    "What's the temperature in Budapest?",
+                    "It's currently 30C"
+                ]
+            ],
+            "thought": "I already know the current temperature",
+            "question": "is it hotter than 40C?",
+            "answer": "memory"
+        },
+        {
+            "mem": [
+                [
+                    "Who is the current US President?",
+                    "Joe Biden, since January 2021"
+                ]
+            ],
+            "question": "How old is he?",
+            "answer": "wolfram"
+        },
+        {
+            "question": "I wanna drive from Boston to NY?",
+            "answer": "directions"
+        },
+        {
+            "mem": [
+                [
+                    "How hot is here?",
+                    "Where are you located?"
+                ],
+                [
+                    "I'm in the United States",
+                    "Can you give me a more specific location?"
+                ]
+            ],
+            "question": "I am in Portland, Oregon",
+            "answer": "weather"
+        },
+        {
+            "question": "Is Michael Jackson alive?",
+            "thought": "He was already dead in 2021. He is still dead and I can answer from memory.",
+            "answer": "memory"
+        },
+        {
+            "question": "Is Abraham Lincoln alive?",
+            "thought": "He was already dead in 2021. He is still dead and I can answer from memory.",
+            "answer": "memory"
+        },
+        {
+            "question": "Did Kanye West die?",
+            "thought": "He was alive in 2021. I must fetch recent data to answer the question.",
+            "answer": "wolfram"
+        },
+        {
+            "question": "What is my mother's favourite food?",
+            "answer": "dont_know"
+        },
+        {
+            "mem": [
+                [
+                    "What is Brooklyn?",
+                    "Brooklyn is a neighbourhood in New York City"
+                ]
+            ],
+            "question": "What is the city?",
+            "answer": "memory"
+        },
+        {
+            "question": "What is the fastest way to go from where I am [Paris France] to Lyon by car?",
+            "answer": "directions"
+        },
+        {
+            "question": "Make a reservation for John and his wife tonight at 8PM at the Blue Palace",
+            "answer": "book_table"
+        },
+        {
+            "question": "What happened yesterday in Johannesburg?",
+            "answer": "news"
+        },
+        {
+            "question": "Give me the latest news on Tesla",
+            "answer": "news"
+        },
+        {
+            "question": "What's the current state of events in Ukraine?",
+            "thought": "current state of events means news",
+            "answer": "news"
+        },
+        {
+            "question": "Are the protests in Paris still happening?",
+            "thought": "A protest is usually in the news",
+            "answer": "news"
+        },
+        {
+            "question": "I'm near St Clair subway station in Toronto. Where can I eat nearby?",
+            "answer": "find_restaurant"
+        },
+        {
+            "question": "I'm in Loring Park in Minneapolis, and I'm hungry. What do you recommend?",
+            "thought": "If someone is hungry, a recommendation means a place to eat",
+            "answer": "find_restaurant"
+        },
+        {
+            "mem": [
+                [
+                    "What are the most important things said in the meeting today?",
+                    "Be respectful, respect deadlines, take your holidays soon and Mary Sheldon will be the new Scrum Master"
+                ],
+                [
+                    "How long has Mary been with us?",
+                    "Mary Sheldon has been at the company since September 2019"
+                ]
+            ],
+            "question": "Email me those meeting bullet points to xxteth443@onhys-email.com",
+            "answer": "send_email"
+        },
+        {
+            "mem": [
+                [
+                    "Is Melinda available this afternoon?",
+                    "According to her calendar, she is free after 4PM, when \"Weekly review\" is scheduled to finish"
+                ]
+            ],
+            "question": "Ask her via email if she would like to do a performance review with our interns",
+            "answer": "send_email"
+        },
+        {
+            "mem": [
+                [
+                    "Can you summarise John Myer's email?",
+                    "We need to improve our collaboration by configuring and using the same tools"
+                ]
+            ],
+            "question": "Create a document with that information",
+            "answer": "create_doc"
+        },
+        {
+            "question": "Share my most recent document with j.hhessy@people-123.io",
+            "answer": "share_doc"
+        },
+        {
+            "question": "Share \"Training Guide.docx\" with j.hhessy@people-123.io",
+            "answer": "share_doc"
+        },
+        {
+            "question": "Make \"Design Guidelines.pdf\" available to anyone with the link",
+            "answer": "share_doc"
+        },
+        {
+            "mem": [
+                [
+                    "Give me a random person",
+                    "John Smith, from London, UK. {\"latitude\": 40.3356,\"longitude\": -75.9269}"
+                ]
+            ],
+            "question": "Is it raining in that place where the random person is?",
+            "answer": "weather"
+        },
+        {
+            "question": "Add that to \"best-employees.txt\"",
+            "answer": "create_doc"
+        },
+        {
+            "mem": [
+                [
+                    "Give me a random person",
+                    "John Smith, from London, UK. {\"latitude\": 40.3356,\"longitude\": -75.9269}"
+                ]
+            ],
+            "question": "What is the weather in that location",
+            "answer": "weather"
+        },
+        {
+            "mem": [
+                [
+                    "Suggest me a good vegan restaurant",
+                    "The Green Leaf has delicious salads and wraps with plenty of plant-based options."
+                ]
+            ],
+            "question": "Can I get a seitan wrap delivered?",
+            "answer": "order_food"
+        },
+        {
+            "mem": [
+                [
+                    "Can you set up a meeting Mary Johnson tomorrow?",
+                    "According to my data, Mary is not working tomorrow."
+                ]
+            ],
+            "question": "When will she be available next week?",
+            "answer": "check_appointment"
+        },
+        {
+            "mem": [
+                [
+                    "Can you set up a meeting Mary Johnson tomorrow?",
+                    "According to my data, Mary is not working tomorrow."
+                ],
+                [
+                    "When will she be available next week?",
+                    "She's available on Monday before 11:30, Tuesday after 14:45, and Wednesday all day"
+                ]
+            ],
+            "question": "Set an appointment with her on Monday at 10:30, for 45 minutes.",
+            "answer": "book_appointment"
+        },
+        {
+            "mem": [
+                [
+                    "What is Petra Taylor's email?",
+                    "petra@taylor-services.com"
+                ],
+                [
+                    "Is she available tomorrow afternoon?",
+                    "She has a free spot between 13:00 and 14:15hs"
+                ]
+            ],
+            "question": "Send her an email asking if she'd like to have a coffee break at 13:00",
+            "answer": "send_email"
+        }
+    ]
+}
