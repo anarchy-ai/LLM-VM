@@ -10,7 +10,6 @@ optimizer = LocalOptimizer(MIN_TRAIN_EXS=2,openai_key=None)
 bp = Blueprint('bp',__name__)
 @bp.route('/', methods=['GET'])
 def home():
-    print(agent)
     return '''home'''
 
 @bp.route('/v1/complete', methods=['POST']) 
@@ -31,7 +30,19 @@ def optimizing_complete():
             return {"status":0, "resp":"Wrong Data Type for temperature"}
         else:
             kwargs.update({"temperature":data["temperature"]})
-    
+
+    if "stop" in data.keys():
+        if type(data["stop"]) != str and type(data["stop"]) != list:
+            # stop can either be a string or array of strings
+            return {"status":0, "resp":"Wrong Data Type for stop"}
+        elif type(data["stop"]) == list:
+            # check that every element in the list is a string
+            for j in data["stop"]:
+                if type(j) != str:
+                    return {"status":0, "resp":"Wrong Data Type for stop"}
+        else:
+            kwargs.update({"stop":data["stop"]})                 
+        
     if "data_synthesis" in data.keys():
         if type(data["data_synthesis"])==bool:
             data_synthesis = data["data_synthesis"]
