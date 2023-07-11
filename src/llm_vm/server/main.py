@@ -25,3 +25,6 @@ def main_server_entry_point():
     # make this more configurable soon
     app.run(host="192.168.1.75", port=3002)
 
+if __name__ == '__main__':
+    app.run(port=3002)
+

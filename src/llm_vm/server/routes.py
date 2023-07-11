@@ -10,6 +10,7 @@ optimizer = LocalOptimizer(MIN_TRAIN_EXS=2,openai_key=None)
 bp = Blueprint('bp',__name__)
 @bp.route('/', methods=['GET'])
 def home():
+    print(agent)
     return '''home'''
 
 @bp.route('/v1/complete', methods=['POST']) 
