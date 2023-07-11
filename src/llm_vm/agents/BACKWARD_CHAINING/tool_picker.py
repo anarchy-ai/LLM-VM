@@ -1,9 +1,9 @@
-try:    
-    from .utils import *
-except:
-     from utils import *
+
+from llm_vm.agents.BACKWARD_CHAINING.utils import *
+
+from utils import *
      
-from labels import *
+from llm_vm.utils.labels import *
 import string
 import re
 import sys

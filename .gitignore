@@ -6,3 +6,5 @@ build/
 .pdm-python
 src/llm_vm.egg-info/*
 .mypy_cache
+.venv
+dist

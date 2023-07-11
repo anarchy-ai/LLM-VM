@@ -1,5 +1,5 @@
 import openai
-from typings_llm import *
+from llm_vm.utils.typings_llm import *
 
 def check_model_status (
     job_id: str,

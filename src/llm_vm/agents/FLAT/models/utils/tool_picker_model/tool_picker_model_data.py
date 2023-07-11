@@ -1,9 +1,9 @@
-from typings_llm import *
+from llm_vm.utils.typings_llm import *
 import json
 import os
-from agent_helper.tool_utils import get_training_tool_subset
-from agent_helper.tools import GENERIC_TOOLS
-from models.utils.tool_picker_model.get_training_tools import get_randomised_training_tools
+from llm_vm.agents.FLAT.agent_helper.tool_utils import get_training_tool_subset
+from llm_vm.agents.FLAT.agent_helper.tools import GENERIC_TOOLS
+from llm_vm.agents.FLAT.models.utils.tool_picker_model.get_training_tools import get_randomised_training_tools
 from random import randrange
 
 def __use_tool(tool_id: int, shuffle_value: int = 0, shuffle_modulo: int = 1e9) -> int:

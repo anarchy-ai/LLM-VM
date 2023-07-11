@@ -1,4 +1,4 @@
-from typings_llm import *
+from llm_vm.utils.typings_llm import *
 
 answer_from_memory_data: AnswerInMemoryModel = {
     "openai_model": OpenAIModel.DAVINCI,

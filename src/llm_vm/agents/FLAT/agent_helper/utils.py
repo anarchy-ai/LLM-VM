@@ -10,10 +10,10 @@ grandparent_dir = os.path.dirname(os.path.dirname(os.path.dirname(current_dir)))
 utils_dir = os.path.join(grandparent_dir, 'utils/')
 sys.path.append(utils_dir)
 
-from labels import *
+from llm_vm.utils.labels import *
 import random
 from Levenshtein import distance as lev
-from typings_llm import *
+from llm_vm.utils.typings_llm import *
 from bs4 import BeautifulSoup
 
 

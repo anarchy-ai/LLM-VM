@@ -25,30 +25,21 @@ from llama_index import (
 )
 import requests
 
-# Get the current file's directory to grab the python files with common functionality in the utils/ folder
-current_dir = os.path.dirname(os.path.abspath(__file__))
-grandparent_dir = os.path.dirname(os.path.dirname(current_dir))
-utils_dir = os.path.join(grandparent_dir, "utils/")
-sys.path.append(utils_dir)
 
-from keys import *
-from print_types import *
-from labels import *
-from tools import *
-from typings_llm import *
 
-try:
-    from .utils import *
-    from .tool_picker import *
-    from .disambiguate import *
-    from .extract import *
-    from .contained import *
-except:
-    from utils import *
-    from tool_picker import *
-    from disambiguate import *
-    from extract import *
-    from contained import *
+from llm_vm.utils.keys import *
+from llm_vm.utils.print_types import *
+from llm_vm.utils.labels import *
+from llm_vm.utils.tools import *
+from llm_vm.utils.typings_llm import *
+
+
+from llm_vm.agents.BACKWARD_CHAINING.utils import *
+from llm_vm.agents.BACKWARD_CHAINING.tool_picker import *
+from llm_vm.agents.BACKWARD_CHAINING.disambiguate import *
+from llm_vm.agents.BACKWARD_CHAINING.extract import *
+from llm_vm.agents.BACKWARD_CHAINING.contained import *
+
 
 
 def buildGenericTools(tools=GENERIC_TOOLS):
@@ -447,9 +438,7 @@ class Agent:
                 print_op("A:", answer)
             return (answer, api_calls, full_calls)
 
-
-# print_op(google(' {"question": ""}'))
-if __name__ == "__main__":
+def BACKWARD_CHAINING_main():
     openai.api_key = os.environ["OPENAI_API_KEY"]
     tools = []
     a = Agent(openai.api_key, buildGenericTools(GENERIC_TOOLS) + tools, verbose=1)
@@ -460,3 +449,8 @@ if __name__ == "__main__":
         ret = a.run(inp, mem)
         mem = ret[1]
         last = "AI: " + str(ret[0]) + "\n"
+
+# print_op(google(' {"question": ""}'))
+if __name__ == "__main__":
+    BACKWARD_CHAINING_main()
+    
