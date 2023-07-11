@@ -12,7 +12,7 @@ license = {text = "MIT"}
 dependencies = [
     "python-dotenv>=1.0.0",
     "openai>=0.27.6",
-    "numpy<1.23",
+    "numpy>=1.22.4",
     "watchdog>=3.0.0",
     "transformers>=4.29.0",
     "flask>=2.3.2",
