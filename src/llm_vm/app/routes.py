@@ -1,38 +1,12 @@
-<<<<<<< HEAD:src/llm_vm/app/routes.py
-from flask import Blueprint
-bp = Blueprint('bp',__name__)
-
-@bp.route('/', methods=['GET'])
-=======
-import flask
-from flask import request, jsonify
+from flask import request, Blueprint
 import json
-import time
-import traceback
-import importlib
-import openai
 import os
-import hashlib
-from src.llm_vm.completion.optimize import LocalOptimizer
-from src.llm_vm.agents.REBEL import agent
+import openai
+from app import optimizer
+from agents.REBEL import agent
 
-# from test_agent import run_test
-from flask_cors import CORS
-
-from contextlib import contextmanager
-
-optimizer = LocalOptimizer(MIN_TRAIN_EXS=2,openai_key=None)
-app = flask.Flask(__name__)
-CORS(app)
-app.config["DEBUG"] = True
-
-def generate_hash(input_string):
-    sha256_hash = hashlib.sha256()
-    sha256_hash.update(str(input_string).encode('utf-8'))
-    return int(sha256_hash.hexdigest(), 16) % 10**18
-
-@app.route('/', methods=['GET'])
->>>>>>> origin/main:app.py
+bp = Blueprint('bp',__name__)
+@bp.route('/', methods=['GET'])
 def home():
     return '''home'''
 

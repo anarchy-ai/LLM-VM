@@ -7,7 +7,7 @@ import importlib
 import openai
 import os
 import hashlib
-from completion import LocalOptimizer
+from completion.optimize import LocalOptimizer
 # from test_agent import run_test
 from flask_cors import CORS
 from contextlib import contextmanager
