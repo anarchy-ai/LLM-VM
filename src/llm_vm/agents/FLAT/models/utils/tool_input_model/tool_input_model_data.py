@@ -1,7 +1,7 @@
-from typings_llm import *
+from llm_vm.utils.typings_llm import *
 import os
 import json
-from agent_helper.utils import verbose_answer
+from llm_vm.agents.FLAT.agent_helper.utils import verbose_answer
 
 def __get_tool_input_model(model: OpenAIModel) -> ToolInputModel:
     current_dir = os.path.dirname(os.path.abspath(__file__))

@@ -2,11 +2,11 @@ import os
 import sys 
 import re
 import random
-from agent_helper.business_logic import promptf
-from labels import *
-from agent_helper.utils import *
-from agent_helper.tools import *
-from keys import *
+from llm_vm.agents.FLAT.agent_helper.business_logic import promptf
+from llm_vm.utils.labels import *
+from llm_vm.agents.FLAT.agent_helper.utils import *
+from llm_vm.agents.FLAT.agent_helper.tools import *
+from llm_vm.utils.keys import *
 
 
 random_fixed_seed = random.Random(4)

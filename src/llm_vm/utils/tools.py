@@ -12,9 +12,9 @@ grandparent_dir = os.path.dirname(os.path.dirname(os.path.dirname(current_dir)))
 utils_dir = os.path.join(grandparent_dir, 'utils/')
 sys.path.append(utils_dir)
 
-from keys import *
-from labels import *
-from typings_llm import *
+from llm_vm.utils.keys import *
+from llm_vm.utils.labels import *
+from llm_vm.utils.typings_llm import *
 
 CUSTOM_TOOL_ANSWER_EMBEDDING = "/answer_embedding"
 

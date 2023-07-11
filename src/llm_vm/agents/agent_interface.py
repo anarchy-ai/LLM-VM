@@ -3,9 +3,9 @@ This file has been temporarily repurposed as an interface that for users to
 call any of the three agents (REBEL, BACKWARD_CHAINING, and FLAT) and interact with them.
 Running this file prompts the user to choose any of the agents and ask it questions. 
 """
-import REBEL.agent 
-import BACKWARD_CHAINING.agent
-import keys  
+import llm_vm.agents.REBEL.agent 
+import llm_vm.agents.BACKWARD_CHAINING.agent
+import llm_vm.utils.keys  
 
 def call_agent():
     print("Try out any agent!")

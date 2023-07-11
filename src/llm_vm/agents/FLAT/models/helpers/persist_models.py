@@ -1,5 +1,5 @@
 import json
-from typings_llm import *
+from llm_vm.utils.typings_llm import *
 import os
 import time
 
