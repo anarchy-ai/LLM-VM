@@ -8,3 +8,4 @@ src/llm_vm.egg-info/*
 .mypy_cache
 .venv
 dist
+.DS_STORE
