@@ -7,8 +7,8 @@ import importlib
 import openai
 import os
 import hashlib
-from llm_vm.completion.optimize import LocalOptimizer
-
+from completion.optimize import LocalOptimizer
+from agents.REBEL import agent
 
 # from test_agent import run_test
 from flask_cors import CORS
@@ -31,11 +31,13 @@ def home():
 
 @app.route('/v1/complete', methods=['POST']) 
 def optimizing_complete():
+    rebel_agent = agent.Agent("", [], verbose=1)
     data = json.loads(request.data)
     static_context = data["context"]
     dynamic_prompt = data["prompt"]
     data_synthesis = False
     finetune = False
+    use_rebel_agent = False
     kwargs = {}
     if "openai_key" not in data.keys():
         return {"status":0, "resp":"No OpenAI key provided"}
@@ -58,19 +60,44 @@ def optimizing_complete():
         else:
             return {"status":0, "resp":"Wrong Data Type for finetune"}
     
+    if "tools" in data.keys():
+        if type(data["tools"]) != list:
+            return {"status":0, "resp":"Wrong data type for tools list"}
+        else:
+            tools=[]
+            for i in data["tools"]:
+                temp_tool_dict = {}
+                temp_args_dict = {}
+                temp_tool_dict.update({"description":i["description"]})
+                temp_tool_dict.update({"dynamic_params":i["dynamic_params"]})
+                temp_tool_dict.update({"method":i["method"]})
+                temp_args_dict.update({"url":i["url"]})
+                temp_args_dict.update({"params":{}})
+                for j in i["static_params"].keys():
+                    temp_args_dict["params"].update({j:i["static_params"][j]})
+                for k in i["dynamic_params"].keys():
+                    temp_args_dict["params"].update({k:"{"+k+"}"})
+                temp_tool_dict.update({"args":temp_args_dict})
+                tools.append(temp_tool_dict)
+            rebel_agent.set_tools(tools)
+            use_rebel_agent = True
    
     try:
         openai.api_key = data["openai_key"]
         os.environ['OPENAI_API_KEY']=openai.api_key
         print(os.getenv("OPENAI_API_KEY"))
     except:
-        raise Exception("No OpenAI Key Provided")
+        return  {"status":0, "resp":"Issue with OpenAI key"}
     
     optimizer.openai_key = openai.api_key
+    agent.set_api_key(openai.api_key,"OPENAI_API_KEY")
     try:
-        completion = optimizer.complete(static_context,dynamic_prompt,data_synthesis=data_synthesis,finetune = finetune, **kwargs)
-    except:
-        return {"status":0, "resp":"An error occured"}
+        if not use_rebel_agent:
+            completion = optimizer.complete(static_context,dynamic_prompt,data_synthesis=data_synthesis,finetune = finetune, **kwargs)
+        else:
+            completion = rebel_agent.run(static_context+dynamic_prompt,[])[0]
+    except Exception as e:
+        return {"status":0, "resp": str(e)}
     
     return {"completion":completion, "status": 200}
 
@@ -80,4 +107,5 @@ def main_server_entry_point():
     app.run(host="192.168.1.75", port=3002)
 
 if __name__ == '__main__':
-    app.run(host="192.168.1.75", port=3002)
+    # app.run(host="192.168.1.75", port=3002)
+    app.run( port=3002)
