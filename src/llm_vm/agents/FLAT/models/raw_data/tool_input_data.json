@@ -1,0 +1,348 @@
+{
+    "$schema": "./json_schemas/tool_input_data.schema.json",
+    "data": [
+        {
+            "mem": [
+                [
+                    "Choose a random employee in my company",
+                    "Sarah Taylor",
+                    {
+                        "name": {
+                            "first": "Sarah",
+                            "last": "Taylor"
+                        },
+                        "city": "Anchorage, AL",
+                        "latitude": 61.2176,
+                        "longitude": -149.8997
+                    }
+                ]
+            ],
+            "description": "Useful to get the weather.",
+            "params": {
+                "latitude": "latitude of the location, a float",
+                "longitude": "the longitude of the location, a float"
+            },
+            "question": "What's the weather in their city like?",
+            "answer": {
+                "latitude": 61.2176,
+                "longitude": -149.8997
+            }
+        },
+        {
+            "description": "Useful to query questions about people, events, anything that can change, complicated math, live data retrieval, current date and other data.",
+            "params": {
+                "input": "The natural language input query"
+            },
+            "mem": [
+                [
+                    "What's the most popular spot to vacation if you are in Germany?",
+                    "Mallorca"
+                ],
+                [
+                    "What's the date",
+                    "July 7, 2009"
+                ]
+            ],
+            "question": "How crowded is it there now?",
+            "answer": {
+                "input": "How many tourists visit Mallorca each July?"
+            }
+        },
+        {
+            "description": "Useful to query questions about people, events, anything that can change, complicated math, live data retrieval, current date and other data.",
+            "params": {
+                "input": "The natural language input query"
+            },
+            "mem": [
+                [
+                    "What is the circumference of a basketball?",
+                    "750mm"
+                ]
+            ],
+            "question": "What is the volume of a basketball?",
+            "answer": {
+                "input": "What is the volume of a ball with circumference 750mm?"
+            }
+        },
+        {
+            "description": "Useful to query questions about people, events, anything that can change, complicated math, live data retrieval, current date and other data.",
+            "params": {
+                "input": "The natural language input query"
+            },
+            "mem": [
+                [
+                    "What's the most popular spot to vacation if you are in Germany?",
+                    "Mallorca"
+                ],
+                [
+                    "What's the date",
+                    "July 7, 2009"
+                ]
+            ],
+            "question": "How crowded is it there now?",
+            "answer": {
+                "input": "How many tourists visit Mallorca each July?"
+            }
+        },
+        {
+            "description": "Useful to query questions about people, events, anything that can change, complicated math, live data retrieval, current date and other data.",
+            "params": {
+                "input": "The natural language input query"
+            },
+            "mem": [
+                [
+                    "What's the fastest a ford explorer can drive?",
+                    "160mph"
+                ]
+            ],
+            "question": "What is that multiplied by seventy?",
+            "answer": {
+                "input": "160 x 70"
+            }
+        },
+        {
+            "description": "Useful to query questions about people, events, anything that can change, complicated math, live data retrieval, current date and other data.",
+            "params": {
+                "input": "The natural language input query"
+            },
+            "question": "Is 5073 raised to the 3rd power divisible by 73?",
+            "answer": {
+                "input": "Is 5073^3 divisible by 73?"
+            }
+        },
+        {
+            "description": "Find the driving distance and time to travel between two cities.",
+            "params": {
+                "origins": "the origin city",
+                "destinations": "the destination city"
+            },
+            "mem": [
+                [
+                    "I feel like taking a drive today to zurich can you help?",
+                    "Surely. Where are you now?"
+                ]
+            ],
+            "question": "I'm in Paris.",
+            "answer": {
+                "origins": "Paris",
+                "destinations": "Zurich"
+            }
+        },
+        {
+            "description": "Find the driving distance and time to travel between two cities.",
+            "params": {
+                "origins": "the origin city",
+                "destinations": "the destination city"
+            },
+            "question": "How long would it take to get between South Africa and Kenya.",
+            "answer": {
+                "origins": "South Africa",
+                "destinations": "Kenya"
+            }
+        },
+        {
+            "description": "Find the driving distance and time to travel between two cities.",
+            "params": {
+                "origins": "the origin city",
+                "destinations": "the destination city"
+            },
+            "mem": [
+                [
+                    "Where do elephant seals mate?",
+                    "San Luis Obispo"
+                ],
+                [
+                    "Thats really cool!",
+                    "Damn right."
+                ],
+                [
+                    "Where do they migrate each year?",
+                    "Alaska"
+                ]
+            ],
+            "question": "How many miles would they travel while doing that?",
+            "answer": {
+                "origins": "San Luis Obispo",
+                "destinations": "Alaska"
+            }
+        },
+        {
+            "description": "Useful to get the weather.",
+            "params": {
+                "latitude": "latitude of the location, a float",
+                "longitude": "the longitude of the location, a float"
+            },
+            "mem": [
+                [
+                    "Which city is NYC?",
+                    "NYC is an abbreviation for New York City"
+                ],
+                [
+                    "What city is Obama in?",
+                    "Washington, D.C."
+                ],
+                [
+                    "What is the latitude of NYC?",
+                    "40.7128° N"
+                ],
+                [
+                    "What is the longitude of NYC?",
+                    "The longitude is 73° 56' 6.8712'' W"
+                ]
+            ],
+            "question": "What is the weather in NYC?",
+            "answer": {
+                "longitude": 73.9352,
+                "latitude": 40.41728
+            }
+        },
+        {
+            "description": "Useful to get the weather.",
+            "params": {
+                "latitude": "latitude of the location, a float",
+                "longitude": "the longitude of the location, a float"
+            },
+            "mem": [
+                [
+                    "What is the longitude of Milan?",
+                    "9.1900° E"
+                ],
+                [
+                    "What is the latitude of Milan?",
+                    "45.4642° N"
+                ]
+            ],
+            "question": "What is the weather in Milan?",
+            "answer": {
+                "latitude": 45.4642,
+                "longitude": 9.1900
+            }
+        },
+        {
+            "description": "Useful to get the weather.",
+            "params": {
+                "latitude": "latitude of the location, a float",
+                "longitude": "the longitude of the location, a float"
+            },
+            "mem": [
+                [
+                    "I am in Hannover. Is that a German city?",
+                    "Yes, it's the capital of Lower Saxony"
+                ],
+                [
+                    "How far am I from Berlin, Germany?",
+                    "You are about 180 miles away, around or 290km"
+                ]
+            ],
+            "question": "Is it raining over there?",
+            "answer": {
+                "longitude": 9.735763,
+                "latitude": 52.37
+            }
+        },
+        {
+            "description": "Useful to share a document with someone",
+            "params": {
+                "document": "The title or name of the document",
+                "with": "Whom to share the document with. A list of emails or full names"
+            },
+            "question": "Share internals.docx with Mary Schiller",
+            "answer": {
+                "document": "internals.docx",
+                "with": [
+                    "Mary Schiller"
+                ]
+            }
+        },
+        {
+            "description": "Useful to share a document with someone",
+            "params": {
+                "document": "The title or name of the document",
+                "with": "Whom to share the document with. A list of emails or full names"
+            },
+            "question": "Share management-revision-11.docx with team@the-company.inc",
+            "answer": {
+                "document": "management-revision-11.docx",
+                "with": [
+                    "team@the-company.inc"
+                ]
+            }
+        },
+        {
+            "description": "Useful to share a document with someone",
+            "params": {
+                "document": "The title or name of the document",
+                "with": "Whom to share the document with. A list of emails or full names"
+            },
+            "mem": [
+                [
+                    "What's the name of the document from yesterday's meeting?",
+                    "The document is budgetReview-Revision01-03.pdf"
+                ]
+            ],
+            "question": "Share that with developers@sggxi.ai",
+            "answer": {
+                "document": "budgetReview-Revision01-03.pdf",
+                "with": [
+                    "developers@sggxi.ai"
+                ]
+            }
+        },
+        {
+            "description": "Useful to share a document with someone",
+            "params": {
+                "document": "The title or name of the document",
+                "with": "Whom to share the document with. A list of emails or full names"
+            },
+            "mem": [
+                [
+                    "What's the name of the document from yesterday's meeting?",
+                    "The document is budgetReview-Revision01-03.pdf"
+                ]
+            ],
+            "question": "Share that with developers@sggxi.ai and management@sggxi.ai",
+            "answer": {
+                "document": "budgetReview-Revision01-03.pdf",
+                "with": [
+                    "developers@sggxi.ai",
+                    "management@sggxi.ai"
+                ]
+            }
+        },
+        {
+            "description": "Useful to share a document with someone",
+            "params": {
+                "document": "The title or name of the document",
+                "with": "Whom to share the document with. A list of emails or full names"
+            },
+            "mem": [
+                [
+                    "Create a document with my most important todos, and call it 'must-do-soon.txt'",
+                    "I created the document must-do-soon.txt"
+                ]
+            ],
+            "question": "Share that with Juan Roble",
+            "answer": {
+                "document": "must-do-soon.txt",
+                "with": [
+                    "Juan Roble"
+                ]
+            }
+        },
+        {
+            "description": "Useful to share a document with someone",
+            "params": {
+                "document": "The title or name of the document",
+                "with": "Whom to share the document with. A list of emails or full names"
+            },
+            "question": "Share with Martin Murray and mark.einenberg@gmail.com my Essay-December.ppt presentation",
+            "answer": {
+                "document": "Essay-December.ppt",
+                "with": [
+                    "Martin Murray",
+                    "mark.einenberg@gmail.com"
+                ]
+            }
+        }
+    ]
+}
