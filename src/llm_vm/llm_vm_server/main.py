@@ -7,7 +7,7 @@ import importlib
 import openai
 import os
 import hashlib
-from completion.optimize import LocalOptimizer
+from llm_vm.completion.optimize import LocalOptimizer
 # from test_agent import run_test
 from flask_cors import CORS
 from contextlib import contextmanager
@@ -18,7 +18,7 @@ app = flask.Flask(__name__)
 CORS(app)
 app.config["DEBUG"] = True
 
-from llm_vm_server import routes
+from llm_vm.llm_vm_server import routes
 app.register_blueprint(routes.bp)
 
 def main_server_entry_point():

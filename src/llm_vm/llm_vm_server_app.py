@@ -1,4 +1,4 @@
-from llm_vm_server.main import app
+from llm_vm.llm_vm_server.main import app
 
 
 if __name__ == '__main__':
