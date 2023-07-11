@@ -13,7 +13,7 @@ if __name__ == "__main__":
     openai.api_key = os.getenv('OPENAI_KEY')
     print("key:", openai.api_key)
 
-    data_synthesizer = data_synthesis.DataSynthesis(0,50)
+    data_synthesizer = data_synthesis.DataSynthesis(0.87, 50)
     optimizer = LocalOptimizer(MIN_TRAIN_EXS=2)
     
     # for one-shot prompt
