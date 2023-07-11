@@ -27,7 +27,25 @@ This will start a flask server as http://192.168.1.75:3002 and will create an en
 ```
 If no temperature, finetune, or data_synthesis are provided, these values will default to 0, false, and false. 
 
-To access the completion endpoint programmatically, after starting up the server on your machine, import llm_vm.py into your code and call the completion function. To test that the server is working correctly, after starting it, run 
+To use the REBEL endpoint with tools, add a tool in the following way. We have used the finnhub api to get stocks data as an example. 
+```
+{
+    "prompt":"What is the price of apple stock?",
+    "context":"",
+    "tools":[{
+        "description":"Find the current price of a stock.",
+        "url":"https://finnhub.io/api/v1/quote",
+        "dynamic_params":{"symbol": "the symbol of the stock"},
+        "method":"GET",
+        "static_params":{"token":<Finnhub Key>}
+    }],
+    "openai_key": <OpenAI Key>,
+    "temperature":0,
+    "finetune": true
+}
+
+```
+To access the completion endpoint programmatically, after starting up the server on your machine, import llm_vm.py into your code and call the completion function. Currently, we do not support tools through the programmatic completion fucntion. To test that the server is working correctly, after starting it, run 
 ```
 python test_llm_vm.py
 ```
