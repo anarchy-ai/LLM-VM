@@ -81,8 +81,8 @@ tokenizer.batch_decode(generate_ids, skip_special_tokens=True, clean_up_tokeniza
 
 
 # below are the scripts for the other models 
-
-"""
+class Small_Local_Bloom:
+    """
 import torch
 
 from transformers import AutoTokenizer,AutoModel, BloomForCausalLM
@@ -105,7 +105,22 @@ gen_tokens = model.generate(
 )
 gen_text = tokenizer.batch_decode(gen_tokens)[0]
 
- """
+"""
+    def __init__(self,model_uri_override="bigscience/bloom-560m"): # tokenizer_kw_args=None,model_kw_args=None
+        self.model_uri = model_uri_override
+        self.tokenizer=self.tokenizer_loader()
+        self.model= self.model_loader()
+
+    def model_loader(self):
+        return BloomForCausalLM.from_pretrained(self.model_uri)
+    def tokenizer_loader(self):
+        return AutoTokenizer.from_pretrained(self.model_uri)
+    def generate(self,prompt,max_length=100,**kwargs): # both tokenizer and model take kwargs :( 
+        inputs=self.tokenizer(prompt,return_tensors="pt")
+        generate_ids=self.model.generate(inputs.input_ids,max_length=max_length)
+        resp= self.tokenizer.batch_decode(generate_ids,skip_special_tokens=True,clean_up_tokenization_spaces=False)[0]
+        # need to drop the len(prompt) prefix with these sequences generally 
+        return resp[len(prompt):]
 
  # 
 """
@@ -159,5 +174,5 @@ print(tokenizer.decode(generation_output[0]))
  """
 
 if __name__ == '__main__':
-    small_opt = Small_Local_OPT()
+    small_opt = Small_Local_Bloom()
     print(small_opt.generate('What do you get when you guzzle down sweets?'))
