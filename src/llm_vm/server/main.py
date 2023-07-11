@@ -23,5 +23,5 @@ app.register_blueprint(routes.bp)
 
 def main_server_entry_point():
     # make this more configurable soon
-    app.run(host="192.168.1.75", port=3002)
+    app.run(host="127.0.0.1", port=3002)
 
