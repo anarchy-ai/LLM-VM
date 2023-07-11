@@ -11,28 +11,28 @@ from transformers import AutoTokenizer, OPTForCausalLM,BloomForCausalLM,LlamaTok
 # print("yup")
 
 # something like this interface 
-class Base_Onsite_LLM(ABC):
-    def __init__(self,model_uri_override=None,tokenizer_kw_args=None,model_kw_args=None):
-        if model_uri_override != None:
-            self.model_uri= model_uri_override 
-        self.model=model_loader()
+# class Base_Onsite_LLM(ABC):
+#     def __init__(self,model_uri_override=None,tokenizer_kw_args=None,model_kw_args=None):
+#         if model_uri_override != None:
+#             self.model_uri= model_uri_override 
+#         self.model=model_loader()
 
-    # @abstractmethod
-    @property
-    def model_uri(self):
-        pass
+#     # @abstractmethod
+#     @property
+#     def model_uri(self):
+#         pass
 
-    @model_uri.setter
-    def model_uri(self,val):
-        self.model_uri=val # ummm, is this correct?
+#     @model_uri.setter
+#     def model_uri(self,val):
+#         self.model_uri=val # ummm, is this correct?
 
-    @abstractmethod
-    def model_loader(self):
-        pass
+#     @abstractmethod
+#     def model_loader(self):
+#         pass
 
-    @abstractmethod
-    def tokenizer_loader(self):
-        pass
+#     @abstractmethod
+#     def tokenizer_loader(self):
+#         pass
 
     # def generate() # this is where the meat and potatoes should live?
 
@@ -60,11 +60,8 @@ generate_ids = model.generate(inputs.input_ids, max_length=30)
 
 tokenizer.batch_decode(generate_ids, skip_special_tokens=True, clean_up_tokenization_spaces=False)[0]
 """
-    def __init__(self,model_uri_override=None): # tokenizer_kw_args=None,model_kw_args=None
-        if (model_uri_override is None): 
-                self.model_uri="facebook/opt-350m"
-        else: 
-                self.model_uri=model_uri_override
+    def __init__(self,model_uri_override="facebook/opt-350m"): # tokenizer_kw_args=None,model_kw_args=None
+        self.model_uri = model_uri_override
         self.tokenizer=self.tokenizer_loader()
         self.model= self.model_loader()
 
@@ -72,9 +69,9 @@ tokenizer.batch_decode(generate_ids, skip_special_tokens=True, clean_up_tokeniza
         return OPTForCausalLM.from_pretrained(self.model_uri)
     def tokenizer_loader(self):
         return AutoTokenizer.from_pretrained(self.model_uri)
-    def generate(prompt,max_length=100,**kwargs): # both tokenizer and model take kwargs :( 
+    def generate(self,prompt,max_length=100,**kwargs): # both tokenizer and model take kwargs :( 
         inputs=self.tokenizer(prompt,return_tensors="pt")
-        generate_ids=self.model.generate(self,inputs.input_ids,max_length=max_length)
+        generate_ids=self.model.generate(inputs.input_ids,max_length=max_length)
         resp= self.tokenizer.batch_decode(generate_ids,skip_special_tokens=True,clean_up_tokenization_spaces=False)[0]
         # need to drop the len(prompt) prefix with these sequences generally 
         return resp[len(prompt):]
@@ -161,4 +158,6 @@ generation_output = model.generate(
 print(tokenizer.decode(generation_output[0]))
  """
 
-
+if __name__ == '__main__':
+    small_opt = Small_Local_OPT()
+    print(small_opt.generate('What do you get when you guzzle down sweets?'))
