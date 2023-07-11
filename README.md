@@ -9,8 +9,8 @@ This is still in BETA.  Very little attention has been paid to package structure
 To run and test this repository you need to start a flask server. To start the flask server use: 
 
 ```bash
-pip3 install -r requirements.txt
-python app.py
+pip3 install .
+llm_vm_server
 ```
 
 This will start a flask server as http://192.168.1.75:3002 and will create an endpoint http://192.168.1.75:3002/completion. Post requests can be sent to this endpoint in the following format:

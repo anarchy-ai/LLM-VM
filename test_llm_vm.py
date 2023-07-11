@@ -1,4 +1,4 @@
-from llm_vm import llm_vm as l
+import llm_vm.client as l 
 
 openai_key = ""
 ret = l.complete("Who are the top 10 greatest soccer players", "", openai_key)
