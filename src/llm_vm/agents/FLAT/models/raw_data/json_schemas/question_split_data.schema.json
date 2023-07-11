@@ -1,0 +1,45 @@
+{
+    "type": "object",
+    "properties": {
+        "data": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "question": {
+                        "title": "Question to choose a best-tool for.",
+                        "description": "The Question is the Main Question for which the LLM must choose a set of sub-questions that help answer it. Use complex, diverse and long/short questions, and add single-hop and multi-hop examples for better results.",
+                        "type": "string"
+                    },
+                    "answer": {
+                        "title": "Sub-questions",
+                        "description": "An array containing the sub-questions that must be answered (insofar as possible, in the logical answering order) to answer the main question.",
+                        "type": "array",
+                        "items": [
+                            {
+                                "type": "string"
+                            }
+                        ]
+                    },
+                    "mem": {
+                        "type": "array",
+                        "title": "The conversation history",
+                        "items": {
+                            "type": "array",
+                            "minItems": 2,
+                            "maxItems": 2,
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                },
+                "required": [
+                    "question",
+                    "answer"
+                ]
+            }
+        }
+    },
+    "required": ["data"]
+}
