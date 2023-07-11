@@ -6,13 +6,14 @@ authors = [
     {name = "Anarchy Team", email = "matt@anarchy.ai"},
 ]
 
-requires-python = ">=3.11" # this could be lower if need be
+requires-python = ">=3.8" # this could be lower if need be
 readme = "README.md"
 license = {text = "MIT"}
 dependencies = [
     "python-dotenv>=1.0.0",
     "openai>=0.27.6",
-    "numpy>=1.24",
+    "numpy<1.23",
+    "watchdog>=3.0.0",
     "transformers>=4.29.0",
     "flask>=2.3.2",
     "sentencepiece>=0.1.99",
