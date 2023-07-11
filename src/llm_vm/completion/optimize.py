@@ -13,7 +13,7 @@ import hashlib
 import pickle
 
 #we need to package-ify so this works 
-import completion.data_synthesis as data_synthesis
+import src.llm_vm.completion.data_synthesis as data_synthesis
 
 
 job_id = None # we want to be able to cancel a fine_tune if you kill the program

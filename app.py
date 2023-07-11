@@ -1,4 +1,5 @@
 import flask
+import flask
 from flask import request, jsonify
 import json
 import time
@@ -7,8 +8,8 @@ import importlib
 import openai
 import os
 import hashlib
-from completion.optimize import LocalOptimizer
-from agents.REBEL import agent
+from src.llm_vm.completion.optimize import LocalOptimizer
+from src.llm_vm.agents.REBEL import agent
 
 # from test_agent import run_test
 from flask_cors import CORS
@@ -29,7 +30,7 @@ def generate_hash(input_string):
 def home():
     return '''home'''
 
-@app.route('/v1/complete', methods=['POST']) 
+@app.route('/complete', methods=['POST']) 
 def optimizing_complete():
     rebel_agent = agent.Agent("", [], verbose=1)
     data = json.loads(request.data)
@@ -102,9 +103,7 @@ def optimizing_complete():
     return {"completion":completion, "status": 200}
 
 
-def main_server_entry_point():
-    # make this more configurable soon
-    app.run(host="192.168.1.75", port=3002)
+
 
 if __name__ == '__main__':
     # app.run(host="192.168.1.75", port=3002)
