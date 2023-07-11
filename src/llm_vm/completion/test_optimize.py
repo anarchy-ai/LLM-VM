@@ -113,7 +113,6 @@ def run_test_stub():
     #                            anarchy_key = anarchy_key, 
     #                            MIN_TRAIN_EXS=2)
     i = 0
-    print("invoking")
     optimizer.complete("Answer question Q. ","Q: What is the currency in myanmmar", \
                  temperature = 0.0, data_synthesis = True,\
                  min_examples_for_synthesis=0,finetune=True)
