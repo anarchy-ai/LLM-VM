@@ -61,9 +61,7 @@ class Agent:
 
         return (answer, memory + [(question, answer)], calls, debug_return, has_friendly_tags)
 
-
-# print_op(google(' {"question": ""}'))
-if __name__ == "__main__":
+def flat_main():
     # tools = [{'method': 'GET',"description":"use this tool to find the price of stocks",'args' : {"url":"https://finnhub.io/api/v1/quote",'params': { 'token' :'cfi1v29r01qq9nt1nu4gcfi1v29r01qq9nt1nu50'} },"dynamic_params":{"symbol":"the symbol of the stock"}}]
     tools =  [{'method': 'GET', "dynamic_params": { 'location': 'This string indicates the geographic area to be used when searching for businesses. \
     Examples: "New York City", "NYC", "350 5th Ave, New York, NY 10118".', 'term': 'Search term, e.g. "food" or "restaurants". The \
@@ -84,3 +82,7 @@ if __name__ == "__main__":
         conversation_history = return_value[1]
         print(return_value[2])
         last = "AI: "+str(return_value[0]) + "\n"
+
+# print_op(google(' {"question": ""}'))
+if __name__ == "__main__":
+    flat_main()

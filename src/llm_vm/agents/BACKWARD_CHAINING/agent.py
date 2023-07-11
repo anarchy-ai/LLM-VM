@@ -438,9 +438,7 @@ class Agent:
                 print_op("A:", answer)
             return (answer, api_calls, full_calls)
 
-
-# print_op(google(' {"question": ""}'))
-if __name__ == "__main__":
+def BACKWARD_CHAINING_main():
     openai.api_key = os.environ["OPENAI_API_KEY"]
     tools = []
     a = Agent(openai.api_key, buildGenericTools(GENERIC_TOOLS) + tools, verbose=1)
@@ -451,3 +449,8 @@ if __name__ == "__main__":
         ret = a.run(inp, mem)
         mem = ret[1]
         last = "AI: " + str(ret[0]) + "\n"
+
+# print_op(google(' {"question": ""}'))
+if __name__ == "__main__":
+    BACKWARD_CHAINING_main()
+    

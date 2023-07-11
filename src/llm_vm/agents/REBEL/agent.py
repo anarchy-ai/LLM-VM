@@ -581,15 +581,9 @@ class Agent:
 
         return (answer, [(question, answer)])
 
-
-# print_op(google(' {"question": ""}'))
-if __name__ == "__main__":
-    
-    
-
+def rebel_main():
     tools = buildExampleTools()
 
-    
 
     label = Agent(OPENAI_DEFAULT_KEY, tools, verbose=1)
     conversation_history = []
@@ -599,3 +593,9 @@ if __name__ == "__main__":
         return_value = label.run(inp, conversation_history)
         conversation_history = return_value[1]
         last = "AI: " + str(return_value[0]) + "\n"
+
+# print_op(google(' {"question": ""}'))
+if __name__ == "__main__":
+    
+    
+    rebel_main()

@@ -15,7 +15,9 @@ dependencies = [
     "numpy>=1.24",
     "transformers>=4.29.0",
     "flask>=2.3.2",
-    "sentencepiece>=0.1.99"
+    "sentencepiece>=0.1.99",
+    "requests>=2.26.0",
+    "spacy>=3.5.3"
 ]
 
 
@@ -24,7 +26,10 @@ dependencies = [
 llm_vm_test_optimize = "llm_vm.completion.test_optimize:run_test_stub"
 llm_vm_server = "llm_vm.server.main:main_server_entry_point"
 
-
+llm_vm_run_agent = "llm_vm.agents.agent_interface:call_agent"
+llm_vm_run_agent_backwards_chaining = "llm_vm.agents.BACKWARD_CHAINING.agent:BACKWARD_CHAINING_main"
+llm_vm_run_agent_rebel = "llm_vm.agents.REBEL.agent:rebel_main"
+llm_vm_run_agent_flat = "llm_vm.agents.FLAT.agent:flat_main"
 # package_dir = {}
 
 [build-system]
