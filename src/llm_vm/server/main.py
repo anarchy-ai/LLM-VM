@@ -7,12 +7,12 @@ import importlib
 import openai
 import os
 import hashlib
-from llm_vm.completion.optimize import LocalOptimizer
+# from llm_vm.completion.optimize import LocalOptimizer
 # from test_agent import run_test
 from flask_cors import CORS
 from contextlib import contextmanager
 
-optimizer = LocalOptimizer(MIN_TRAIN_EXS=2,openai_key=None)
+# optimizer = LocalOptimizer(MIN_TRAIN_EXS=2,openai_key=None)
 # Flask Configuration
 app = flask.Flask(__name__)
 CORS(app)

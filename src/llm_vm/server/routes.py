@@ -4,6 +4,9 @@ import os
 import openai
 from llm_vm.agents.REBEL import agent
 
+from llm_vm.completion.optimize import LocalOptimizer
+optimizer = LocalOptimizer(MIN_TRAIN_EXS=2,openai_key=None)
+
 bp = Blueprint('bp',__name__)
 @bp.route('/', methods=['GET'])
 def home():
