@@ -1,8 +1,10 @@
-@app.route('/', methods=['GET'])
+from flask import Blueprint
+bp = Blueprint('bp',__name__)
+@bp.route('/', methods=['GET'])
 def home():
     return '''home'''
 
-@app.route('/v1/complete', methods=['POST']) 
+@bp.route('/v1/complete', methods=['POST']) 
 def optimizing_complete():
     data = json.loads(request.data)
     static_context = data["context"]
