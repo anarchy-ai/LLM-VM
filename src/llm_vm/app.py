@@ -7,7 +7,7 @@ import importlib
 import openai
 import os
 import hashlib
-from llm_vm.completion.optimize import LocalOptimizer
+from completion import LocalOptimizer
 
 
 # from test_agent import run_test
@@ -80,4 +80,4 @@ def main_server_entry_point():
     app.run(host="192.168.1.75", port=3002)
 
 if __name__ == '__main__':
-    app.run(host="192.168.1.75", port=3002)
+    app.run(port=3002)
