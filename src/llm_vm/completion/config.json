@@ -1,5 +1,5 @@
 {
-    "big_model":"neo",
-    "small_model":"opt"
+    "big_model":"chat_gpt",
+    "small_model":"gpt"
 
 }
