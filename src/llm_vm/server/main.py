@@ -26,6 +26,7 @@ def main_server_entry_point(host = '127.0.0.1', port = 3002):
     # make this more configurable soon
     app.run(host = host,port = port)
 
+
 def cli():
     # this function allows the user to call the script from the command line and specify network locations if wanted.
     # The nature of this logic allows either a port or address to be called

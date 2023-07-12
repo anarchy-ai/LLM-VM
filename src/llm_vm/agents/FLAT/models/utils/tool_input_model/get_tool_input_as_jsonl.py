@@ -1,9 +1,9 @@
 import json
-from agent_helper.tool_utils import create_memory_prompt, make_tool_input_case
-from agent_helper.labels import *
+from llm_vm.agents.FLAT.agent_helper.tool_utils import create_memory_prompt, make_tool_input_case
+from llm_vm.agents.FLAT.agent_helper.labels import *
 from typings_llm import *
 from random import shuffle
-from models.utils.tool_input_model.tool_input_model_data import tool_input_data
+from llm_vm.agents.FLAT.models.utils.tool_input_model.tool_input_model_data import tool_input_data
 
 def __get_tool_input_jsonl(data: List[ToolInputModelData]) -> List[PromptModelEntry]:
     jsonl_entries: List[PromptModelEntry] = []

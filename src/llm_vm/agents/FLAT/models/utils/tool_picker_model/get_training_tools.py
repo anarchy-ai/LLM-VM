@@ -1,4 +1,4 @@
-from typings_llm import *
+from llm_vm.utils.typings_llm import *
 
 # Retuns the tools, in a random order, and with randomised IDs.
 def get_randomised_training_tools (

@@ -1,6 +1,6 @@
 import json
 import os
-from typings_llm import *
+from llm_vm.utils.typings_llm import *
 
 def __question_splitter_data() -> QuestionSplitInputModel: 
     current_dir = os.path.dirname(os.path.abspath(__file__))

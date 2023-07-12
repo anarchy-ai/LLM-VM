@@ -6,16 +6,19 @@ authors = [
     {name = "Anarchy Team", email = "matt@anarchy.ai"},
 ]
 
-requires-python = ">=3.11" # this could be lower if need be
+requires-python = ">=3.8" # this could be lower if need be
 readme = "README.md"
 license = {text = "MIT"}
 dependencies = [
     "python-dotenv>=1.0.0",
     "openai>=0.27.6",
-    "numpy>=1.24",
+    "numpy>=1.22.4",
+    "watchdog>=3.0.0",
     "transformers>=4.29.0",
     "flask>=2.3.2",
-    "sentencepiece>=0.1.99"
+    "sentencepiece>=0.1.99",
+    "requests>=2.26.0",
+    "spacy>=3.5.3"
 ]
 
 
@@ -24,7 +27,10 @@ dependencies = [
 llm_vm_test_optimize = "llm_vm.completion.test_optimize:run_test_stub"
 llm_vm_server = "llm_vm.server.main:main_server_entry_point"
 
-
+llm_vm_run_agent = "llm_vm.agents.agent_interface:call_agent"
+llm_vm_run_agent_backwards_chaining = "llm_vm.agents.BACKWARD_CHAINING.agent:BACKWARD_CHAINING_main"
+llm_vm_run_agent_rebel = "llm_vm.agents.REBEL.agent:rebel_main"
+llm_vm_run_agent_flat = "llm_vm.agents.FLAT.agent:flat_main"
 # package_dir = {}
 
 [build-system]
