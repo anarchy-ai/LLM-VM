@@ -33,15 +33,18 @@ def optimizing_complete():
             kwargs.update({"temperature":data["temperature"]})
 
     if "stoptoken" in data.keys():
-        print('found a stop sequence which is: ' + data['stoptoken'])
+       
         if type(data["stoptoken"]) != str and type(data["stoptoken"]) != list:
             # stop can either be a string or array of strings
             return {"status":0, "resp":"Wrong Data Type for stop"}
         elif type(data["stoptoken"]) == list:
+            if len(data["stoptoken"]) > 4:
+                return {"status":0, "resp":"Too many stop tokens in array limit to 4 or less"}
             # check that every element in the list is a string
             for j in data["stoptoken"]:
                 if type(j) != str:
                     return {"status":0, "resp":"Wrong Data Type for stop"}
+            kwargs.update({"stop": data["stoptoken"]})
         else:
             kwargs.update({"stop":data["stoptoken"]})                 
         
