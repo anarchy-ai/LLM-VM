@@ -13,7 +13,7 @@ pip3 install .
 llm_vm_server
 ```
 
-This will start a flask server as http://192.168.1.75:3002 and will create an endpoint http://192.168.1.75:3002/completion. Post requests can be sent to this endpoint in the following format:
+This will start a flask server at https://localhost:3002/ and will create an endpoint https://localhost:3002/completion. Post requests can be sent to this endpoint in the following format:
 
 ```
 {

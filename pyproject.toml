@@ -25,7 +25,7 @@ dependencies = [
 
 [project.scripts] # these names are just placeholders 
 llm_vm_test_optimize = "llm_vm.completion.test_optimize:run_test_stub"
-llm_vm_server = "llm_vm.server.main:main_server_entry_point"
+llm_vm_server = "llm_vm.server.main:cli"
 
 llm_vm_run_agent = "llm_vm.agents.agent_interface:call_agent"
 llm_vm_run_agent_backwards_chaining = "llm_vm.agents.BACKWARD_CHAINING.agent:BACKWARD_CHAINING_main"
