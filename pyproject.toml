@@ -38,6 +38,19 @@ requires = ["setuptools>=61", "wheel"]
 build-backend = "setuptools.build_meta"
 
 
+
+# lets maybe try pytest
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "-ra -q"
+testpaths = [
+    "tests/src",
+    # "integration_tests", # this dir is for stuff that requires api key or server running
+]
+python_files = "*.py"
+# python_classes = "Check"
+# python_functions = "*_check"
+
 # these are strawman configs
 [tool.black]
 line-length = 140
