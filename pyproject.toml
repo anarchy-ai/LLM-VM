@@ -66,6 +66,6 @@ packages = [
     { include = "llm_vm", from = "src" },
 ]
 name = "llm_vm"
-version = "999999"
+version = "0.0.1"
 description = "Taming LLMs to do whatever you want"
 authors = ["Anarchy Team"]
