@@ -69,3 +69,6 @@ name = "llm_vm"
 version = "0.0.1"
 description = "Taming LLMs to do whatever you want"
 authors = ["Anarchy Team"]
+
+[tool.poetry.scripts]
+llm_vm_server = "llm_vm.server.main:cli"
