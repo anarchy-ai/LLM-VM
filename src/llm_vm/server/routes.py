@@ -14,6 +14,7 @@ def home():
 
 @bp.route('/v1/complete', methods=['POST']) 
 def optimizing_complete():
+    print(request.data)
     rebel_agent = agent.Agent("", [], verbose=1)
     data = json.loads(request.data)
     static_context = data["context"]
@@ -31,17 +32,18 @@ def optimizing_complete():
         else:
             kwargs.update({"temperature":data["temperature"]})
 
-    if "stop" in data.keys():
-        if type(data["stop"]) != str and type(data["stop"]) != list:
+    if "stoptoken" in data.keys():
+        print('found a stop sequence which is: ' + data['stoptoken'])
+        if type(data["stoptoken"]) != str and type(data["stoptoken"]) != list:
             # stop can either be a string or array of strings
             return {"status":0, "resp":"Wrong Data Type for stop"}
-        elif type(data["stop"]) == list:
+        elif type(data["stoptoken"]) == list:
             # check that every element in the list is a string
-            for j in data["stop"]:
+            for j in data["stoptoken"]:
                 if type(j) != str:
                     return {"status":0, "resp":"Wrong Data Type for stop"}
         else:
-            kwargs.update({"stop":data["stop"]})                 
+            kwargs.update({"stop":data["stoptoken"]})                 
         
     if "data_synthesis" in data.keys():
         if type(data["data_synthesis"])==bool:
@@ -76,11 +78,10 @@ def optimizing_complete():
                 tools.append(temp_tool_dict)
             rebel_agent.set_tools(tools)
             use_rebel_agent = True
-   
     try:
         openai.api_key = data["openai_key"]
-        os.environ['OPENAI_API_KEY']=openai.api_key
-        print(os.getenv("OPENAI_API_KEY"))
+        # os.environ['OPENAI_API_KEY']=openai.api_key
+        # print(os.getenv("OPENAI_API_KEY"))
     except:
         return  {"status":0, "resp":"Issue with OpenAI key"}
     
