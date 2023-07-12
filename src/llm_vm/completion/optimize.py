@@ -101,11 +101,11 @@ class local_ephemeral:
 
 
 def CALL_BIG(prompt, **kwargs):
-    model = models.return_generation_big()()
+    model = models.MODELCONFIG.big_model
     return model.generate(prompt,**kwargs)
 
 def CALL_SMALL(prompt,**kwargs):
-    model = models.return_generation_small()()
+    model = models.MODELCONFIG.small_model
     return model.generate(prompt,**kwargs)
 
 

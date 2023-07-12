@@ -11,12 +11,13 @@ MODEL_DICT = {
     "chat_gpt":llms.Chat_GPT
 }
 
-def return_generation_big():
-    f = open('src/llm_vm/completion/config.json')
-    data = json.load(f)
-    return MODEL_DICT[data["big_model"]]
+class ModelConfig:
+    def __init__(self):
+        f = open('src/llm_vm/completion/config.json')
+        data = json.load(f)
+        self.big_model = MODEL_DICT[data["big_model"]]()
+        self.small_model = MODEL_DICT[data["small_model"]]()
 
-def return_generation_small():
-    f = open('src/llm_vm/completion/config.json')
-    data = json.load(f)
-    return MODEL_DICT[data["small_model"]]
+MODELCONFIG = ModelConfig()
+
+    

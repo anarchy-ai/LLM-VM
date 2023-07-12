@@ -1,5 +1,5 @@
 {
-    "big_model":"opt",
-    "small_model":"neo"
+    "big_model":"neo",
+    "small_model":"opt"
 
 }
