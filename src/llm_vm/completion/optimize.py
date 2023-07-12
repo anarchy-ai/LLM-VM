@@ -12,6 +12,7 @@ import requests
 import hashlib
 import pickle
 
+import llm_vm.completion.models as models
 #we need to package-ify so this works 
 import llm_vm.completion.data_synthesis as data_synthesis
 
@@ -99,22 +100,13 @@ class local_ephemeral:
                                           "model": None }
 
 
-def CALL_BIG(prompt, gpt4=False, **kwargs):
-    print("HERE",os.getenv("OPENAI_API_KEY"))
-    cur_prompt = [{'role': "system", 'content' : prompt}]
-    print("CUR_PROMPT:", cur_prompt, flush=True)
-    print("KWARGS:", kwargs, flush=True)
-    ans = openai.ChatCompletion.create(
-        messages=cur_prompt,
-        model="gpt-3.5-turbo-0301" if not gpt4 else 'gpt-4',
-        **kwargs)
+def CALL_BIG(prompt, **kwargs):
+    model = models.MODELCONFIG.big_model
+    return model.generate(prompt,**kwargs)
 
-    return ans['choices'][0]['message']['content']
-
-def CALL_SMALL(*args, **kwargs):
-    ans = openai.Completion.create(*args, **kwargs)
-    return ans['choices'][0]['text']
-
+def CALL_SMALL(prompt,**kwargs):
+    model = models.MODELCONFIG.small_model
+    return model.generate(prompt,**kwargs)
 
 
 class Optimizer:
