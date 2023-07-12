@@ -9,3 +9,4 @@ src/llm_vm.egg-info/*
 .venv
 dist
 .DS_STORE
+/poetry.lock
