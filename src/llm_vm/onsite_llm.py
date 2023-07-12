@@ -3,6 +3,7 @@
 
 import abc
 from abc import ABC,abstractmethod
+import openai
 
 from transformers import AutoTokenizer, OPTForCausalLM,BloomForCausalLM,LlamaTokenizer, LlamaForCausalLM, GPTNeoForCausalLM, GPT2Tokenizer
 
@@ -204,7 +205,24 @@ print(tokenizer.decode(generation_output[0]))
         resp= self.tokenizer.batch_decode(generate_ids,skip_special_tokens=True,clean_up_tokenization_spaces=False)[0]
         # need to drop the len(prompt) prefix with these sequences generally 
         return resp[len(prompt):]
+
+class GPT3:
+
     
+    def generate(self,prompt, max_length=100,**kwargs): # both tokenizer and model take kwargs :( 
+        ans = openai.Completion.create(prompt= prompt,**kwargs)
+        return ans['choices'][0]['text']
+
+class Chat_GPT:
+
+    
+    def generate(self,prompt, max_length=100,**kwargs): # both tokenizer and model take kwargs :( 
+        cur_prompt = [{'role': "system", 'content' : prompt}]
+        ans = openai.ChatCompletion.create(
+            messages=cur_prompt,
+            model="gpt-3.5-turbo-0301",
+            **kwargs)
+        return ans['choices'][0]['message']['content']
 if __name__ == '__main__':
     small_opt = Small_Local_LLama()
     print(small_opt.generate('What do you get when you guzzle down sweets?'))
