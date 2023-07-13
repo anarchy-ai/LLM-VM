@@ -2,17 +2,17 @@ import re
 import openai
 import random
 from llm_vm.utils.typings_llm import *
-from .requests.call_llm import call_llm
+from llm_vm.agents.FLAT.agent_helper.requests.call_llm import call_llm
 
-from .tools import *
-from .tool_utils import *
-from .utils import *
+from llm_vm.agents.FLAT.agent_helper.tools import *
+from llm_vm.agents.FLAT.agent_helper.tool_utils import *
+from llm_vm.agents.FLAT.agent_helper.utils import *
 
-from models.get_decision_model import get_newest_decision_model
-from models.utils.tool_picker_model.tool_picker_model_data import tool_input_data
-from models.utils.question_split_model.question_split_model_data import question_splitter_data
+from llm_vm.agents.FLAT.models.get_decision_model import get_newest_decision_model
+from llm_vm.agents.FLAT.models.utils.tool_picker_model.tool_picker_model_data import tool_input_data
+from llm_vm.agents.FLAT.models.utils.question_split_model.question_split_model_data import question_splitter_data
 
-openai.api_key = OPENAI_DEFAULT_KEY
+# openai.api_key = OPENAI_DEFAULT_KEY
 
 
 def question_split(question_to_split, use_fine_tuned_model = True):

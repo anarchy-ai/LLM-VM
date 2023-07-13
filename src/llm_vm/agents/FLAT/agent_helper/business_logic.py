@@ -1,18 +1,18 @@
 import json
 from llm_vm.utils.typings_llm import *
-from agent_helper.utils import *
-from agent_helper.bothandler import question_split, pick_tool, check_can_answer_from_memory, generate_convo_history, prompt_for_answer, get_newest_decision_model
-from agent_helper.use_tool import use_tool
-from agent_helper.tool_utils import make_tool_input_case
+from llm_vm.agents.FLAT.agent_helper.utils import *
+from llm_vm.agents.FLAT.agent_helper.bothandler import question_split, pick_tool, check_can_answer_from_memory, generate_convo_history, prompt_for_answer, get_newest_decision_model
+from llm_vm.agents.FLAT.agent_helper.use_tool import use_tool
+from llm_vm.agents.FLAT.agent_helper.tool_utils import make_tool_input_case
 
 # Get the current file's directory to grab the python files with common functionality in the utils/ folder
-current_dir = os.path.dirname(os.path.abspath(__file__))
-grandparent_dir = os.path.dirname(os.path.dirname(os.path.dirname(current_dir)))
-utils_dir = os.path.join(grandparent_dir, 'utils/')
-sys.path.append(utils_dir)
+# current_dir = os.path.dirname(os.path.abspath(__file__))
+# grandparent_dir = os.path.dirname(os.path.dirname(os.path.dirname(current_dir)))
+# utils_dir = os.path.join(grandparent_dir, 'utils/')
+# sys.path.append(utils_dir)
 
 from labels import *
-from agent_helper.requests.call_llm import call_llm
+from llm_vm.agents.FLAT.agent_helper.requests.call_llm import call_llm
 
 __MAX_RETRIES_GUESS_INPUT = 3
 
