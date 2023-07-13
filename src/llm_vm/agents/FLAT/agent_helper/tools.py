@@ -17,33 +17,36 @@ CUSTOM_TOOL_ANSWER_EMBEDDING = "/answer_embedding"
 
 def __get_generic_tools():
     # # wolfram
-    # wolfram_tool = {
-    #     'description': "Useful to query questions about people, events, anything that can change, complicated math, live data retrieval, current date and other data.",
-    #     # {'description': "The tool returns the results of free-form queries similar to those used for wolfram alpha. This is useful for complicated math or live data retrieval.  Can be used to get the current date.",
-    #     'id': DefaultTools.WOLFRAM.value,
-    #     'dynamic_params': {"input": 'The natural language input query'},
-    #     'method': 'GET',
-    #     'args': {
-    #         'url': "http://api.wolframalpha.com/v2/query",
-    #         'params': {'appid': WOLFRAM_KEY, 'input': '{input}'}
-    #     },
-    # }
 
-    # # geopy
-    # directions_tool = {
-    #     'description': "Find the driving distance and time to travel between two cities.",
-    #     'id': DefaultTools.DIRECTIONS.value,
-    #     'dynamic_params': {"origins": 'the origin city', "destinations": 'the destination city'},
-    #     'method': 'GET',
-    #     'args': {
-    #         'url': "https://maps.googleapis.com/maps/api/distancematrix/json",
-    #         'params': {
-    #             'key': GOOGLE_MAPS_KEY,
-    #             'origins': '{origins}',
-    #             'destinations': '{destinations}'
-    #         }
-    #     }
-    # }
+    WOLFRAM_KEY = os.getenv("WOLFRAM_KEY")
+    GOOGLE_MAPS_KEY = os.getenv("GOOGLE_MAPS_KEY")
+    wolfram_tool = {
+        'description': "Useful to query questions about people, events, anything that can change, complicated math, live data retrieval, current date and other data.",
+        # {'description': "The tool returns the results of free-form queries similar to those used for wolfram alpha. This is useful for complicated math or live data retrieval.  Can be used to get the current date.",
+        'id': DefaultTools.WOLFRAM.value,
+        'dynamic_params': {"input": 'The natural language input query'},
+        'method': 'GET',
+        'args': {
+            'url': "http://api.wolframalpha.com/v2/query",
+            'params': {'appid': WOLFRAM_KEY, 'input': '{input}'}
+        },
+    }
+
+    # geopy
+    directions_tool = {
+        'description': "Find the driving distance and time to travel between two cities.",
+        'id': DefaultTools.DIRECTIONS.value,
+        'dynamic_params': {"origins": 'the origin city', "destinations": 'the destination city'},
+        'method': 'GET',
+        'args': {
+            'url': "https://maps.googleapis.com/maps/api/distancematrix/json",
+            'params': {
+                'key': GOOGLE_MAPS_KEY,
+                'origins': '{origins}',
+                'destinations': '{destinations}'
+            }
+        }
+    }
 
     # weather
     weather_tool = {
