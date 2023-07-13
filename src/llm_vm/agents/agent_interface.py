@@ -3,9 +3,10 @@ This file has been temporarily repurposed as an interface that for users to
 call any of the three agents (REBEL, BACKWARD_CHAINING, and FLAT) and interact with them.
 Running this file prompts the user to choose any of the agents and ask it questions. 
 """
-import llm_vm.agents.REBEL.agent 
-import llm_vm.agents.BACKWARD_CHAINING.agent
-import llm_vm.utils.keys  
+import llm_vm.agents.REBEL.agent as REBEL
+import llm_vm.agents.FLAT.agent as FLAT
+import os 
+key = os.getenv("OPENAI_API_KEY")
 
 def call_agent():
     print("Try out any agent!")
@@ -34,15 +35,16 @@ def call_agent():
     # FLAT 
     if model_choice == 1:
         # TODO: Add agent call here when FLAT is fixed
+        tools = FLAT
         pass
     # REBEL
     elif model_choice == 2:
-        tools = REBEL.agent.buildGenericTools()
-        agent = REBEL.agent.Agent(keys.OPENAI_DEFAULT_KEY, tools, verbose = 1)
-    # BACKWARD_CHAINING 
-    elif model_choice == 3:
-        tools = BACKWARD_CHAINING.agent.buildGenericTools()
-        agent = BACKWARD_CHAINING.agent.Agent(keys.OPENAI_DEFAULT_KEY, tools, verbose = 1)
+        tools = REBEL.buildExampleTools()
+        agent = REBEL.Agent(key, tools, verbose = 1)
+    # # BACKWARD_CHAINING 
+    # elif model_choice == 3:
+    #     tools = BACKWARD_CHAINING.agent.buildGenericTools()
+    #     agent = BACKWARD_CHAINING.agent.Agent(keys.OPENAI_DEFAULT_KEY, tools, verbose = 1)
 
     pass 
 

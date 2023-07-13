@@ -585,7 +585,7 @@ def rebel_main():
     tools = buildExampleTools()
 
 
-    label = Agent(OPENAI_DEFAULT_KEY, tools, verbose=1)
+    label = Agent(os.getenv("OPENAI_API_KEY"), tools, verbose=1)
     conversation_history = []
     last = ""
     while True:
@@ -594,8 +594,6 @@ def rebel_main():
         conversation_history = return_value[1]
         last = "AI: " + str(return_value[0]) + "\n"
 
-# print_op(google(' {"question": ""}'))
 if __name__ == "__main__":
-    
     
     rebel_main()
