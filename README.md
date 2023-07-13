@@ -1,20 +1,45 @@
-# LLM-VM
+# Anarchy LLM-VM
 
 This is an LLM agnostic JIT for natural language. Specifically, it uses LLMs to convert conversational natural language into a dynamic series of LLM and IO commands. You provide the underlying provider(s), actions (APIs, code-hooks) and their descriptions, data-sources (PDFs, websites...), and the LLM-VM will take care of load-balancing, fine-tuning, natural language compilation and tool-selection.
 
-This is still in BETA.  Very little attention has been paid to package structure.  Expect it to change.
+For the first time ever, you don't have to be an AI PhD to set up your own chatbot. Our inference engine is both highly optimized to run models and includes all the bells-and-whistles of OpenAI (agentic tool use, large context windows), and more: persistent state, web playground, api endpoints, fine-tuning, teacher-student distillation, vector storage.
+
+> This project is in BETA. Expect continuous improvement and development.
+
+## About
+
+### What is Amarchy LLM-VM
+
+Formally, an LLM-VM is a virtual machine/interpreter for human language, coordinating between data, models (CPU), your prompts (code), and tools (IO). 
+
+In other words, the Anarchy LLM-VM is a backend for running LLMs with all the modern features we've come to expect from completion (tool usage, stateful memory, live data augmentation, data and task fine-tuning).  
+
+By doing all these things in one spot in an opinionated way, the LLM-VM can properly optimize and batch calls that would be exorbitantly expensive with distributed endpoints.  It furthermore strives for both model and architecture agnosticism, properly optimizing the chosen model for the current architecture.
+
+### Why use the Anarchy LLM-VM
+
+In line with Anarchy's mission, the LLM-VM strives to support open-source models. By utilizing open-source models and running them locally you achieve a number of benefits:
+
+* **Simplify your AI development:** *With AnarchyAI, one interface is all you need to interact with the latest LLMs available.*
+  
+* **Lower your costs:** *Running models locally can reduce the pay-as-you-go costs of development and testing.*
+  
+* **Unparalleled flexibility:** *AnarchyAI allows you to rapidly switch between models so you can pinpoint the exact right tool for your project.*
+  
+* **Strong community:** *Join our active community of highly motivated developers and engineers working passionately to democratize AI*
+  
+* **WYSIWYG:** *Open source means nothing is hidden; we strive for transparency and efficiency so you can focus on building.*
+
+### How does Anarchy LLM-VM compare with other projects?
+
+Anarchy is built by hackers, for hackers. Stemming from that principle, our product is designed to be simple, helpful, and flexible to apply to as many use cases as possible. *YOU* are the center of our business and we're working to make it as simple as running `pip3 install` to put the power of AI in *your* hands. 
 
 
-## What is LLM-VM
-
-LLM-VM is an abstraction layer over diverse LLM architectures and model sizes that provides portable
-metaprogramming so that you can easily change out the chosen LLM for a new one at the drop of a hat! 
-
-
-## Why use LLM-VM
-
-The LLM-VM mission is to make taming and effectively using LLMs in application development as simple as 
-a library import.
+* No other project grants as much freedom as Anarchy. We DGAF what you use our OSS AI for -- just don’t use our hosted playground for anything illegal.
+  
+* At Anarchy, we believe in open source and the power of community. Want a new feature? Come help us make it!
+  
+* Running your models on your hardware is key to democratizing AGI. We might be able to make it faster on ours, but every optimiztion made effects how these models behave and thus one’s ability to hack them. We’ll always keep this core open.
 
 
 ## Running/Testing
