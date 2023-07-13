@@ -11,6 +11,11 @@ import sys
 from flask_cors import CORS
 from contextlib import contextmanager
 import llm_vm.server.routes as routes
+import argparse, configparser
+
+parser = argparse.ArgumentParser()
+parser.add_argument("-c", "--config_file", type=str, help='Config File')
+parser.add_argument("-f", "--foo", type=int, default=5, help='Foo Number. Default: 5')
 
 # Initialize Flask App
 app = flask.Flask(__name__)
