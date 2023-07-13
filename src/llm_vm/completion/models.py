@@ -1,6 +1,10 @@
 import llm_vm.onsite_llm as llms
+from llm_vm.config import args
 import json
 import os
+
+print('Big LLM Model: ' + args.big_model)
+print('Small LLM Model: ' + args.small_model)
 
 MODEL_DICT = {
     "opt":llms.Small_Local_OPT,
@@ -12,12 +16,8 @@ MODEL_DICT = {
 }
 
 class ModelConfig:
-    def __init__(self):
-        f = open('src/llm_vm/completion/config.json')
-        data = json.load(f)
-        self.big_model = MODEL_DICT[data["big_model"]]()
-        self.small_model = MODEL_DICT[data["small_model"]]()
+    def __init__(self, big_model = 'chat_gpt', small_model='gpt'):
+        self.big_model = MODEL_DICT[big_model]()
+        self.small_model = MODEL_DICT[small_model]()
 
-MODELCONFIG = ModelConfig()
-
-    
+MODELCONFIG = ModelConfig(big_model=args.big_model, small_model=args.small_model)

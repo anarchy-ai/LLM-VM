@@ -11,7 +11,6 @@ import abc
 import requests
 import hashlib
 import pickle
-
 import llm_vm.completion.models as models
 #we need to package-ify so this works 
 import llm_vm.completion.data_synthesis as data_synthesis
@@ -99,8 +98,7 @@ class local_ephemeral:
                                           "data": [],
                                           "model": None }
 
-
-def CALL_BIG(prompt, **kwargs):
+def CALL_BIG(prompt, **kwargs): 
     model = models.MODELCONFIG.big_model
     return model.generate(prompt,**kwargs)
 
