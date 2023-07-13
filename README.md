@@ -4,6 +4,19 @@ This is an LLM agnostic JIT for natural language. Specifically, it uses LLMs to 
 
 This is still in BETA.  Very little attention has been paid to package structure.  Expect it to change.
 
+
+## What is LLM-VM
+
+LLM-VM is an abstraction layer over diverse LLM architectures and model sizes that provides portable
+metaprogramming so that you can easily change out the chosen LLM for a new one at the drop of a hat! 
+
+
+## Why use LLM-VM
+
+The LLM-VM mission is to make taming and effectively using LLMs in application development as simple as 
+a library import.
+
+
 ## Running/Testing
 
 ### Installation and Starting the Server
