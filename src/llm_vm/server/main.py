@@ -11,7 +11,7 @@ import sys
 from flask_cors import CORS
 from contextlib import contextmanager
 import llm_vm.server.routes as routes
-from llm_vm.server.anarchparse import args
+from llm_vm.config import args
 
 app = flask.Flask(__name__)
 CORS(app)
