@@ -35,7 +35,6 @@ def call_agent():
     # FLAT 
     if model_choice == 1:
         # TODO: Add agent call here when FLAT is fixed
-        tools = 
         pass
     elif model_choice == 2:
         tools = REBEL.buildExampleTools()
