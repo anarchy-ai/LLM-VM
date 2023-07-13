@@ -14,7 +14,7 @@ metaprogramming so that you can easily change out the chosen LLM for a new one a
 ## Why use LLM-VM
 
 The LLM-VM mission is to make taming and effectively using LLMs in application development as simple as 
-a library import and web server launch.
+a library import.
 
 
 ## Running/Testing
