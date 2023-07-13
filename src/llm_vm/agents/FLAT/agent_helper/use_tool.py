@@ -2,7 +2,7 @@ import os
 import sys 
 
 import requests
-from gpt_index import Document, GPTTreeIndex
+from llama_index import Document, GPTTreeIndex
 from llm_vm.agents.FLAT.agent_helper.utils import print_op, make_interaction, print_big
 from llm_vm.agents.FLAT.agent_helper.requests.call_llm import call_llm
 from llm_vm.agents.FLAT.agent_helper.replacer import replace_variables_for_values

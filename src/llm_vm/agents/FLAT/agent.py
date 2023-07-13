@@ -18,8 +18,7 @@ class Agent:
         self.bot_instructions = f"<{L_BOT_INSTRUCTIONS}>{bot_instructions}<{L_BOT_INSTRUCTIONS}>" if bot_instructions else ""
         
         # set the openai key to make calls to the API
-        set_api_key(openai_key, "OPENAI_API_KEY")
-
+        set_api_key(os.getenv("OPENAI_API_KEY"))
     def set_tools(self, tools):
         self.tools = []
         for tool in tools:

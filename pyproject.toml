@@ -16,6 +16,7 @@ dependencies = [
     "watchdog>=3.0.0",
     "transformers>=4.29.0",
     "flask>=2.3.2",
+    "llama-index>=0.7.7",
     "python-Levenshtein>=0.21.1",
     "bs4>=0.0.1",
     "sentencepiece>=0.1.99",

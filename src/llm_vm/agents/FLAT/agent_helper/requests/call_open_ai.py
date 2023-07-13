@@ -23,6 +23,9 @@ def call_open_ai(request: LLMCallParams) -> LLMCallReturnType:
         current_key = openai.api_key
         os.environ["OPENAI_API_KEY"] = api_key
         openai.api_key = api_key
+    else:
+        api_key = os.getenv("OPENAI_API_KEY")
+        openai.api_key = api_key
         
     if chat == LLMCallType.OPENAI_CHAT:
         response = openai.ChatCompletion.create(
