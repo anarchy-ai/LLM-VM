@@ -40,8 +40,7 @@ def server_entry_point(host = '127.0.0.1', port = 3002):
          >>> server_entry_point(port = 3002)
     """
     app.run(host = host,port = port)
-
-
+    
 def cli():
     """
      This function is the entry point for the project and allows the user to specify an option network address and port number when launching from the cli
