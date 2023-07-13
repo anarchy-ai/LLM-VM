@@ -72,3 +72,4 @@ authors = ["Anarchy Team"]
 
 [tool.poetry.scripts]
 llm_vm_server = "llm_vm.server.main:cli"
+my_script = "llm_vm.server.main:cli"
