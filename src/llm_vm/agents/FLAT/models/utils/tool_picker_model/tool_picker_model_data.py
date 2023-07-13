@@ -21,7 +21,7 @@ def __get_random_tool_subset(tool_id: int, shuffle_value: int = 0, shuffle_modul
 def __get_toolpicker_model(tools_input_model: ToolpickerInputModel) -> ToolpickerInputModel:
     
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    file_path = os.path.abspath(os.path.join(current_dir, '../../raw_data/toolpicker_data.json'))
+    file_path = os.path.abspath(current_dir, f'../raw_data/toolpicker_data.json')
     print(current_dir, file_path)
     json_data: List[QuestionSplitModelJSONData] = json.load(open(file_path, "r"))["data"]
     

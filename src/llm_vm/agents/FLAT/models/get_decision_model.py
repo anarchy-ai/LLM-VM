@@ -1,4 +1,4 @@
-from llm_vm.agents.FLAT.typings import *
+from llm_vm.utils.typings_llm import *
 import os
 import json
 
