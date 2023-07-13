@@ -7,7 +7,7 @@ from llm_vm.completion.optimize import LocalOptimizer
 
 # load optimizer for endpoint use
 optimizer = LocalOptimizer(MIN_TRAIN_EXS=2,openai_key=None)
-
+print('optimizer loaded')
 bp = Blueprint('bp',__name__)
 @bp.route('/', methods=['GET'])
 def home():
