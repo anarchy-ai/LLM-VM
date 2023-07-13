@@ -1,0 +1,75 @@
+[project]
+name = "llm_vm"
+version = "0.1.0"
+description = "Taming LLMs to do whatever you want"
+authors = [
+    {name = "Anarchy Team", email = "matt@anarchy.ai"},
+]
+
+requires-python = ">=3.8" # this could be lower if need be
+readme = "README.md"
+license = {text = "MIT"}
+dependencies = [
+    "python-dotenv>=1.0.0",
+    "openai>=0.27.6",
+    "numpy>=1.22.4",
+    "watchdog>=3.0.0",
+    "transformers>=4.29.0",
+    "flask>=2.3.2",
+    "sentencepiece>=0.1.99",
+    "requests>=2.26.0",
+    "spacy>=3.5.3",
+    "en_core_web_md @ https://github.com/explosion/spacy-models/releases/download/en_core_web_md-3.6.0/en_core_web_md-3.6.0-py3-none-any.whl"
+]
+
+
+
+[project.scripts] # these names are just placeholders 
+llm_vm_test_optimize = "llm_vm.completion.test_optimize:run_test_stub"
+llm_vm_server = "llm_vm.server.main:cli"
+
+llm_vm_run_agent = "llm_vm.agents.agent_interface:call_agent"
+llm_vm_run_agent_backwards_chaining = "llm_vm.agents.BACKWARD_CHAINING.agent:BACKWARD_CHAINING_main"
+llm_vm_run_agent_rebel = "llm_vm.agents.REBEL.agent:rebel_main"
+llm_vm_run_agent_flat = "llm_vm.agents.FLAT.agent:flat_main"
+# package_dir = {}
+
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+
+
+# lets maybe try pytest
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "-ra -q"
+testpaths = [
+    "tests/src",
+    # "integration_tests", # this dir is for stuff that requires api key or server running
+]
+python_files = "*.py"
+# python_classes = "Check"
+# python_functions = "*_check"
+
+# these are strawman configs
+[tool.black]
+line-length = 140
+target-version = ["py37"] # what does this do?
+skip-string-normalization = true
+
+
+[tool.poetry]
+# does poetry make sense as a tool to use?
+# ... this is also the default anyways
+packages = [
+    { include = "llm_vm", from = "src" },
+]
+name = "llm_vm"
+version = "0.0.1"
+description = "Taming LLMs to do whatever you want"
+authors = ["Anarchy Team"]
+
+[tool.poetry.scripts]
+llm_vm_server = "llm_vm.server.main:cli"
+my_script = "llm_vm.server.main:cli"

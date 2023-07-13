@@ -1,36 +1,21 @@
-import flask
-from flask import request, jsonify
+from flask import request, Blueprint
 import json
-import time
-import traceback
-import importlib
-import openai
 import os
-import hashlib
-from src.llm_vm.completion.optimize import LocalOptimizer
-from src.llm_vm.agents.REBEL import agent
+import openai
+from llm_vm.agents.REBEL import agent
+from llm_vm.completion.optimize import LocalOptimizer
 
-# from test_agent import run_test
-from flask_cors import CORS
-
-from contextlib import contextmanager
-
+# load optimizer for endpoint use
 optimizer = LocalOptimizer(MIN_TRAIN_EXS=2,openai_key=None)
-app = flask.Flask(__name__)
-CORS(app)
-app.config["DEBUG"] = True
-
-def generate_hash(input_string):
-    sha256_hash = hashlib.sha256()
-    sha256_hash.update(str(input_string).encode('utf-8'))
-    return int(sha256_hash.hexdigest(), 16) % 10**18
-
-@app.route('/', methods=['GET'])
+print('optimizer loaded')
+bp = Blueprint('bp',__name__)
+@bp.route('/', methods=['GET'])
 def home():
     return '''home'''
 
-@app.route('/complete', methods=['POST']) 
+@bp.route('/v1/complete', methods=['POST']) 
 def optimizing_complete():
+    print(request.data)
     rebel_agent = agent.Agent("", [], verbose=1)
     data = json.loads(request.data)
     static_context = data["context"]
@@ -47,7 +32,23 @@ def optimizing_complete():
             return {"status":0, "resp":"Wrong Data Type for temperature"}
         else:
             kwargs.update({"temperature":data["temperature"]})
-    
+
+    if "stoptoken" in data.keys():
+       
+        if type(data["stoptoken"]) != str and type(data["stoptoken"]) != list:
+            # stop can either be a string or array of strings
+            return {"status":0, "resp":"Wrong Data Type for stop"}
+        elif type(data["stoptoken"]) == list:
+            if len(data["stoptoken"]) > 4:
+                return {"status":0, "resp":"Too many stop tokens in array limit to 4 or less"}
+            # check that every element in the list is a string
+            for j in data["stoptoken"]:
+                if type(j) != str:
+                    return {"status":0, "resp":"Wrong Data Type for stop"}
+            kwargs.update({"stop": data["stoptoken"]})
+        else:
+            kwargs.update({"stop":data["stoptoken"]})                 
+        
     if "data_synthesis" in data.keys():
         if type(data["data_synthesis"])==bool:
             data_synthesis = data["data_synthesis"]
@@ -81,11 +82,8 @@ def optimizing_complete():
                 tools.append(temp_tool_dict)
             rebel_agent.set_tools(tools)
             use_rebel_agent = True
-   
     try:
         openai.api_key = data["openai_key"]
-        os.environ['OPENAI_API_KEY']=openai.api_key
-        print(os.getenv("OPENAI_API_KEY"))
     except:
         return  {"status":0, "resp":"Issue with OpenAI key"}
     
@@ -100,9 +98,3 @@ def optimizing_complete():
         return {"status":0, "resp": str(e)}
     
     return {"completion":completion, "status": 200}
-
-
-
-
-if __name__ == '__main__':
-    app.run(host="192.168.1.75", port=3002)

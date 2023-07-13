@@ -11,12 +11,10 @@ import abc
 import requests
 import hashlib
 import pickle
-import tiktoken
+import llm_vm.completion.models as models
+#we need to package-ify so this works 
+import llm_vm.completion.data_synthesis as data_synthesis
 
-try:
-    import data_synthesis
-except:
-    from . import data_synthesis
 
 job_id = None # we want to be able to cancel a fine_tune if you kill the program
 
@@ -100,33 +98,13 @@ class local_ephemeral:
                                           "data": [],
                                           "model": None }
 
+def CALL_BIG(prompt, **kwargs): 
+    model = models.MODELCONFIG.big_model
+    return model.generate(prompt,**kwargs)
 
-def CALL_BIG(prompt, gpt4=False, **kwargs):
-    print("HERE",os.getenv("OPENAI_API_KEY"))
-    cur_prompt = [{'role': "system", 'content' : prompt}]
-    print("CUR_PROMPT:", cur_prompt, flush=True)
-    print("KWARGS:", kwargs, flush=True)
-    ans = openai.ChatCompletion.create(
-        messages=cur_prompt,
-        model="gpt-3.5-turbo-0301" if not gpt4 else 'gpt-4',
-        **kwargs)
-
-    if ans["choices"][0]["finish_reason"] == "stop":
-        return ans["choices"][0]["message"]["content"]
-    elif ans["choices"][0]["finish_reason"] == "length":
-        enc = tiktoken.get_encoding("cl100k_base")
-        num_tokens = len(enc.encode(ans["choices"][0]["message"]["content"]))
-        print(f"Max tokens generated: {num_tokens} tokens", file=sys.stderr)
-        return ans["choices"][0]["message"]["content"]
-    elif ans["choices"][0]["finish_reason"] == "content_filter":
-        print(f"Error occurred while generating response. Your prompt was flagged by Open AI content moderation.", file=sys.stderr)
-    else:
-        print("Error occurred while generating response.", file=sys.stderr)
-
-def CALL_SMALL(*args, **kwargs):
-    ans = openai.Completion.create(*args, **kwargs)
-    return ans['choices'][0]['text']
-
+def CALL_SMALL(prompt,**kwargs):
+    model = models.MODELCONFIG.small_model
+    return model.generate(prompt,**kwargs)
 
 
 class Optimizer:

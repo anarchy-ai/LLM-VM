@@ -3,20 +3,20 @@ import sys
 
 import requests
 from gpt_index import Document, GPTTreeIndex
-from agent_helper.utils import print_op, make_interaction, print_big
-from agent_helper.requests.call_llm import call_llm
-from agent_helper.replacer import replace_variables_for_values
-from typings_llm import *
-from agent_helper.bothandler import prompt_for_answer, prompt_for_instructions
+from llm_vm.agents.FLAT.agent_helper.utils import print_op, make_interaction, print_big
+from llm_vm.agents.FLAT.agent_helper.requests.call_llm import call_llm
+from llm_vm.agents.FLAT.agent_helper.replacer import replace_variables_for_values
+from llm_vm.utils.typings_llm import *
+from llm_vm.agents.FLAT.agent_helper.bothandler import prompt_for_answer, prompt_for_instructions
 
-# Get the current file's directory to grab the python files with common functionality in the utils/ folder
-current_dir = os.path.dirname(os.path.abspath(__file__))
-grandparent_dir = os.path.dirname(os.path.dirname(os.path.dirname(current_dir)))
-utils_dir = os.path.join(grandparent_dir, 'utils/')
-sys.path.append(utils_dir)
+# # Get the current file's directory to grab the python files with common functionality in the utils/ folder
+# current_dir = os.path.dirname(os.path.abspath(__file__))
+# grandparent_dir = os.path.dirname(os.path.dirname(os.path.dirname(current_dir)))
+# utils_dir = os.path.join(grandparent_dir, 'utils/')
+# sys.path.append(utils_dir)
 
-from labels import *
-from agent_helper.tools import CUSTOM_TOOL_ANSWER_EMBEDDING
+from llm_vm.utils.labels import *
+from llm_vm.agents.FLAT.agent_helper.tools import CUSTOM_TOOL_ANSWER_EMBEDDING
 import json
 
 def __format_tool_url (url: str) -> str:

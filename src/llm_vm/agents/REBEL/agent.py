@@ -14,15 +14,15 @@ import os
 import sys
 
 # Get the current file's directory to grab the python files with common functionality in the utils/ folder
-current_dir = os.path.dirname(os.path.abspath(__file__))
-grandparent_dir = os.path.dirname(os.path.dirname(current_dir))
-utils_dir = os.path.join(grandparent_dir, "utils/")
-sys.path.append(utils_dir)
+# current_dir = os.path.dirname(os.path.abspath(__file__))
+# grandparent_dir = os.path.dirname(os.path.dirname(current_dir))
+# utils_dir = os.path.join(grandparent_dir, "utils/")
+# sys.path.append(utils_dir)
 
-from keys import *
-from labels import *
-from print_types import *
-from tools import *
+from llm_vm.utils.keys import *
+from llm_vm.utils.labels import *
+from llm_vm.utils.print_types import *
+from llm_vm.utils.tools import *
 from urllib.parse import urlencode
 import urllib.parse as urlparse
 import json
@@ -581,15 +581,9 @@ class Agent:
 
         return (answer, [(question, answer)])
 
-
-# print_op(google(' {"question": ""}'))
-if __name__ == "__main__":
-    
-    
-
+def rebel_main():
     tools = buildExampleTools()
 
-    
 
     label = Agent(OPENAI_DEFAULT_KEY, tools, verbose=1)
     conversation_history = []
@@ -599,3 +593,9 @@ if __name__ == "__main__":
         return_value = label.run(inp, conversation_history)
         conversation_history = return_value[1]
         last = "AI: " + str(return_value[0]) + "\n"
+
+# print_op(google(' {"question": ""}'))
+if __name__ == "__main__":
+    
+    
+    rebel_main()

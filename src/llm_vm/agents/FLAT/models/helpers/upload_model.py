@@ -2,8 +2,8 @@ import json
 import openai
 import time
 import os
-from typings_llm import *
-from models.helpers.check_model_status import check_model_status
+from llm_vm.utils.typings_llm import *
+from llm_vm.agents.FLAT.models.helpers.check_model_status import check_model_status
 
 __START_LABEL    = " 🎛️  Creating model..."
 __PROGRESS_LABEL = " ⏳ Processing"
