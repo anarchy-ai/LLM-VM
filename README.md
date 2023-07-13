@@ -82,7 +82,7 @@ python test_llm_vm.py
 ```
 ### Optimizing Text Generation
 
-The code in `src/llm_vm/completion/` provides an optimizing text generation framework. It allows storing models and fine-tuning them on new data to improve generations over time.
+The code in `src/llm_vm/completion/` provides an optimizing completion library.  This technique intelligently analyzes call-site usage and automatically initiates student-teacher distillation to fine-tune purpose-specialized small and efficient models from slow and accurate general purpose models.
 
 #### Files
 
