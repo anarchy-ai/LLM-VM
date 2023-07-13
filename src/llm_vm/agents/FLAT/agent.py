@@ -12,9 +12,9 @@ from llm_vm.utils.keys import *
 random_fixed_seed = random.Random(4)
 
 class Agent:
-    def __init__(self, openai_key, tools, bot_instructions = "", verbose = 4):
+    def __init__(self, openai_key, tools = None, bot_instructions = "", verbose = 4):
         self.verbose = verbose
-        self.set_tools(GENERIC_TOOLS + tools)
+        self.set_tools((GENERIC_TOOLS + tools) if tools else GENERIC_TOOLS)
         self.bot_instructions = f"<{L_BOT_INSTRUCTIONS}>{bot_instructions}<{L_BOT_INSTRUCTIONS}>" if bot_instructions else ""
         
         # set the openai key to make calls to the API

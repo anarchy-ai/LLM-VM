@@ -19,32 +19,28 @@ def call_agent():
 
     # if user enters invalid choice, prompt for input until valid 
     while True:
-        model_choice = input("[1] FLAT (not working)\n[2] REBEL\n[3] BACKWARD_CHAINING\nChoose your agent:")
+        model_choice = input("[1] FLAT\n[2] REBEL\nChoose your agent:")
         try:
             # try to cast the input to an integer 
             model_choice = int(model_choice)
 
             if model_choice not in range (1, 4):
-                print("=====Please enter 1, 2, or 3!=====")
+                print("=====Please enter 1, or 2!=====")
             else:
                 # user has entered a valid input 
                 break
         except:
-            print("=====Please enter 1, 2, or 3!=====")
+            print("=====Please enter 1 or 2!=====")
 
     # FLAT 
     if model_choice == 1:
         # TODO: Add agent call here when FLAT is fixed
-        tools = FLAT
+        tools = 
         pass
-    # REBEL
     elif model_choice == 2:
         tools = REBEL.buildExampleTools()
         agent = REBEL.Agent(key, tools, verbose = 1)
-    # # BACKWARD_CHAINING 
-    # elif model_choice == 3:
-    #     tools = BACKWARD_CHAINING.agent.buildGenericTools()
-    #     agent = BACKWARD_CHAINING.agent.Agent(keys.OPENAI_DEFAULT_KEY, tools, verbose = 1)
+   
 
     pass 
 

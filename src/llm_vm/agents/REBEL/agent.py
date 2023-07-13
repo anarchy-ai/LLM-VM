@@ -594,6 +594,5 @@ def rebel_main():
         conversation_history = return_value[1]
         last = "AI: " + str(return_value[0]) + "\n"
 
-if __name__ == "__main__":
-    
+if __name__ == "__main__":    
     rebel_main()
