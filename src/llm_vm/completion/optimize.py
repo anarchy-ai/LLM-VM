@@ -98,8 +98,7 @@ class local_ephemeral:
                                           "data": [],
                                           "model": None }
 
-def CALL_BIG(prompt, **kwargs):
-    
+def CALL_BIG(prompt, **kwargs): 
     model = models.MODELCONFIG.big_model
     return model.generate(prompt,**kwargs)
 
