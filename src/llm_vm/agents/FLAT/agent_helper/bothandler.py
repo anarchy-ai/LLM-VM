@@ -8,9 +8,9 @@ from llm_vm.agents.FLAT.agent_helper.tools import *
 from llm_vm.agents.FLAT.agent_helper.tool_utils import *
 from llm_vm.agents.FLAT.agent_helper.utils import *
 
-from llm_vm.completion.models.get_decision_model import get_newest_decision_model
-from llm_vm.completion.models.utils.tool_picker_model.tool_picker_model_data import tool_input_data
-from llm_vm.completion.models.utils.question_split_model.question_split_model_data import question_splitter_data
+from llm_vm.agents.FLAT.models.get_decision_model import get_newest_decision_model
+from llm_vm.agents.FLAT.models.utils.tool_picker_model.tool_picker_model_data import tool_input_data
+from llm_vm.agents.FLAT.models.utils.question_split_model.question_split_model_data import question_splitter_data
 
 # openai.api_key = OPENAI_DEFAULT_KEY
 

@@ -1,4 +1,4 @@
-from llm_vm.typings_llm import *
+from llm_vm.agents.FLAT.typings import *
 import os
 import json
 
@@ -8,7 +8,7 @@ def get_newest_decision_model(model: DecisionStep, default_model = OpenAIModel.D
     
     model_name = model.value
     default_model_name = default_model.value
-    
+    print(file_name)
     file = open(file_name)
     
     data: List[LLModels] = json.load(file);
