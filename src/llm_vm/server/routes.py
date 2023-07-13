@@ -3,8 +3,9 @@ import json
 import os
 import openai
 from llm_vm.agents.REBEL import agent
-
 from llm_vm.completion.optimize import LocalOptimizer
+
+# load optimizer for endpoint use
 optimizer = LocalOptimizer(MIN_TRAIN_EXS=2,openai_key=None)
 
 bp = Blueprint('bp',__name__)

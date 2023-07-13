@@ -8,28 +8,46 @@ import openai
 import os
 import hashlib
 import sys
-
 from flask_cors import CORS
 from contextlib import contextmanager
-
-
 import llm_vm.server.routes as routes
 
+# Initialize Flask App
 app = flask.Flask(__name__)
 CORS(app)
 app.config["DEBUG"] = True
 
-
+# Register_blueprint from routes to load API
 app.register_blueprint(routes.bp)
 
-def main_server_entry_point(host = '127.0.0.1', port = 3002):
-    # make this more configurable soon
+def server_entry_point(host = '127.0.0.1', port = 3002):
+    """
+    This function launches the server with specified parameters
+
+     Parameters:
+         host (str): Network IP address
+         port (int): Port Number
+
+     Returns:
+         None
+
+     Example:
+         >>> server_entry_point(port = 3002)
+    """
     app.run(host = host,port = port)
 
 
 def cli():
-    # this function allows the user to call the script from the command line and specify network locations if wanted.
-    # The nature of this logic allows either a port or address to be called
+    """
+     This function is the entry point for the project and allows the user to specify an option network address and port number when launching from the cli
+
+     Parameters:
+         None
+
+     Returns:
+         None
+     
+    """
     if len(sys.argv) > 1:
         try:
             # We're going to except on a value error at the int exchange
@@ -44,9 +62,9 @@ def cli():
         if port > 66535:
             print('Port defined out of range, defaulting to 3002')
             port = 3002
-        main_server_entry_point(host = host, port = port)
+        server_entry_point(host = host, port = port)
     else:
-        main_server_entry_point()
+        server_entry_point()
 
     
 if __name__ == '__main__':
