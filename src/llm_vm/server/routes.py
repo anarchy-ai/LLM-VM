@@ -84,8 +84,6 @@ def optimizing_complete():
             use_rebel_agent = True
     try:
         openai.api_key = data["openai_key"]
-        # os.environ['OPENAI_API_KEY']=openai.api_key
-        # print(os.getenv("OPENAI_API_KEY"))
     except:
         return  {"status":0, "resp":"Issue with OpenAI key"}
     
