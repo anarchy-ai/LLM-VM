@@ -1,3 +1,4 @@
+print('this is our file')
 import json
 from llm_vm.utils.typings_llm import *
 from llm_vm.agents.FLAT.agent_helper.utils import *
@@ -6,13 +7,13 @@ from llm_vm.agents.FLAT.agent_helper.use_tool import use_tool
 from llm_vm.agents.FLAT.agent_helper.tool_utils import make_tool_input_case
 
 # Get the current file's directory to grab the python files with common functionality in the utils/ folder
-current_dir = os.path.dirname(os.path.abspath(__file__))
-grandparent_dir = os.path.dirname(os.path.dirname(os.path.dirname(current_dir)))
-utils_dir = os.path.join(grandparent_dir, 'utils/')
-sys.path.append(utils_dir)
+# current_dir = os.path.dirname(os.path.abspath(__file__))
+# grandparent_dir = os.path.dirname(os.path.dirname(os.path.dirname(current_dir)))
+# utils_dir = os.path.join(grandparent_dir, 'utils/')
+# sys.path.append(utils_dir)
 
 from labels import *
-from agent_helper.requests.call_llm import call_llm
+from llm_vm.agents.FLAT.agent_helper.requests.call_llm import call_llm
 
 __MAX_RETRIES_GUESS_INPUT = 3
 

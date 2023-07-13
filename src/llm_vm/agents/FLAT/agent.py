@@ -73,7 +73,7 @@ def flat_main():
                        'headers': {'authorization': 'Bearer OaEqVSw9OV6llVnvh9IJo92ZCnseQ9tftnUUVwjYXTNzPxDjxRafYkz99oJKI9WHEwUYkiwULXjoBcLJm7JhHj479Xqv6C0lKVXS7N91ni-nRWpGomaPkZ6Z1T0GZHYx',
                                    'accept': 'application/json'}}}]
 
-    label = Agent(OPENAI_DEFAULT_KEY, tools, verbose=4)
+    label = Agent(os.getenv("OPENAI_API_KEY"), tools, verbose=4)
     conversation_history = []
     last = ""
     while True:
