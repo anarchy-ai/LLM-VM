@@ -10,3 +10,4 @@ src/llm_vm.egg-info/*
 dist
 .DS_STORE
 /poetry.lock
+*.ipynb
