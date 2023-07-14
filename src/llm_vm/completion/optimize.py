@@ -185,6 +185,7 @@ class LocalOptimizer(Optimizer):
     def complete(self, stable_context, dynamic_prompt, data_synthesis = False, finetune = False, **kwargs):
         openai.api_key = self.openai_key
         completion, train = self.complete_delay_train(stable_context, dynamic_prompt, run_data_synthesis=data_synthesis, **kwargs)
+        print(finetune,flush=True)
         if finetune:
             train()
         return completion
