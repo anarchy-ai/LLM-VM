@@ -68,6 +68,22 @@ To install the LLM-VM you simply need to download this repository and install it
 
 This will install both the library and test-server.  
 
+### Generating Completions
+Our LLM-VM gets you working directly with popular LLMs locally in just 3 lines. Once you've installed (as above), just load your model and start generating!
+
+```python
+# import our client
+from llm_vm.client import Client
+
+# Instantiate the client specifying which LLM you want to use
+client = Client(big_model = 'neo')
+
+# Put in your prompt and go!
+response = client.complete('What is Anarchy?')
+print(response)
+# Anarchy is a political system in which the state is abolished and the people are free...
+```
+
 ### 🏃‍♀️ Running Standalone
 
 After you have installed (as above), you now have an anarchy server which provides an completion API (using flask).
@@ -151,6 +167,8 @@ python test_llm_vm.py
 ## 🚅 Optimizing Completion 🚅
 
 The code in `src/llm_vm/completion/` provides an optimizing completion library.  This technique intelligently analyzes call-site usage and automatically initiates student-teacher distillation to fine-tune purpose-specialized small and efficient models from slow and accurate general purpose models.
+
+To 
 
 #### Files
 
