@@ -1,14 +1,16 @@
 ![Anarchy Logo](anarchy_logo.svg)
 
-# 🚀 Anarchy LLM-VM 🚀
+# 🤖 Anarchy LLM-VM 🤖
 
-This is Anarchy's attempt at building 🏗️ generalized artificial intelligence 🤖 through the LLM-VM: a way to give your LLMs superpowers 🦸 and superspeed 🚄.
+This is [Anarchy's](https://anarchy.ai) attempt at building 🏗️ generalized artificial intelligence 🤖 through the LLM-VM: a way to give your LLMs superpowers 🦸 and superspeed 🚄.
+
+You can find instructions to try it live here: [anarchy.ai](https://anarchy.ai)
 
 > This project is in BETA. Expect continuous improvement and development.
 
-## About
+## 📚 About 📚
 
-### What is the Anarchy LLM-VM?
+### 💁 What is the Anarchy LLM-VM?
 
 The Anarchy LLM-VM is a highly optimized and opinionated backend for running LLMs with all the modern features we've come to expect from completion: tool usage, persistent stateful memory, live data augmentation, data and task fine-tuning, output templating, a web playground, api endpoints, student-teacher distillation, data synthesis, load-balancing and orchestration, large context-window mimicry.
 
@@ -16,44 +18,68 @@ Formally, it is a virtual machine/interpreter for human language, coordinating b
 
 By doing all these things in one spot in an opinionated way, the LLM-VM can properly optimize and batch calls that would be exorbitantly expensive with distributed endpoints.  It furthermore strives for both model and architecture agnosticism, properly optimizing the chosen model for the current architecture.
 
-### Why use the Anarchy LLM-VM?
+### 🤌 Why use the Anarchy LLM-VM?
 
 In line with Anarchy's mission, the LLM-VM strives to support open-source models. By utilizing open-source models and running them locally you achieve a number of benefits:
 
-* **Simplify your AI development:** *With AnarchyAI, one interface is all you need to interact with the latest LLMs available.*
+* **Speed up your AGI development 🚀:** *With AnarchyAI, one interface is all you need to interact with the latest LLMs available.*
   
-* **Lower your costs:** *Running models locally can reduce the pay-as-you-go costs of development and testing.*
+* **Lower your costs 💸:** *Running models locally can reduce the pay-as-you-go costs of development and testing.*
   
-* **Unparalleled flexibility:** *AnarchyAI allows you to rapidly switch between models so you can pinpoint the exact right tool for your project.*
+* **Flexibility 🧘‍♀️:** *AnarchyAI allows you to rapidly switch between models so you can pinpoint the exact right tool for your project.*
   
-* **Strong community:** *Join our active community of highly motivated developers and engineers working passionately to democratize AI*
+* **Community Vibes 🫂:** *Join our active community of highly motivated developers and engineers working passionately to democratize AGI*
   
-* **WYSIWYG:** *Open source means nothing is hidden; we strive for transparency and efficiency so you can focus on building.*
+* **WYSIWYG 👀:** *Open source means nothing is hidden; we strive for transparency and efficiency so you can focus on building.*
 
-### How does Anarchy LLM-VM compare with other projects?
+### 🎁 Features & Roadmap
 
-Anarchy is built by hackers, for hackers. Stemming from that principle, our product is designed to be simple, helpful, and flexible to apply to as many use cases as possible. *YOU* are the center of our business and we're working to make it as simple as running `pip3 install` to put the power of AI in *your* hands. 
+* **Implicit Agents 🔧🕵️:** *The Anarchy LLM-VM can be set up to use external tools through our agents such as **REBEL** or **ReAct** just by supplying tool descriptions!*
 
+* **Inference Optimization 🚄:** *The Anarchy LLM-VM is optimized from agent level all the way to assembly on known LLM architectures to get the most bang for your buck. With state of the art batching, sparse inference and quantization, distillation, and multi-level colocation, we aim to provide the fastest framework available.
 
-* No other project grants as much freedom as Anarchy. We DGAF what you use our OSS AI for -- just don’t use our hosted playground for anything illegal.
-  
-* At Anarchy, we believe in open source and the power of community. Want a new feature? Come help us make it!
-  
-* Running your models on your hardware is key to democratizing AGI. We might be able to make it faster on ours, but every optimiztion made effects how these models behave and thus one’s ability to hack them. We’ll always keep this core open.
+* **Task Auto-Optimization 🚅:** *The Anarchy LLM-VM will analyze your use cases for repetative tasks where it can activate student-teacher distillation to train a super-efficient small model from a larger more general model without loosing accuracy.  It can furthermore take advantage of data-synthesis techniques to improve results.
 
+* **HTTP Endpoints 🕸️:** *We provide an HTTP standalone server to handle completion requests.*
 
-## Running/Testing
+* **Library Callable 📚:** *We provide a library that can be used from any python codebase directly.*
 
-### Installation and Starting the Server
+* **Live Data Augmentation 📊:** (ROADMAP) *You will be able to provide a live updating data-set and the Anarchy LLM-VM will **fine-tune** your models or work with a **vector DB** to provide up-to-date information with citations*
 
-To run and test this repository you need to start a flask server. To start the flask server use: 
+* **Web Playground 🛝:** (ROADMAP) *You will be able to run the Anarchy LLM-VM and test it's outputs from the browser.*
+
+* **Load-Balancing and Orchestration ⚖️:** (ROADMAP) *If you have multiple LLMs or providers you'd like to utilize, you will be able to hand them to the Anarchy LLM-VM to automatically figure out which to work with and when to optimize your uptime or your costs*
+
+* **Output Templating 🤵:** (ROADMAP) *You can ensure that the LLM only outputs data in specific formats and fills in variables from a template with either regular expressions, LMQL, or OpenAI's template language*
+
+* **Persistent Stateful Memory 📝:** (ROADMAP) *The Anarchy LLM-VM can remember a user's conversation history and react accordingly*
+
+## 🚀 Quickstart 🚀
+
+### 👨‍💻 Installation
+
+To install the LLM-VM you simply need to download this repository and install it with pip like so:
 
 ```bash
-pip3 install .
-llm_vm_server
+> git clone https://github.com/anarchy-ai/LLM-VM.git
+> cd LLM-VM
+> pip3 install .
 ```
 
-This will start a flask server at https://localhost:3002/ and will create an endpoint https://localhost:3002/v1/completion. 
+This will install both the library and test-server.  
+
+### 🏃‍♀️ Running Standalone
+
+After you have installed (as above), you now have an anarchy server which provides an completion API (using flask).
+
+```bash
+> cd LLM-VM
+> llm_vm_server
+```
+
+This will start a flask server at https://localhost:3002/ and will create an endpoint https://localhost:3002/v1/completion.
+
+## 🕸️ API Usage 🕸️
 
 ### Submitting a Request
 
@@ -91,6 +117,9 @@ Post requests can be sent to this endpoint `https://localhost:3002/` in the foll
 
 If no `temperature`, `finetune`, or `data_synthesis` are provided, these values will default to `0`, `false`, and `false` respectively. 
 
+## 🛠️ Tool Using Agents 🛠️
+
+
 #### Submitting a Request to the REBEL Agent
 
 An agent is an algorithm that uses the LLM in a way to increase its reasoning capabilities such as allowing the use of outside tools or allowing the LLM to answer compositional questions. To use the REBEL (REcursion Based Extensible Llm) endpoint with tools, add a tool in the following way. We have used the finnhub api to get stocks data as an example.
@@ -118,7 +147,8 @@ To access the completion endpoint programmatically, after starting up the server
 ```
 python test_llm_vm.py
 ```
-### Optimizing Text Generation
+
+## 🚅 Optimizing Completion 🚅
 
 The code in `src/llm_vm/completion/` provides an optimizing completion library.  This technique intelligently analyzes call-site usage and automatically initiates student-teacher distillation to fine-tune purpose-specialized small and efficient models from slow and accurate general purpose models.
 
@@ -175,6 +205,10 @@ titled `agent.py`.
 
 Alternatively, to run a simple interface and choose an agent to run from the CLI, run the `src/llm_vm/agents/agent_interface.py` file 
 and follow the command prompt instructions. 
+
+## Acknowledgements 
+
+
 
 ## License
 
