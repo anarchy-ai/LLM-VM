@@ -1,5 +1,5 @@
 """
-This file has been temporarily repurposed as an interface that for users to 
+This file has been temporarily repurposed as an interface for users to 
 call any of the three agents (REBEL, BACKWARD_CHAINING, and FLAT) and interact with them.
 Running this file prompts the user to choose any of the agents and ask it questions. 
 """

@@ -25,7 +25,9 @@ class Base_Onsite_LLM(ABC):
     def tokenizer_loader(self):
         pass
 
-    # def generate() # this is where the meat and potatoes should live?
+    @abstractmethod
+    def generate(self): # this is where the meat and potatoes should live?
+        pass
 
 """
 this factorization isn't necessarily the greatest, nor should it be viewed

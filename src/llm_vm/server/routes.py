@@ -8,14 +8,15 @@ from llm_vm.completion.optimize import LocalOptimizer
 # load optimizer for endpoint use
 optimizer = LocalOptimizer(MIN_TRAIN_EXS=2,openai_key=None)
 print('optimizer loaded')
+
 bp = Blueprint('bp',__name__)
+
 @bp.route('/', methods=['GET'])
 def home():
     return '''home'''
 
 @bp.route('/v1/complete', methods=['POST']) 
 def optimizing_complete():
-    print(request.data)
     rebel_agent = agent.Agent("", [], verbose=1)
     data = json.loads(request.data)
     static_context = data["context"]
