@@ -6,6 +6,16 @@ import os
 print('Big LLM Model: ' + args.big_model)
 print('Small LLM Model: ' + args.small_model)
 
+# making MODELS_AVAILABLE a set because it will be used for membership testing
+MODELS_AVAILABLE = set([
+    "opt",
+    "bloom",
+    "neo",
+    "llama",
+    "gpt",
+    "chat_gpt",
+])
+
 MODEL_DICT = {
     "opt":llms.Small_Local_OPT,
     "bloom":llms.Small_Local_Bloom,
