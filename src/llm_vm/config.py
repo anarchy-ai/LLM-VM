@@ -1,5 +1,5 @@
 import argparse, configparser
-from llm_vm.completion.models import MODELS_AVAILABLE
+import re
 
 parser = argparse.ArgumentParser()
 
@@ -21,41 +21,24 @@ if args.config_file:
     args = parser.parse_args() # Overwrite arguments
 
 # argument checking
+
+# making MODELS_AVAILABLE a set because it will be used for membership testing
+MODELS_AVAILABLE = set([
+    "opt",
+    "bloom",
+    "neo",
+    "llama",
+    "gpt",
+    "chat_gpt",
+])
+
 if args.big_model not in MODELS_AVAILABLE:
     print(args.big_model + " is an invalid Model selection for Big LLM Model")
     exit()
+    
 if args.small_model not in MODELS_AVAILABLE:
-    print(args.small_model + " is an invalid Model selection for Big LLM Model")
+    print(args.small_model + " is an invalid Model selection for Small LLM Model")
     exit()
-
-import argparse, configparser
-from llm_vm.completion.models import MODELS_AVAILABLE
-
-parser = argparse.ArgumentParser()
-
-# Set parse strategy here, lines should be self explanatory
-parser.add_argument("-b", "--big_model", type=str, default='gpt', help='Big LLM Model. Default: chat_gpt')
-parser.add_argument("-c", "--config_file", type=str, help='Config File')
-parser.add_argument("-p", "--port", type=int, default=3002, help='Port Number. Default: 3002')
-parser.add_argument("-s", "--small_model", type=str, default='neo', help='Small LLM Model. Default: gpt')
-parser.add_argument("-H", "--host", type=str, default='127.0.0.1', help='Host Address. Default: 127.0.0.1')
-
-args = parser.parse_args()
-
-if args.config_file:
-    config = configparser.ConfigParser()
-    config.read(args.config_file)
-    defaults = {}
-    defaults.update(dict(config.items("Defaults")))
-    parser.set_defaults(**defaults)
-    args = parser.parse_args() # Overwrite arguments
-
-# argument checking
-if args.big_model not in MODELS_AVAILABLE:
-    print(args.big_model + " is an invalid Model selection for Big LLM Model")
-
-if args.small_model not in MODELS_AVAILABLE:
-    print(args.small_model + " is an invalid Model selection for Big LLM Model")
     
 # check args.port is a valid port number
 if not (1024 < args.port < 65535):
