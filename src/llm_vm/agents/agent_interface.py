@@ -1,5 +1,5 @@
 """
-This file has been temporarily repurposed as an interface that for users to 
+This file has been temporarily repurposed as an interface for users to 
 call any of the three agents (REBEL, BACKWARD_CHAINING, and FLAT) and interact with them.
 Running this file prompts the user to choose any of the agents and ask it questions. 
 """
@@ -35,7 +35,16 @@ def call_agent():
     # FLAT 
     if model_choice == 1:
         # TODO: Add agent call here when FLAT is fixed
-        pass
+        tools =  [{'method': 'GET', "dynamic_params": { 'location': 'This string indicates the geographic area to be used when searching for businesses. \
+    Examples: "New York City", "NYC", "350 5th Ave, New York, NY 10118".', 'term': 'Search term, e.g. "food" or "restaurants". The \
+    term may also be the business\'s name, such as "Starbucks"', 'price': 'Pricing levels to filter the search result with: 1 = \
+    $, 2 = $$, 3 = $$$, 4 = $$$$. The price filter can be a list of comma delimited pricing levels. e.g., "1, 2, 3" will filter the \
+    results to show the ones that are $, $$, or $$$.'}, "description":"This tool searches for a business on yelp.  It's useful for finding restaurants and \
+    whatnot.", 'args' :{'url': 'https://api.yelp.com/v3/businesses/search', 'cert': '', 'json': {}, 'params': {'limit': '1', 
+                                                                                                              'open_now': 'true', 'location': '{location}', 'term': '{term}', 'price': '{price}'}, 'data': {},
+                       'headers': {'authorization': 'Bearer OaEqVSw9OV6llVnvh9IJo92ZCnseQ9tftnUUVwjYXTNzPxDjxRafYkz99oJKI9WHEwUYkiwULXjoBcLJm7JhHj479Xqv6C0lKVXS7N91ni-nRWpGomaPkZ6Z1T0GZHYx',
+                                   'accept': 'application/json'}}}]
+        agent = FLAT.Agent(key, tools, verbose=1)
     elif model_choice == 2:
         tools = REBEL.buildExampleTools()
         agent = REBEL.Agent(key, tools, verbose = 1)

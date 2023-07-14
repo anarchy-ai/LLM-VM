@@ -12,6 +12,7 @@ parser.add_argument("-H", "--host", type=str, default='127.0.0.1', help='Host Ad
 
 args = parser.parse_args()
 
+# Handling config file for customized launching
 if args.config_file:
     config = configparser.ConfigParser()
     config.read(args.config_file)
@@ -53,6 +54,7 @@ if not re.match(pattern, args.host):
     print("Invalid IP address. Reverting to the default host.")
     args.host = '127.0.0.1'
 else:
+    # validates each number in the IP address is between 0-255
     octets = args.host.split('.')
     valid_ip = True
     for octet in octets:
