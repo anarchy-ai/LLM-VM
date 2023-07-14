@@ -1,22 +1,22 @@
-# Anarchy LLM-VM
+![Anarchy Logo](anarchy_logo.svg)
 
-This is an LLM agnostic JIT for natural language. Specifically, it uses LLMs to convert conversational natural language into a dynamic series of LLM and IO commands. You provide the underlying provider(s), actions (APIs, code-hooks) and their descriptions, data-sources (PDFs, websites...), and the LLM-VM will take care of load-balancing, fine-tuning, natural language compilation and tool-selection.
+# 🚀 Anarchy LLM-VM 🚀
 
-For the first time ever, you don't have to be an AI PhD to set up your own chatbot. Our inference engine is both highly optimized to run models and includes all the bells-and-whistles of OpenAI (agentic tool use, large context windows), and more: persistent state, web playground, api endpoints, fine-tuning, teacher-student distillation, vector storage.
+This is Anarchy's attempt at building 🏗️ generalized artificial intelligence 🤖 through the LLM-VM: a way to give your LLMs superpowers 🦸 and superspeed 🚄.
 
 > This project is in BETA. Expect continuous improvement and development.
 
 ## About
 
-### What is Amarchy LLM-VM
+### What is the Anarchy LLM-VM?
 
-Formally, an LLM-VM is a virtual machine/interpreter for human language, coordinating between data, models (CPU), your prompts (code), and tools (IO). 
+The Anarchy LLM-VM is a highly optimized and opinionated backend for running LLMs with all the modern features we've come to expect from completion: tool usage, persistent stateful memory, live data augmentation, data and task fine-tuning, output templating, a web playground, api endpoints, student-teacher distillation, data synthesis, load-balancing and orchestration, large context-window mimicry.
 
-In other words, the Anarchy LLM-VM is a backend for running LLMs with all the modern features we've come to expect from completion (tool usage, stateful memory, live data augmentation, data and task fine-tuning).  
+Formally, it is a virtual machine/interpreter for human language, coordinating between data, models (CPU), your prompts (code), and tools (IO). 
 
 By doing all these things in one spot in an opinionated way, the LLM-VM can properly optimize and batch calls that would be exorbitantly expensive with distributed endpoints.  It furthermore strives for both model and architecture agnosticism, properly optimizing the chosen model for the current architecture.
 
-### Why use the Anarchy LLM-VM
+### Why use the Anarchy LLM-VM?
 
 In line with Anarchy's mission, the LLM-VM strives to support open-source models. By utilizing open-source models and running them locally you achieve a number of benefits:
 
