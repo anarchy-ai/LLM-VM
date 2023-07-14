@@ -190,11 +190,10 @@ class LocalOptimizer(Optimizer):
         openai.api_key = self.openai_key
         completion, train = self.complete_delay_train(stable_context, dynamic_prompt, run_data_synthesis=data_synthesis, **kwargs)
         if finetune:
-            return completion, train
-        else:
-            return completion, None
+            train()
+        return completion
     
-    def complete_delay_train(self, stable_context, dynamic_prompt, run_data_synthesis = False, min_examples_for_synthesis = 0 ,c_id = None, **kwargs):
+    def complete_delay_train(self, stable_context, dynamic_prompt, run_data_synthesis = False, min_examples_for_synthesis = 2 ,c_id = None, **kwargs):
         """
         Runs a completion using the string stable_context+dynamic_prompt.  Returns an optional training closure to use if the 
         caller decides that the completion was particularly good.
@@ -268,14 +267,14 @@ class LocalOptimizer(Optimizer):
                     if len(training_exs) >= self.MIN_TRAIN_EXS and not self.storage.get_training_in_progress_set_true(c_id):
                         print("Actually Fine-tuning", flush=True)
                         print("Training examples:",str(len(training_exs)))
-                        models.MODELCONFIG.small_model.finetune(training_exs,self,c_id)
+                        asyncStart(models.MODELCONFIG.small_model.finetune(training_exs,self,c_id))
                 return (best_completion, actual_train)
 
-            best_completion_promise = promiseCompletion()
+            best_completion_promise = asyncStart(promiseCompletion)
 
             if completion is None:
                 # crazy story: succeed_train gets set before this anyway if it makes sense to set it!
-                completion, succeed_train = best_completion_promise
+                completion, succeed_train = asyncAwait(best_completion_promise)
             print(completion)
         
 
@@ -285,10 +284,10 @@ class LocalOptimizer(Optimizer):
                     return succeed_train(use_completion)
                 if best_completion_promise is not None:
                     try:
-                        return best_completion[1](use_completion)
+                        return asyncAwait(best_completion)[1](use_completion)
                     except:
                         return
-            return promise
+            return asyncStart(promise)
 
         return completion, succeed_train_closure
     
