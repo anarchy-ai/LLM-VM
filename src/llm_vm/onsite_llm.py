@@ -1,7 +1,6 @@
 import abc
 from abc import ABC,abstractmethod
 import openai
-from llm_vm.config import MODELS_AVAILABLE
 from transformers import AutoTokenizer, OPTForCausalLM,BloomForCausalLM,LlamaTokenizer, LlamaForCausalLM, GPTNeoForCausalLM, GPT2Tokenizer
 
 class Base_Onsite_LLM(ABC):
@@ -280,33 +279,3 @@ class Chat_GPT:
             **kwargs)
         return ans['choices'][0]['message']['content']
 
-def loadLocalModel(model_name: str = 'neo') -> Base_Onsite_LLM:
-    """
-        This function returns a model to generate a 'local' response from the prompt
-
-        Parameters:
-            model_name (str): Name of desired model to use
-
-        Returns:
-            (Base_Onsite_LLM)
-        
-        Example:
-            >>> bloom_model = loadLocalModel('bloom')
-        """
-    if model_name not in MODELS_AVAILABLE:
-        print(model_name + " is not currently supported, please choose from the following: " + str(MODELS_AVAILABLE))
-        exit()
-    match model_name:
-        case 'neo':
-            model = Small_Local_Neo
-        case 'bloom':
-            model = Small_Local_Bloom
-        case 'opt':
-            model = Small_Local_OPT
-        case 'llama':
-            model = Small_Local_LLama
-        case 'gpt':
-            model = GPT3
-        case 'chat_gpt':
-            model = Chat_GPT
-    return model()
