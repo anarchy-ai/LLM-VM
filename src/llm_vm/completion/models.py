@@ -21,3 +21,4 @@ class ModelConfig:
         self.small_model = MODEL_DICT[small_model]()
 
 MODELCONFIG = ModelConfig(big_model=args.big_model, small_model=args.small_model)
+

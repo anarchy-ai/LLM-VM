@@ -1,7 +1,6 @@
 import abc
 from abc import ABC,abstractmethod
 import openai
-
 from transformers import AutoTokenizer, OPTForCausalLM,BloomForCausalLM,LlamaTokenizer, LlamaForCausalLM, GPTNeoForCausalLM, GPT2Tokenizer
 
 class Base_Onsite_LLM(ABC):
@@ -279,3 +278,4 @@ class Chat_GPT:
             model="gpt-3.5-turbo-0301",
             **kwargs)
         return ans['choices'][0]['message']['content']
+
