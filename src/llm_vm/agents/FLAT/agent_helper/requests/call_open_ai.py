@@ -17,7 +17,12 @@ def call_open_ai(request: LLMCallParams) -> LLMCallReturnType:
         model, api_key = model[0], model[1]
     else:
         api_key = False
-    
+
+    if api_key:
+        if api_key[0] == '$':
+            api_key = False
+
+
     current_key = None
     if api_key:
         current_key = openai.api_key
