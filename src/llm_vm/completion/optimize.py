@@ -186,10 +186,11 @@ class LocalOptimizer(Optimizer):
         openai.api_key = self.openai_key
         completion, train = self.complete_delay_train(stable_context, dynamic_prompt, run_data_synthesis=data_synthesis, **kwargs)
         if finetune:
-            train()
-        return completion
+            return completion, train
+        else:
+            return completion, None
     
-    def complete_delay_train(self, stable_context, dynamic_prompt, run_data_synthesis = False, min_examples_for_synthesis = 5,c_id = None, **kwargs):
+    def complete_delay_train(self, stable_context, dynamic_prompt, run_data_synthesis = False, min_examples_for_synthesis = 0 ,c_id = None, **kwargs):
         """
         Runs a completion using the string stable_context+dynamic_prompt.  Returns an optional training closure to use if the 
         caller decides that the completion was particularly good.
@@ -223,11 +224,11 @@ class LocalOptimizer(Optimizer):
                     'args' : kwargs, 
                     'MIN_TRAIN_EXS' : self.MIN_TRAIN_EXS, 
                     'MAX_TRAIN_EXS' : self.MAX_TRAIN_EXS,
-                    'call_small' : str(self.call_small).split(' ')[1], # HACKS 
-                    'call_big' : str(self.call_big).split(' ')[1],
+                    'call_small' : str(models.MODELCONFIG.small_model).split(' ')[1], # HACKS 
+                    'call_big' : str(models.MODELCONFIG.big_model).split(' ')[1],
                     }) if c_id is None else c_id
         c_id = generate_hash(c_id_repr)
-
+        print(str(models.MODELCONFIG.small_model))
         completion = None
         model = self.storage.get_model(c_id)
         if model is not None:
@@ -255,47 +256,20 @@ class LocalOptimizer(Optimizer):
                             for j in self.data_synthesizer.data_synthesis(self,prompt,best_completion):
                                 self.storage.add_example(c_id, j)
                     training_exs = self.storage.get_data(c_id)
-                    
+                    print(training_exs)
                     print("Considering Fine-tuning", flush=True)
                     
                     if len(training_exs) >= self.MIN_TRAIN_EXS and not self.storage.get_training_in_progress_set_true(c_id):
                         print("Actually Fine-tuning", flush=True)
                         print("Training examples:",str(len(training_exs)))
-                        def train_with():
-                            old_model = self.storage.get_model(c_id)
-                            training_file = create_jsonl_file(self.storage.get_data(c_id))
-                            upload_response = openai.File.create(file=training_file, purpose="fine-tune")
-                            training_file.close()
-                            fine_tuning_job = openai.FineTune.create(training_file= upload_response.id)
-
-                            print(f"Fine-tuning job created: {fine_tuning_job}", flush=True)
-                            global job_id # global state isn't great, but thats interrupt handlers
-                            job_id = fine_tuning_job["id"]
-                            while True:
-                                fine_tuning_status = openai.FineTune.retrieve(id=job_id)
-                                status = fine_tuning_status["status"]
-                                print(f"Fine-tuning job status: {status}")
-                                if status in ["succeeded", "completed", "failed"]:
-                                    break
-                                time.sleep(30)
-                            job_id = None #
-                            new_model_id = fine_tuning_status.fine_tuned_model
-
-                            print("New_model_id: ", new_model_id, flush=True)
-
-                            self.storage.set_model(c_id, new_model_id)
-                            self.storage.set_training_in_progress(c_id, False)
-                            if old_model is not None:
-                                openai.Model.delete(old_model)
-
-                        asyncStart(train_with)
+                        models.MODELCONFIG.small_model.finetune(training_exs,self,c_id)
                 return (best_completion, actual_train)
 
-            best_completion_promise = asyncStart(promiseCompletion)
+            best_completion_promise = promiseCompletion()
 
             if completion is None:
                 # crazy story: succeed_train gets set before this anyway if it makes sense to set it!
-                completion, succeed_train = asyncAwait(best_completion_promise)
+                completion, succeed_train = best_completion_promise
             print(completion)
         
 
@@ -305,10 +279,10 @@ class LocalOptimizer(Optimizer):
                     return succeed_train(use_completion)
                 if best_completion_promise is not None:
                     try:
-                        return asyncAwait(best_completion)[1](use_completion)
+                        return best_completion[1](use_completion)
                     except:
                         return
-            return asyncStart(promise)
+            return promise
 
         return completion, succeed_train_closure
     
