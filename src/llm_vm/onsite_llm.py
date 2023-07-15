@@ -252,7 +252,7 @@ class Small_Local_Neo:
         # need to drop the len(prompt) prefix with these sequences generally 
         return resp[len(prompt):]
     
-    iddef finetune(self,data, optimizer, c_id):
+    def finetune(self,data, optimizer, c_id):
         def asynctune():
             old_model = optimizer.storage.get_model(c_id)
             untokenized_final_dataset = []
