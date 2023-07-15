@@ -1,8 +1,29 @@
 import abc
 from abc import ABC,abstractmethod
 import openai
-from transformers import AutoTokenizer, OPTForCausalLM,BloomForCausalLM,LlamaTokenizer, LlamaForCausalLM, GPTNeoForCausalLM, GPT2Tokenizer
+import math
+from transformers import AutoTokenizer, OPTForCausalLM,BloomForCausalLM,LlamaTokenizer, LlamaForCausalLM, GPTNeoForCausalLM, GPT2Tokenizer, DataCollatorForLanguageModeling,TrainingArguments, Trainer
+import time
+import tempfile
+import json
+import torch
 
+def create_jsonl_file(data_list):
+    out = tempfile.TemporaryFile('w+')
+    for a,b in data_list:
+        out.write(json.dumps({'prompt': a, 'completion': b}) + "\n")
+    out.seek(0)
+    return out
+
+class FinetuningDataset(torch.utils.data.Dataset):
+    def __init__(self,iterable_dataset,length):
+        self.dataset = list(iterable_dataset)   
+        self.length = length
+    def __len__(self):
+        return self.length
+    def __getitem__(self, idx):
+        return self.dataset[idx]
+    
 class Base_Onsite_LLM(ABC):
     def __init__(self,model_uri_override=None,tokenizer_kw_args=None,model_kw_args=None):
         if model_uri_override != None:
@@ -80,6 +101,34 @@ class Small_Local_OPT:
         resp= self.tokenizer.batch_decode(generate_ids,skip_special_tokens=True,clean_up_tokenization_spaces=False)[0]
         # need to drop the len(prompt) prefix with these sequences generally 
         return resp[len(prompt):]
+    def finetune(self,data, optimizer, c_id):
+        old_model = optimizer.storage.get_model(c_id)
+        final_dataset = []
+        for i in data:
+            final_dataset =  i[0] + i[1]
+        f_dataset = map(self.tokenizer,final_dataset)
+        self.tokenizer.pad_token = self.tokenizer.eos_token
+        data_collator = DataCollatorForLanguageModeling(tokenizer=self.tokenizer, mlm=False)
+
+        training_args = TrainingArguments(
+            output_dir="Neo_finetuned",
+            evaluation_strategy="epoch",
+            learning_rate=2e-5,
+            num_train_epochs=2,
+            weight_decay=0.01,
+        )
+
+        trainer = Trainer(
+            model=self.model,
+            args=training_args,
+            train_dataset=FinetuningDataset(f_dataset,len(final_dataset)),
+            eval_dataset=FinetuningDataset(f_dataset,len(final_dataset)),
+            data_collator=data_collator,
+        )
+
+        trainer.train()
+        eval_results = trainer.evaluate()
+        return math.exp(eval_results['eval_loss'])
 
 class Small_Local_Bloom:
 
@@ -126,6 +175,34 @@ class Small_Local_Bloom:
         resp= self.tokenizer.batch_decode(generate_ids,skip_special_tokens=True,clean_up_tokenization_spaces=False)[0]
         # need to drop the len(prompt) prefix with these sequences generally 
         return resp[len(prompt):]
+    def finetune(self,data, optimizer, c_id):
+        old_model = optimizer.storage.get_model(c_id)
+        final_dataset = []
+        for i in data:
+            final_dataset =  i[0] + i[1]
+        f_dataset = map(self.tokenizer,final_dataset)
+        self.tokenizer.pad_token = self.tokenizer.eos_token
+        data_collator = DataCollatorForLanguageModeling(tokenizer=self.tokenizer, mlm=False)
+
+        training_args = TrainingArguments(
+            output_dir="Neo_finetuned",
+            evaluation_strategy="epoch",
+            learning_rate=2e-5,
+            num_train_epochs=2,
+            weight_decay=0.01,
+        )
+
+        trainer = Trainer(
+            model=self.model,
+            args=training_args,
+            train_dataset=FinetuningDataset(f_dataset,len(final_dataset)),
+            eval_dataset=FinetuningDataset(f_dataset,len(final_dataset)),
+            data_collator=data_collator,
+        )
+
+        trainer.train()
+        eval_results = trainer.evaluate()
+        return math.exp(eval_results['eval_loss'])
 
  #
 
@@ -174,7 +251,43 @@ class Small_Local_Neo:
         resp= self.tokenizer.batch_decode(generate_ids,skip_special_tokens=True,clean_up_tokenization_spaces=False)[0]
         # need to drop the len(prompt) prefix with these sequences generally 
         return resp[len(prompt):]
-#
+    
+    def finetune(self,data, optimizer, c_id):
+        def asynctune():
+            old_model = optimizer.storage.get_model(c_id)
+            untokenized_final_dataset = []
+            for prompt,response in data:
+                untokenized_final_dataset.append(prompt + response)
+        #    = map(untokenized_final_dataset, lambda x : x[0]+x[1])
+            tokenized_final_dataset = map(self.tokenizer,untokenized_final_dataset)
+            self.tokenizer.pad_token = self.tokenizer.eos_token
+            data_collator = DataCollatorForLanguageModeling(tokenizer=self.tokenizer, mlm=False)
+
+            training_args = TrainingArguments(
+                output_dir="Neo_finetuned",
+                evaluation_strategy="epoch",
+                learning_rate=2e-5,
+                per_device_train_batch_size = 1,
+                per_device_eval_batch_size = 1,
+                num_train_epochs=1,
+                weight_decay=0.01,
+            )
+            test_set = FinetuningDataset(tokenized_final_dataset,len(untokenized_final_dataset))
+
+            trainer = Trainer(
+                model=self.model,
+                args=training_args,
+                train_dataset=test_set,
+                eval_dataset=test_set,
+                data_collator=data_collator,
+            )
+
+            if tokenized_final_dataset:
+                trainer.train()
+                eval_results = trainer.evaluate()
+            return math.exp(eval_results['eval_loss']) #perplexity is the metric we use for finetuning measurement
+        return asynctune
+    
 class Small_Local_LLama:
 
     """
@@ -221,6 +334,34 @@ class Small_Local_LLama:
         resp= self.tokenizer.batch_decode(generate_ids,skip_special_tokens=True,clean_up_tokenization_spaces=False)[0]
         # need to drop the len(prompt) prefix with these sequences generally 
         return resp[len(prompt):]
+    def finetune(self,data, optimizer, c_id):
+        old_model = optimizer.storage.get_model(c_id)
+        final_dataset = []
+        for i in data:
+            final_dataset =  i[0] + i[1]
+        f_dataset = map(self.tokenizer,final_dataset)
+        self.tokenizer.pad_token = self.tokenizer.eos_token
+        data_collator = DataCollatorForLanguageModeling(tokenizer=self.tokenizer, mlm=False)
+
+        training_args = TrainingArguments(
+            output_dir="Neo_finetuned",
+            evaluation_strategy="epoch",
+            learning_rate=2e-5,
+            num_train_epochs=2,
+            weight_decay=0.01,
+        )
+
+        trainer = Trainer(
+            model=self.model,
+            args=training_args,
+            train_dataset=FinetuningDataset(f_dataset,len(final_dataset)),
+            eval_dataset=FinetuningDataset(f_dataset,len(final_dataset)),
+            data_collator=data_collator,
+        )
+
+        trainer.train()
+        eval_results = trainer.evaluate()
+        return math.exp(eval_results['eval_loss'])
 
 class GPT3:
 
@@ -247,8 +388,37 @@ class GPT3:
             >>> Small_Local_OPT.generate("How long does it take for an apple to grow?)
             It typically takes about 100-200 days...
         """
-        ans = openai.Completion.create(prompt= prompt, model='text-davinci-003', **kwargs)
+
+        ans = openai.Completion.create(prompt= prompt, model="text-davinci-003", **kwargs)
         return ans['choices'][0]['text']
+    
+    
+    def finetune(self, dataset, optimizer, c_id):
+        old_model = optimizer.storage.get_model(c_id)
+        training_file = create_jsonl_file(dataset)
+        upload_response = openai.File.create(file=training_file, purpose="fine-tune")
+        training_file.close()
+        fine_tuning_job = openai.FineTune.create(training_file= upload_response.id)
+
+        print(f"Fine-tuning job created: {fine_tuning_job}", flush=True)
+        global job_id # global state isn't great, but thats interrupt handlers
+        job_id = fine_tuning_job["id"]
+        while True:
+            fine_tuning_status = openai.FineTune.retrieve(id=job_id)
+            status = fine_tuning_status["status"]
+            print(f"Fine-tuning job status: {status}")
+            if status in ["succeeded", "completed", "failed"]:
+                break
+            time.sleep(30)
+        job_id = None #
+        new_model_id = fine_tuning_status.fine_tuned_model
+
+        print("New_model_id: ", new_model_id, flush=True)
+
+        optimizer.storage.set_model(c_id, new_model_id)
+        optimizer.storage.set_training_in_progress(c_id, False)
+        if old_model is not None:
+            openai.Model.delete(old_model)
 
 class Chat_GPT:
     """
@@ -281,3 +451,29 @@ class Chat_GPT:
             **kwargs)
         return ans['choices'][0]['message']['content']
 
+    def finetune(self, dataset, optimizer, c_id):
+        old_model = optimizer.storage.get_model(c_id)
+        training_file = create_jsonl_file(dataset)
+        upload_response = openai.File.create(file=training_file, purpose="fine-tune")
+        training_file.close()
+        fine_tuning_job = openai.FineTune.create(training_file= upload_response.id)
+
+        print(f"Fine-tuning job created: {fine_tuning_job}", flush=True)
+        global job_id # global state isn't great, but thats interrupt handlers
+        job_id = fine_tuning_job["id"]
+        while True:
+            fine_tuning_status = openai.FineTune.retrieve(id=job_id)
+            status = fine_tuning_status["status"]
+            print(f"Fine-tuning job status: {status}")
+            if status in ["succeeded", "completed", "failed"]:
+                break
+            time.sleep(30)
+        job_id = None #
+        new_model_id = fine_tuning_status.fine_tuned_model
+
+        print("New_model_id: ", new_model_id, flush=True)
+
+        optimizer.storage.set_model(c_id, new_model_id)
+        optimizer.storage.set_training_in_progress(c_id, False)
+        if old_model is not None:
+            openai.Model.delete(old_model)

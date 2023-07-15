@@ -14,6 +14,7 @@ import pickle
 import llm_vm.completion.models as models
 #we need to package-ify so this works 
 import llm_vm.completion.data_synthesis as data_synthesis
+import inspect
 
 
 job_id = None # we want to be able to cancel a fine_tune if you kill the program
@@ -36,10 +37,16 @@ def generate_hash(input_string):
     return int(sha256_hash.hexdigest(), 16) % 10**18
 
 def asyncStart(foo):
+    caller_frame = inspect.currentframe().f_back
+    caller_name = inspect.getframeinfo(caller_frame).function
+    caller_lineno = caller_frame.f_lineno
+    print(f"asyncStart called by function '{caller_name}' at line {caller_lineno}")
+    
     t = [None, None]
     def new_thread():
         t[0] = foo()
     t[1] = threading.Thread(target=new_thread)
+    print(foo)
     t[1].start()
     return t
 
@@ -189,11 +196,12 @@ class LocalOptimizer(Optimizer):
     def complete(self, stable_context, dynamic_prompt, data_synthesis = False, finetune = False, **kwargs):
         openai.api_key = self.openai_key
         completion, train = self.complete_delay_train(stable_context, dynamic_prompt, run_data_synthesis=data_synthesis, **kwargs)
+        print(finetune,flush=True)
         if finetune:
             train()
         return completion
     
-    def complete_delay_train(self, stable_context, dynamic_prompt, run_data_synthesis = False, min_examples_for_synthesis = 5,c_id = None, **kwargs):
+    def complete_delay_train(self, stable_context, dynamic_prompt, run_data_synthesis = False, min_examples_for_synthesis = 2 ,c_id = None, **kwargs):
         """
         Runs a completion using the string stable_context+dynamic_prompt.  Returns an optional training closure to use if the 
         caller decides that the completion was particularly good.
@@ -229,11 +237,11 @@ class LocalOptimizer(Optimizer):
                     'args' : kwargs, 
                     'MIN_TRAIN_EXS' : self.MIN_TRAIN_EXS, 
                     'MAX_TRAIN_EXS' : self.MAX_TRAIN_EXS,
-                    'call_small' : str(self.call_small).split(' ')[1], # HACKS 
-                    'call_big' : str(self.call_big).split(' ')[1],
+                    'call_small' : str(models.MODELCONFIG.small_model).split(' ')[1], # HACKS 
+                    'call_big' : str(models.MODELCONFIG.big_model).split(' ')[1],
                     }) if c_id is None else c_id
         c_id = generate_hash(c_id_repr)
-
+        print(str(models.MODELCONFIG.small_model))
         completion = None
         model = self.storage.get_model(c_id)
         if model is not None:
@@ -261,40 +269,13 @@ class LocalOptimizer(Optimizer):
                             for j in self.data_synthesizer.data_synthesis(self,prompt,best_completion, **kwargs):
                                 self.storage.add_example(c_id, j)
                     training_exs = self.storage.get_data(c_id)
-                    
+                    print(training_exs)
                     print("Considering Fine-tuning", flush=True)
                     
                     if len(training_exs) >= self.MIN_TRAIN_EXS and not self.storage.get_training_in_progress_set_true(c_id):
                         print("Actually Fine-tuning", flush=True)
                         print("Training examples:",str(len(training_exs)))
-                        def train_with():
-                            old_model = self.storage.get_model(c_id)
-                            training_file = create_jsonl_file(self.storage.get_data(c_id))
-                            upload_response = openai.File.create(file=training_file, purpose="fine-tune")
-                            training_file.close()
-                            fine_tuning_job = openai.FineTune.create(training_file= upload_response.id)
-
-                            print(f"Fine-tuning job created: {fine_tuning_job}", flush=True)
-                            global job_id # global state isn't great, but thats interrupt handlers
-                            job_id = fine_tuning_job["id"]
-                            while True:
-                                fine_tuning_status = openai.FineTune.retrieve(id=job_id)
-                                status = fine_tuning_status["status"]
-                                print(f"Fine-tuning job status: {status}")
-                                if status in ["succeeded", "completed", "failed"]:
-                                    break
-                                time.sleep(30)
-                            job_id = None #
-                            new_model_id = fine_tuning_status.fine_tuned_model
-
-                            print("New_model_id: ", new_model_id, flush=True)
-
-                            self.storage.set_model(c_id, new_model_id)
-                            self.storage.set_training_in_progress(c_id, False)
-                            if old_model is not None:
-                                openai.Model.delete(old_model)
-
-                        asyncStart(train_with)
+                        asyncStart(models.MODELCONFIG.small_model.finetune(training_exs,self,c_id))
                 return (best_completion, actual_train)
 
             best_completion_promise = asyncStart(promiseCompletion)

@@ -54,7 +54,7 @@ class Client:
                  temperature=0,
                  stoptoken = None,
                  tools = None):
-        """"
+        """
         This function is Anarchy's completion entry point
 
         Parameters:

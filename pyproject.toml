@@ -14,6 +14,7 @@ dependencies = [
     "openai>=0.27.6",
     "numpy>=1.22.4",
     "watchdog>=3.0.0",
+    "accelerate>=0.21.0",
     "transformers>=4.29.0",
     "flask>=2.3.2",
     "llama-index>=0.7.7",
