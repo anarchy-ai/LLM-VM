@@ -30,10 +30,12 @@ We found that REBEL outperformed ReAct on answering questions that require i) th
 large amounts of unstructured data. With our experimental results we were able to show that REBEL is a state-of-the-art system in terms of its ability to consistently answer
 questions from disparate knowledge bases.
 
-Below is the table depicting the results of the REBEL system versus ReAct on Compositional Celebrities
+Below is the table depicting the results of the REBEL system versus ReAct on Compositional Celebrities.
+
 <img width="400" alt="image" src="https://github.com/anarchy-ai/LLM-VM/assets/37461794/842ff756-f52b-403d-94a0-595e5ac9bba7">
 
 Below is the table depicting the results of the REBEL systhem versus ReAct on HotPotQA and FEVER.
+
 <img width="300" alt="image" src="https://github.com/anarchy-ai/LLM-VM/assets/37461794/de2e1df4-7f4a-4947-8c32-2ce4312df484">
 
 
