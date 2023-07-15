@@ -34,7 +34,7 @@ In line with Anarchy's mission, the LLM-VM strives to support open-source models
 
 ### 🎁 Features & Roadmap
 
-* **Implicit Agents 🔧🕵️:** *The Anarchy LLM-VM can be set up to use external tools through our agents such as **REBEL** or **ReAct** just by supplying tool descriptions!*
+* **Implicit Agents 🔧🕵️:** *The Anarchy LLM-VM can be set up to use external tools through our agents such as **REBEL** just by supplying tool descriptions!*
 
 * **Inference Optimization 🚄:** *The Anarchy LLM-VM is optimized from agent level all the way to assembly on known LLM architectures to get the most bang for your buck. With state of the art batching, sparse inference and quantization, distillation, and multi-level colocation, we aim to provide the fastest framework available.*
 
