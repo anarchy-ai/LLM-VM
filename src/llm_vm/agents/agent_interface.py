@@ -42,7 +42,7 @@ def call_agent():
     results to show the ones that are $, $$, or $$$.'}, "description":"This tool searches for a business on yelp.  It's useful for finding restaurants and \
     whatnot.", 'args' :{'url': 'https://api.yelp.com/v3/businesses/search', 'cert': '', 'json': {}, 'params': {'limit': '1', 
                                                                                                               'open_now': 'true', 'location': '{location}', 'term': '{term}', 'price': '{price}'}, 'data': {},
-                       'headers': {'authorization': 'Bearer OaEqVSw9OV6llVnvh9IJo92ZCnseQ9tftnUUVwjYXTNzPxDjxRafYkz99oJKI9WHEwUYkiwULXjoBcLJm7JhHj479Xqv6C0lKVXS7N91ni-nRWpGomaPkZ6Z1T0GZHYx',
+                       'headers': {'authorization': '',
                                    'accept': 'application/json'}}}]
         agent = FLAT.Agent(key, tools, verbose=1)
     elif model_choice == 2:
