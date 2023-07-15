@@ -20,11 +20,8 @@ class FinetuningDataset(torch.utils.data.Dataset):
         self.dataset = list(iterable_dataset)   
         self.length = length
     def __len__(self):
-        print("length",str(self.length))
         return self.length
     def __getitem__(self, idx):
-        print("index",str(idx))
-        print(self.dataset)
         return self.dataset[idx]
     
 class Base_Onsite_LLM(ABC):
@@ -255,38 +252,42 @@ class Small_Local_Neo:
         # need to drop the len(prompt) prefix with these sequences generally 
         return resp[len(prompt):]
     
-    def finetune(self,data, optimizer, c_id):
-        old_model = optimizer.storage.get_model(c_id)
-        untokenized_final_dataset = []
-        for prompt,response in data:
-            untokenized_final_dataset.append(prompt + response)
+    iddef finetune(self,data, optimizer, c_id):
+        def asynctune():
+            old_model = optimizer.storage.get_model(c_id)
+            untokenized_final_dataset = []
+            for prompt,response in data:
+                untokenized_final_dataset.append(prompt + response)
         #    = map(untokenized_final_dataset, lambda x : x[0]+x[1])
-        tokenized_final_dataset = map(self.tokenizer,untokenized_final_dataset)
-        self.tokenizer.pad_token = self.tokenizer.eos_token
-        data_collator = DataCollatorForLanguageModeling(tokenizer=self.tokenizer, mlm=False)
+            tokenized_final_dataset = map(self.tokenizer,untokenized_final_dataset)
+            self.tokenizer.pad_token = self.tokenizer.eos_token
+            data_collator = DataCollatorForLanguageModeling(tokenizer=self.tokenizer, mlm=False)
 
-        training_args = TrainingArguments(
-            output_dir="Neo_finetuned",
-            evaluation_strategy="epoch",
-            learning_rate=2e-5,
-            per_device_train_batch_size = 1,
-            per_device_eval_batch_size = 1,
-            num_train_epochs=1,
-            weight_decay=0.01,
-        )
+            training_args = TrainingArguments(
+                output_dir="Neo_finetuned",
+                evaluation_strategy="epoch",
+                learning_rate=2e-5,
+                per_device_train_batch_size = 1,
+                per_device_eval_batch_size = 1,
+                num_train_epochs=1,
+                weight_decay=0.01,
+            )
+            test_set = FinetuningDataset(tokenized_final_dataset,len(untokenized_final_dataset))
 
-        trainer = Trainer(
-            model=self.model,
-            args=training_args,
-            train_dataset=FinetuningDataset(tokenized_final_dataset,len(untokenized_final_dataset)),
-            eval_dataset=FinetuningDataset(tokenized_final_dataset,len(untokenized_final_dataset)),
-            data_collator=data_collator,
-        )
+            trainer = Trainer(
+                model=self.model,
+                args=training_args,
+                train_dataset=test_set,
+                eval_dataset=test_set,
+                data_collator=data_collator,
+            )
 
-        trainer.train()
-        eval_results = trainer.evaluate()
-        return math.exp(eval_results['eval_loss']) #perplexity is the metric we use for finetuning measurement
-#
+            if tokenized_final_dataset:
+                trainer.train()
+                eval_results = trainer.evaluate()
+            return math.exp(eval_results['eval_loss']) #perplexity is the metric we use for finetuning measurement
+        return asynctune
+    
 class Small_Local_LLama:
 
     """

@@ -14,6 +14,7 @@ import pickle
 import llm_vm.completion.models as models
 #we need to package-ify so this works 
 import llm_vm.completion.data_synthesis as data_synthesis
+import inspect
 
 
 job_id = None # we want to be able to cancel a fine_tune if you kill the program
@@ -36,10 +37,16 @@ def generate_hash(input_string):
     return int(sha256_hash.hexdigest(), 16) % 10**18
 
 def asyncStart(foo):
+    caller_frame = inspect.currentframe().f_back
+    caller_name = inspect.getframeinfo(caller_frame).function
+    caller_lineno = caller_frame.f_lineno
+    print(f"asyncStart called by function '{caller_name}' at line {caller_lineno}")
+    
     t = [None, None]
     def new_thread():
         t[0] = foo()
     t[1] = threading.Thread(target=new_thread)
+    print(foo)
     t[1].start()
     return t
 
