@@ -75,8 +75,8 @@ Our LLM-VM gets you working directly with popular LLMs locally in just 3 lines. 
 # import our client
 from llm_vm.client import Client
 
-# Instantiate the client specifying which LLM you want to use
-client = Client(big_model = 'neo')
+# Select which LLM you want to use, here we have openAI's 
+client = Client(big_model = 'gpt')
 
 # Put in your prompt and go!
 response = client.complete('What is Anarchy?')
