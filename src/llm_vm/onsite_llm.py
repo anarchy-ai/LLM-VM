@@ -247,7 +247,7 @@ class GPT3:
             >>> Small_Local_OPT.generate("How long does it take for an apple to grow?)
             It typically takes about 100-200 days...
         """
-        ans = openai.Completion.create(prompt= prompt,**kwargs)
+        ans = openai.Completion.create(prompt= prompt, model='text-davinci-003', **kwargs)
         return ans['choices'][0]['text']
 
 class Chat_GPT:
