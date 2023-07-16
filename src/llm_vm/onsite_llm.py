@@ -415,33 +415,7 @@ class Small_Local_Flan_T5:
         return resp[len(prompt):]
     
     def finetune(self,data, optimizer, c_id):
-        old_model = optimizer.storage.get_model(c_id)
-        final_dataset = []
-        for i in data:
-            final_dataset =  i[0] + i[1]
-        f_dataset = map(self.tokenizer,final_dataset)
-        self.tokenizer.pad_token = self.tokenizer.eos_token
-        data_collator = DataCollatorForLanguageModeling(tokenizer=self.tokenizer, mlm=False)
-
-        training_args = TrainingArguments(
-            output_dir="Neo_finetuned",
-            evaluation_strategy="epoch",
-            learning_rate=2e-5,
-            num_train_epochs=2,
-            weight_decay=0.01,
-        )
-
-        trainer = Trainer(
-            model=self.model,
-            args=training_args,
-            train_dataset=FinetuningDataset(f_dataset,len(final_dataset)),
-            eval_dataset=FinetuningDataset(f_dataset,len(final_dataset)),
-            data_collator=data_collator,
-        )
-
-        trainer.train()
-        eval_results = trainer.evaluate()
-        return math.exp(eval_results['eval_loss'])
+        pass
     
 class GPT3:
 
