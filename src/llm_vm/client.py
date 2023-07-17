@@ -31,7 +31,7 @@ class Client:
             >>> client = Client(big_model = 'neo')
         """
         if os.path.isdir("finetuned_models") == False:
-            os.mkdir("finetuned_models",0o666)
+            os.mkdir("finetuned_models")
         # Specify the model strategy the user will use
         MODELCONFIG = models.ModelConfig(big_model=big_model, small_model=small_model)
         print("Using model: " + big_model) # announce the primary LLM that is generating results
