@@ -239,7 +239,7 @@ class Small_Local_Bloom:
             optimizer.storage.set_model(c_id, new_model)
             return math.exp(eval_results['eval_loss']) #perplexity is the metric we use for finetuning measurement
         return asynctune
- #
+ 
 
 class Small_Local_Neo:
 
@@ -300,7 +300,7 @@ class Small_Local_Neo:
             data_collator = DataCollatorForLanguageModeling(tokenizer=self.tokenizer, mlm=False)
             optimizer.storage.set_training_in_progress(c_id, True)
             training_args = TrainingArguments(
-                output_dir = "Neo_fin",
+                output_dir = "Neo_finetuning_checkpoints",
                 evaluation_strategy="epoch",
                 learning_rate=2e-5,
                 per_device_train_batch_size = 1,
@@ -361,7 +361,7 @@ class Small_Local_LLama:
         """
         This function uses the class's llm and tokenizer to generate a response given a user's prompt
 
-        Parameters:
+        Parameters:b
             prompt (str): Prompt to send to LLM
             max_length (int): Optional parameter limiting response length
 

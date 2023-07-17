@@ -35,17 +35,11 @@ def generate_hash(input_string):
     sha256_hash.update(str(input_string).encode('utf-8'))
     return int(sha256_hash.hexdigest(), 16) % 10**18
 
-def asyncStart(foo):
-    caller_frame = inspect.currentframe().f_back
-    caller_name = inspect.getframeinfo(caller_frame).function
-    caller_lineno = caller_frame.f_lineno
-    print(f"asyncStart called by function '{caller_name}' at line {caller_lineno}")
-    
+def asyncStart(foo):    
     t = [None, None]
     def new_thread():
         t[0] = foo()
     t[1] = threading.Thread(target=new_thread)
-    print(foo)
     t[1].start()
     return t
 
@@ -195,7 +189,7 @@ class LocalOptimizer(Optimizer):
             train()
         return completion
     
-    def complete_delay_train(self, stable_context, dynamic_prompt, run_data_synthesis = False, min_examples_for_synthesis = 2 ,c_id = None, **kwargs):
+    def complete_delay_train(self, stable_context, dynamic_prompt, run_data_synthesis = False, min_examples_for_synthesis = 1 ,c_id = None, **kwargs):
         """
         Runs a completion using the string stable_context+dynamic_prompt.  Returns an optional training closure to use if the 
         caller decides that the completion was particularly good.
@@ -236,7 +230,9 @@ class LocalOptimizer(Optimizer):
                     }) if c_id is None else c_id
         c_id = generate_hash(c_id_repr)
         completion = None
+        
         model = self.storage.get_model(c_id)
+        # this gives us the model_id
         if model is not None:
             print("Using the new model:", model, flush=True)
             completion = self.call_small(prompt = dynamic_prompt.strip(), model=model, **kwargs)
