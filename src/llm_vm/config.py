@@ -4,10 +4,10 @@ import re
 parser = argparse.ArgumentParser()
 
 # Set parse strategy here, lines should be self explanatory
-parser.add_argument("-b", "--big_model", type=str, default='gpt', help='Big LLM Model. Default: chat_gpt')
+parser.add_argument("-b", "--big_model", type=str, default='chat_gpt', help='Big LLM Model. Default: chat_gpt')
 parser.add_argument("-c", "--config_file", type=str, help='Config File')
 parser.add_argument("-p", "--port", type=int, default=3002, help='Port Number. Default: 3002')
-parser.add_argument("-s", "--small_model", type=str, default='bloom', help='Small LLM Model. Default: gpt')
+parser.add_argument("-s", "--small_model", type=str, default='bloom', help='Small LLM Model. Default: bloom')
 parser.add_argument("-H", "--host", type=str, default='127.0.0.1', help='Host Address. Default: 127.0.0.1')
 
 args = parser.parse_args()
