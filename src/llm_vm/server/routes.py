@@ -3,10 +3,13 @@ import json
 import os
 import openai
 from llm_vm.agents.REBEL import agent
-from llm_vm.completion.optimize import LocalOptimizer
-
+from llm_vm.client import Client
+from llm_vm.config import args
 # load optimizer for endpoint use
-optimizer = LocalOptimizer(MIN_TRAIN_EXS=2,openai_key=None)
+# optimizer = LocalOptimizer(MIN_TRAIN_EXS=2,openai_key=None)
+
+client = Client( big_model=args.big_model, small_model=args.small_model)
+
 print('optimizer loaded')
 
 bp = Blueprint('bp',__name__)
@@ -88,14 +91,15 @@ def optimizing_complete():
     except:
         return  {"status":0, "resp":"Issue with OpenAI key"}
     
-    optimizer.openai_key = openai.api_key
+    # optimizer.openai_key = openai.api_key
     agent.set_api_key(openai.api_key,"OPENAI_API_KEY")
     try:
         if not use_rebel_agent:
-            completion = optimizer.complete(static_context,dynamic_prompt,data_synthesis=data_synthesis,finetune = finetune, **kwargs)
+            completion = client.complete(static_context,dynamic_prompt,openai_key=openai.api_key, data_synthesis=data_synthesis,finetune = finetune, **kwargs)
         else:
             completion = rebel_agent.run(static_context+dynamic_prompt,[])[0]
     except Exception as e:
         return {"status":0, "resp": str(e)}
     
-    return {"completion":completion, "status": 200}
+    # return {"completion":completion, "status": 200}
+    return completion
