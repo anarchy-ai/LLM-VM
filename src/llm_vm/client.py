@@ -1,8 +1,26 @@
 import openai
+import llm_vm.onsite_llm as llms
 from llm_vm.agents.REBEL import agent
 from llm_vm.completion.optimize import LocalOptimizer
 import llm_vm.completion.models as models
 import os
+
+
+# Dictionary of models to be loaded in ModelConfig
+def load_model_closure(model_name):
+    models = {
+        "opt":llms.Small_Local_OPT,
+        "bloom":llms.Small_Local_Bloom,
+        "neo":llms.Small_Local_Neo,
+        "llama":llms.Small_Local_LLama,
+        "gpt":llms.GPT3,
+        "chat_gpt":llms.Chat_GPT
+        }
+    return models[model_name]
+
+
+
+
 
 class Client:
     """
@@ -16,7 +34,7 @@ class Client:
         complete: The Anarchy completion endpoint giving access to a specified LLM
     """
 
-    def __init__(self, big_model = 'gpt', small_model ='chat_gpt'):
+    def __init__(self, big_model = 'chat_gpt', small_model ='gpt',big_model_config={},small_model_config={}):
         """
         This __init__ function allows the user to specify which LLM they want to use upon instantiation.
 
@@ -30,23 +48,28 @@ class Client:
         Example:
             >>> client = Client(big_model = 'neo')
         """
+        self.teacher = load_model_closure(big_model)(**big_model_config)
+        self.student = load_model_closure(small_model)(**small_model_config)
+
+        ## FIXME, do something like $HOME/.llm_vm/finetuned_models/ 
         if os.path.isdir("finetuned_models") == False:
             os.mkdir("finetuned_models")
         # Specify the model strategy the user will use
-        MODELCONFIG = models.ModelConfig(big_model=big_model, small_model=small_model)
+        # MODELCONFIG = models.ModelConfig(big_model=big_model, small_model=small_model)
         print("Using model: " + big_model) # announce the primary LLM that is generating results
 
         # These functions allow for proper initialization of the optimizer
         def CALL_BIG(prompt, **kwargs):
-            model = MODELCONFIG.big_model
-            return model.generate(prompt,**kwargs)
+            
+            return self.teacher.generate(prompt,**kwargs)
 
         def CALL_SMALL(prompt,**kwargs):
-            model = MODELCONFIG.small_model
-            return model.generate(prompt,**kwargs)
+           
+            return self.student.generate(prompt,**kwargs)
         
         # load the optimizer into object memory for use by the complete function
-        self.optimizer = LocalOptimizer(MIN_TRAIN_EXS=2,openai_key=None, call_big=CALL_BIG, call_small= CALL_SMALL, big_model = MODELCONFIG.big_model, small_model = MODELCONFIG.small_model)
+        self.optimizer = LocalOptimizer(MIN_TRAIN_EXS=2,openai_key=None, call_big=CALL_BIG, call_small= CALL_SMALL, 
+                                        big_model = self.teacher, small_model = self.student)
 
     
     def complete(self, prompt,
