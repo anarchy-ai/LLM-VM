@@ -1,12 +1,25 @@
 ![Anarchy Logo](anarchy_logo.svg)
+Need help? Want to help out? Come join our discord server! Our engineers are 
+standing by to help out!  https://discord.gg/YmNvCAk6W6
+
 
 # 🤖 Anarchy LLM-VM 🤖
 
-This is [Anarchy's](https://anarchy.ai) attempt at building 🏗️ generalized artificial intelligence 🤖 through the LLM-VM: a way to give your LLMs superpowers 🦸 and superspeed 🚄.
+This is [Anarchy's](https://anarchy.ai) effort for building 🏗️ generalized artificial intelligence 🤖 through the LLM-VM: a way to give your LLMs superpowers 🦸 and superspeed 🚄.
 
 You can find instructions to try it live here: [anarchy.ai](https://anarchy.ai)
 
 > This project is in BETA. Expect continuous improvement and development.
+
+
+# Table of Contents
+
+* [Table of Contents](#Table)
+* [About](#📚 About)
+    * [What](#💁 What is)
+    * [Why](#🤌 Why)
+
+
 
 ## 📚 About 📚
 
