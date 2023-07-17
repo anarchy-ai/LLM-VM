@@ -2,7 +2,18 @@ import abc
 from abc import ABC,abstractmethod
 import openai
 import math
-from transformers import AutoTokenizer, OPTForCausalLM,BloomForCausalLM,LlamaTokenizer, LlamaForCausalLM, GPTNeoForCausalLM, GPT2Tokenizer, DataCollatorForLanguageModeling,TrainingArguments, Trainer
+from transformers import (
+    AutoModelForSeq2SeqLM,
+    AutoTokenizer, 
+    OPTForCausalLM,
+    BloomForCausalLM,
+    LlamaTokenizer, 
+    LlamaForCausalLM, 
+    GPTNeoForCausalLM, 
+    GPT2Tokenizer, 
+    DataCollatorForLanguageModeling,
+    TrainingArguments, 
+    Trainer)
 import time
 import tempfile
 import json
@@ -363,6 +374,49 @@ class Small_Local_LLama:
         eval_results = trainer.evaluate()
         return math.exp(eval_results['eval_loss'])
 
+class Small_Local_Flan_T5:
+
+    """
+    This is a class for Google's flan-t5 LLM
+
+    Attributes:
+        model_uri (str): Hugging Face Endpoint for LLM
+        tokenizer (AutoTokenizer): Tokenizer from Transformer's library
+        model (LLM): The large language model
+
+    Methods:
+        model_loader: Loads the LLM into memory
+        tokenizer_loader: Loads the tokenizer into memory
+        generate: Generates a response from a given prompt with the loaded LLM and tokenizer
+    """
+    def __init__(self,model_uri_override="google/flan-t5-small"): # tokenizer_kw_args=None,model_kw_args=None
+        self.model_uri = model_uri_override
+        self.tokenizer=self.tokenizer_loader()
+        self.model= self.model_loader()
+
+    def model_loader(self):
+        return AutoModelForSeq2SeqLM.from_pretrained(self.model_uri)
+    def tokenizer_loader(self):
+        return AutoTokenizer.from_pretrained(self.model_uri)
+
+    def generate(self,prompt,max_length=100,**kwargs): # both tokenizer and model take kwargs :(
+        """
+        This function uses the class's llm and tokenizer to generate a response given a user's prompt
+        Parameters:
+            prompt (str): Prompt to send to LLM
+            max_length (int): Optional parameter limiting response length
+        Returns:
+            str: LLM Generated Response
+        """
+        inputs=self.tokenizer(prompt,return_tensors="pt")
+        generate_ids=self.model.generate(inputs.input_ids,max_length=max_length)
+        resp= self.tokenizer.batch_decode(generate_ids,skip_special_tokens=True,clean_up_tokenization_spaces=False)[0]
+        # need to drop the len(prompt) prefix with these sequences generally 
+        return resp[len(prompt):]
+    
+    def finetune(self,data, optimizer, c_id):
+        pass
+    
 class GPT3:
 
     """
