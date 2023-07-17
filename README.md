@@ -46,7 +46,7 @@ In line with Anarchy's mission, the LLM-VM strives to support open-source models
   
 * **WYSIWYG 👀:** *Open source means nothing is hidden; we strive for transparency and efficiency so you can focus on building.*
 
-### 🎁 Features & Roadmap
+### 🎁 Features and Roadmap
 
 * **Implicit Agents 🔧🕵️:** *The Anarchy LLM-VM can be set up to use external tools through our agents such as **REBEL** just by supplying tool descriptions!*
 
