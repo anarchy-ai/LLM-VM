@@ -15,10 +15,11 @@ You can find instructions to try it live here: [anarchy.ai](https://anarchy.ai)
 # Table of Contents
 
 * [Table of Contents](#Table)
-* [About](#-About)
+* [About](#-About-)
     * [What](#-what-is-the-anarchy-llm-vm)
     * [Why](#-why-use-the-anarchy-llm-vm)
     * [Features and Roadmap](#-features-and-roadmap)
+* [Quick Start]
 
 
 
@@ -90,13 +91,32 @@ Our LLM-VM gets you working directly with popular LLMs locally in just 3 lines. 
 from llm_vm.client import Client
 
 # Select which LLM you want to use, here we have openAI's 
-client = Client(big_model = 'gpt')
+client = Client(big_model = 'chat_gpt')
 
 # Put in your prompt and go!
 response = client.complete('What is Anarchy?')
 print(response)
 # Anarchy is a political system in which the state is abolished and the people are free...
 ```
+
+### Locally Run an LLM
+```python
+# import our client
+from llm_vm.client import Client
+
+# Select which LLM you want to use, here we have openAI's 
+client = Client(big_model = 'llama',small_model='llama')
+
+# Put in your prompt and go!
+response = client.complete('What is Anarchy?')
+print(response)
+# Anarchy is a political system in which the state is abolished and the people are free...
+```
+
+
+### Supported Models
+
+
 
 ### 🏃‍♀️ Running Standalone
 
