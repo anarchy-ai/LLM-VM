@@ -2,6 +2,7 @@ import openai
 from llm_vm.agents.REBEL import agent
 from llm_vm.completion.optimize import LocalOptimizer
 import llm_vm.completion.models as models
+import os
 
 class Client:
     """
@@ -29,6 +30,8 @@ class Client:
         Example:
             >>> client = Client(big_model = 'neo')
         """
+        if os.path.isdir("finetuned_models") == False:
+            os.mkdir("finetuned_models",0o666)
         # Specify the model strategy the user will use
         MODELCONFIG = models.ModelConfig(big_model=big_model, small_model=small_model)
         print("Using model: " + big_model) # announce the primary LLM that is generating results
@@ -43,7 +46,7 @@ class Client:
             return model.generate(prompt,**kwargs)
         
         # load the optimizer into object memory for use by the complete function
-        self.optimizer = LocalOptimizer(MIN_TRAIN_EXS=2,openai_key=None, call_big=CALL_BIG, call_small= CALL_SMALL)
+        self.optimizer = LocalOptimizer(MIN_TRAIN_EXS=2,openai_key=None, call_big=CALL_BIG, call_small= CALL_SMALL, big_model = MODELCONFIG.big_model, small_model = MODELCONFIG.small_model)
 
     
     def complete(self, prompt,

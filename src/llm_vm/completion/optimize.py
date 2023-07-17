@@ -11,7 +11,6 @@ import abc
 import requests
 import hashlib
 import pickle
-import llm_vm.completion.models as models
 #we need to package-ify so this works 
 import llm_vm.completion.data_synthesis as data_synthesis
 import inspect
@@ -105,13 +104,6 @@ class local_ephemeral:
                                           "data": [],
                                           "model": None }
 
-def CALL_BIG(prompt, **kwargs): 
-    model = models.MODELCONFIG.big_model
-    return model.generate(prompt,**kwargs)
-
-def CALL_SMALL(prompt,**kwargs):
-    model = models.MODELCONFIG.small_model
-    return model.generate(prompt,**kwargs)
 
 
 class Optimizer:
@@ -184,12 +176,14 @@ class HostedOptimizer(Optimizer):
         
     
 class LocalOptimizer(Optimizer):
-    def __init__(self, storage=local_ephemeral(), MIN_TRAIN_EXS = 20, MAX_TRAIN_EXS = 2000, call_small = CALL_SMALL, call_big = CALL_BIG, openai_key=""):
+    def __init__(self, storage=local_ephemeral(), MIN_TRAIN_EXS = 1, MAX_TRAIN_EXS = 2000, call_small = None , call_big = None , big_model = None, small_model = None, openai_key=""):
         self.storage = storage
         self.MIN_TRAIN_EXS = MIN_TRAIN_EXS
         self.MAX_TRAIN_EXS = MAX_TRAIN_EXS
         self.call_small = call_small
         self.call_big = call_big
+        self.big_model = big_model
+        self.small_model = small_model
         self.openai_key = openai_key
         self.data_synthesizer = data_synthesis.DataSynthesis(0.87, 50)
 
@@ -228,7 +222,7 @@ class LocalOptimizer(Optimizer):
         execution at a later time.  If you pass it a completion, it will use that, otherwise it will use the completion from the "best" model.
         """
         assert dynamic_prompt.strip() != "" or stable_context.strip() != ""
-
+        assert self.call_big is not None and self.call_small is not None and self.big_model is not None and self.small_model is not None
         if stable_context.strip() == "" :
             print("Running with an empty context")
         
@@ -237,11 +231,10 @@ class LocalOptimizer(Optimizer):
                     'args' : kwargs, 
                     'MIN_TRAIN_EXS' : self.MIN_TRAIN_EXS, 
                     'MAX_TRAIN_EXS' : self.MAX_TRAIN_EXS,
-                    'call_small' : str(models.MODELCONFIG.small_model).split(' ')[1], # HACKS 
-                    'call_big' : str(models.MODELCONFIG.big_model).split(' ')[1],
+                    'call_small' : str(self.small_model).split(' ')[0], # HACKS 
+                    'call_big' : str(self.big_model).split(' ')[0],
                     }) if c_id is None else c_id
         c_id = generate_hash(c_id_repr)
-        print(str(models.MODELCONFIG.small_model))
         completion = None
         model = self.storage.get_model(c_id)
         if model is not None:
@@ -252,7 +245,7 @@ class LocalOptimizer(Optimizer):
         
         best_completion_promise = None
         succeed_train = None
-        if completion is None or len(training_exs) < self.MAX_TRAIN_EXS:
+        if len(training_exs) < self.MAX_TRAIN_EXS:
             def promiseCompletion():
                 best_completion = self.call_big(prompt, **kwargs)
                 
@@ -275,7 +268,7 @@ class LocalOptimizer(Optimizer):
                     if len(training_exs) >= self.MIN_TRAIN_EXS and not self.storage.get_training_in_progress_set_true(c_id):
                         print("Actually Fine-tuning", flush=True)
                         print("Training examples:",str(len(training_exs)))
-                        asyncStart(models.MODELCONFIG.small_model.finetune(training_exs,self,c_id))
+                        asyncStart(self.small_model.finetune(training_exs,self,c_id))
                 return (best_completion, actual_train)
 
             best_completion_promise = asyncStart(promiseCompletion)
@@ -283,6 +276,9 @@ class LocalOptimizer(Optimizer):
             if completion is None:
                 # crazy story: succeed_train gets set before this anyway if it makes sense to set it!
                 completion, succeed_train = asyncAwait(best_completion_promise)
+            
+            else:
+                _, succeed_train = asyncAwait(best_completion_promise)
             print(completion)
         
 
