@@ -25,6 +25,6 @@ class ModelConfig:
         self.big_model = MODEL_DICT[big_model]()
         self.small_model = MODEL_DICT[small_model]()
 
-# Loads the server with argument flags from command line
-MODELCONFIG = ModelConfig(big_model=args.big_model, small_model=args.small_model)
+
+
 

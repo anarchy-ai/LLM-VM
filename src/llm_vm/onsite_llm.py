@@ -17,6 +17,7 @@ from transformers import (
 import time
 import tempfile
 import json
+import os
 import torch
 
 def create_jsonl_file(data_list):
@@ -113,33 +114,50 @@ class Small_Local_OPT:
         # need to drop the len(prompt) prefix with these sequences generally 
         return resp[len(prompt):]
     def finetune(self,data, optimizer, c_id):
-        old_model = optimizer.storage.get_model(c_id)
-        final_dataset = []
-        for i in data:
-            final_dataset =  i[0] + i[1]
-        f_dataset = map(self.tokenizer,final_dataset)
-        self.tokenizer.pad_token = self.tokenizer.eos_token
-        data_collator = DataCollatorForLanguageModeling(tokenizer=self.tokenizer, mlm=False)
+        def asynctune():
+            old_model = optimizer.storage.get_model(c_id)
+            if old_model is not None:
+                self.model.load_state_dict(torch.load(old_model))
+            untokenized_final_dataset = []
+            for prompt,response in data:
+                untokenized_final_dataset.append(prompt + response)
+            tokenized_final_dataset = map(self.tokenizer,untokenized_final_dataset)
+            self.tokenizer.pad_token = self.tokenizer.eos_token
+            data_collator = DataCollatorForLanguageModeling(tokenizer=self.tokenizer, mlm=False)
+            optimizer.storage.set_training_in_progress(c_id, True)
+            training_args = TrainingArguments(
+                output_dir="OPT_finetuned",
+                evaluation_strategy="epoch",
+                learning_rate=2e-5,
+                per_device_train_batch_size = 1,
+                per_device_eval_batch_size = 1,
+                num_train_epochs=1,
+                weight_decay=0.01,
+            )
+            test_set = FinetuningDataset(tokenized_final_dataset,len(untokenized_final_dataset))
 
-        training_args = TrainingArguments(
-            output_dir="Neo_finetuned",
-            evaluation_strategy="epoch",
-            learning_rate=2e-5,
-            num_train_epochs=2,
-            weight_decay=0.01,
-        )
+            trainer = Trainer(
+                model=self.model,
+                args=training_args,
+                train_dataset=test_set,
+                eval_dataset=test_set,
+                data_collator=data_collator,
+            )
 
-        trainer = Trainer(
-            model=self.model,
-            args=training_args,
-            train_dataset=FinetuningDataset(f_dataset,len(final_dataset)),
-            eval_dataset=FinetuningDataset(f_dataset,len(final_dataset)),
-            data_collator=data_collator,
-        )
-
-        trainer.train()
-        eval_results = trainer.evaluate()
-        return math.exp(eval_results['eval_loss'])
+            if tokenized_final_dataset:
+                trainer.train()
+                eval_results = trainer.evaluate()
+            optimizer.storage.set_training_in_progress(c_id, False)
+            new_model = ""
+            if old_model is not None:
+                new_model = "finetuned_models/opt_"+str(int(old_model.split("_")[2].split(".")[0])+1)+".pt"
+            else:
+                new_model = "finetuned_models/opt_0.pt"
+            open(new_model,"a")
+            torch.save(self.model.state_dict(), new_model)
+            optimizer.storage.set_model(c_id, new_model)
+            return math.exp(eval_results['eval_loss']) #perplexity is the metric we use for finetuning measurement
+        return asynctune
 
 class Small_Local_Bloom:
 
@@ -186,36 +204,53 @@ class Small_Local_Bloom:
         resp= self.tokenizer.batch_decode(generate_ids,skip_special_tokens=True,clean_up_tokenization_spaces=False)[0]
         # need to drop the len(prompt) prefix with these sequences generally 
         return resp[len(prompt):]
+    
     def finetune(self,data, optimizer, c_id):
-        old_model = optimizer.storage.get_model(c_id)
-        final_dataset = []
-        for i in data:
-            final_dataset =  i[0] + i[1]
-        f_dataset = map(self.tokenizer,final_dataset)
-        self.tokenizer.pad_token = self.tokenizer.eos_token
-        data_collator = DataCollatorForLanguageModeling(tokenizer=self.tokenizer, mlm=False)
+        def asynctune():
+            old_model = optimizer.storage.get_model(c_id)
+            if old_model is not None:
+                self.model.load_state_dict(torch.load(old_model))
+            untokenized_final_dataset = []
+            for prompt,response in data:
+                untokenized_final_dataset.append(prompt + response)
+            tokenized_final_dataset = map(self.tokenizer,untokenized_final_dataset)
+            self.tokenizer.pad_token = self.tokenizer.eos_token
+            data_collator = DataCollatorForLanguageModeling(tokenizer=self.tokenizer, mlm=False)
+            optimizer.storage.set_training_in_progress(c_id, True)
+            training_args = TrainingArguments(
+                output_dir="Bloom_finetuned",
+                evaluation_strategy="epoch",
+                learning_rate=2e-5,
+                per_device_train_batch_size = 1,
+                per_device_eval_batch_size = 1,
+                num_train_epochs=1,
+                weight_decay=0.01,
+            )
+            test_set = FinetuningDataset(tokenized_final_dataset,len(untokenized_final_dataset))
 
-        training_args = TrainingArguments(
-            output_dir="Neo_finetuned",
-            evaluation_strategy="epoch",
-            learning_rate=2e-5,
-            num_train_epochs=2,
-            weight_decay=0.01,
-        )
+            trainer = Trainer(
+                model=self.model,
+                args=training_args,
+                train_dataset=test_set,
+                eval_dataset=test_set,
+                data_collator=data_collator,
+            )
 
-        trainer = Trainer(
-            model=self.model,
-            args=training_args,
-            train_dataset=FinetuningDataset(f_dataset,len(final_dataset)),
-            eval_dataset=FinetuningDataset(f_dataset,len(final_dataset)),
-            data_collator=data_collator,
-        )
-
-        trainer.train()
-        eval_results = trainer.evaluate()
-        return math.exp(eval_results['eval_loss'])
-
- #
+            if tokenized_final_dataset:
+                trainer.train()
+                eval_results = trainer.evaluate()
+            optimizer.storage.set_training_in_progress(c_id, False)
+            new_model = ""
+            if old_model is not None:
+                new_model = "finetuned_models/bloom_"+str(int(old_model.split("_")[2].split(".")[0])+1)+".pt"
+            else:
+                new_model = "finetuned_models/bloom_0.pt"
+            open(new_model,"a")
+            torch.save(self.model.state_dict(), new_model)
+            optimizer.storage.set_model(c_id, new_model)
+            return math.exp(eval_results['eval_loss']) #perplexity is the metric we use for finetuning measurement
+        return asynctune
+ 
 
 class Small_Local_Neo:
 
@@ -266,16 +301,17 @@ class Small_Local_Neo:
     def finetune(self,data, optimizer, c_id):
         def asynctune():
             old_model = optimizer.storage.get_model(c_id)
+            if old_model is not None:
+                self.model.load_state_dict(torch.load(old_model))
             untokenized_final_dataset = []
             for prompt,response in data:
                 untokenized_final_dataset.append(prompt + response)
-        #    = map(untokenized_final_dataset, lambda x : x[0]+x[1])
             tokenized_final_dataset = map(self.tokenizer,untokenized_final_dataset)
             self.tokenizer.pad_token = self.tokenizer.eos_token
             data_collator = DataCollatorForLanguageModeling(tokenizer=self.tokenizer, mlm=False)
-
+            optimizer.storage.set_training_in_progress(c_id, True)
             training_args = TrainingArguments(
-                output_dir="Neo_finetuned",
+                output_dir = "Neo_finetuning_checkpoints",
                 evaluation_strategy="epoch",
                 learning_rate=2e-5,
                 per_device_train_batch_size = 1,
@@ -292,10 +328,19 @@ class Small_Local_Neo:
                 eval_dataset=test_set,
                 data_collator=data_collator,
             )
-
+            
             if tokenized_final_dataset:
                 trainer.train()
                 eval_results = trainer.evaluate()
+            optimizer.storage.set_training_in_progress(c_id, False)
+            new_model = ""
+            if old_model is not None:
+                new_model = "finetuned_models/neo_"+str(int(old_model.split("_")[2].split(".")[0])+1)+".pt"
+            else:
+                new_model = "finetuned_models/neo_0.pt"
+            open(new_model,"a")
+            torch.save(self.model.state_dict(), new_model)
+            optimizer.storage.set_model(c_id, new_model)
             return math.exp(eval_results['eval_loss']) #perplexity is the metric we use for finetuning measurement
         return asynctune
     
@@ -327,7 +372,7 @@ class Small_Local_LLama:
         """
         This function uses the class's llm and tokenizer to generate a response given a user's prompt
 
-        Parameters:
+        Parameters:b
             prompt (str): Prompt to send to LLM
             max_length (int): Optional parameter limiting response length
 
@@ -345,34 +390,52 @@ class Small_Local_LLama:
         resp= self.tokenizer.batch_decode(generate_ids,skip_special_tokens=True,clean_up_tokenization_spaces=False)[0]
         # need to drop the len(prompt) prefix with these sequences generally 
         return resp[len(prompt):]
+    
     def finetune(self,data, optimizer, c_id):
-        old_model = optimizer.storage.get_model(c_id)
-        final_dataset = []
-        for i in data:
-            final_dataset =  i[0] + i[1]
-        f_dataset = map(self.tokenizer,final_dataset)
-        self.tokenizer.pad_token = self.tokenizer.eos_token
-        data_collator = DataCollatorForLanguageModeling(tokenizer=self.tokenizer, mlm=False)
+        def asynctune():
+            old_model = optimizer.storage.get_model(c_id)
+            if old_model is not None:
+                self.model.load_state_dict(torch.load(old_model))
+            untokenized_final_dataset = []
+            for prompt,response in data:
+                untokenized_final_dataset.append(prompt + response)
+            tokenized_final_dataset = map(self.tokenizer,untokenized_final_dataset)
+            self.tokenizer.pad_token = self.tokenizer.eos_token
+            data_collator = DataCollatorForLanguageModeling(tokenizer=self.tokenizer, mlm=False)
+            optimizer.storage.set_training_in_progress(c_id, True)
+            training_args = TrainingArguments(
+                output_dir="Llama_finetuned",
+                evaluation_strategy="epoch",
+                learning_rate=2e-5,
+                per_device_train_batch_size = 1,
+                per_device_eval_batch_size = 1,
+                num_train_epochs=1,
+                weight_decay=0.01,
+            )
+            test_set = FinetuningDataset(tokenized_final_dataset,len(untokenized_final_dataset))
 
-        training_args = TrainingArguments(
-            output_dir="Neo_finetuned",
-            evaluation_strategy="epoch",
-            learning_rate=2e-5,
-            num_train_epochs=2,
-            weight_decay=0.01,
-        )
-
-        trainer = Trainer(
-            model=self.model,
-            args=training_args,
-            train_dataset=FinetuningDataset(f_dataset,len(final_dataset)),
-            eval_dataset=FinetuningDataset(f_dataset,len(final_dataset)),
-            data_collator=data_collator,
-        )
-
-        trainer.train()
-        eval_results = trainer.evaluate()
-        return math.exp(eval_results['eval_loss'])
+            trainer = Trainer(
+                model=self.model,
+                args=training_args,
+                train_dataset=test_set,
+                eval_dataset=test_set,
+                data_collator=data_collator,
+            )
+            
+            if tokenized_final_dataset:
+                trainer.train()
+                eval_results = trainer.evaluate()
+            optimizer.storage.set_training_in_progress(c_id, False)
+            new_model = ""
+            if old_model is not None:
+                new_model = "finetuned_models/llama_"+str(int(old_model.split("_")[2].split(".")[0])+1)+".pt"
+            else:
+                new_model = "finetuned_models/llama_0.pt"
+            open(new_model,"a")
+            torch.save(self.model.state_dict(), new_model)
+            optimizer.storage.set_model(c_id, new_model)
+            return math.exp(eval_results['eval_loss']) #perplexity is the metric we use for finetuning measurement
+        return asynctune
 
 class Small_Local_Flan_T5:
 
