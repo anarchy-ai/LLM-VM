@@ -15,9 +15,10 @@ You can find instructions to try it live here: [anarchy.ai](https://anarchy.ai)
 # Table of Contents
 
 * [Table of Contents](#Table)
-* [About](#📚-About)
-    * [What](#what-is-the-anarchy-llm-vm)
-    * [Why](#why-use-the-anarchy-llm-vm)
+* [About](#-About)
+    * [What](#-what-is-the-anarchy-llm-vm)
+    * [Why](#-why-use-the-anarchy-llm-vm)
+    * [Features and Roadmap](#-features-and-roadmap)
 
 
 
