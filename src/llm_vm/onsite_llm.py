@@ -255,7 +255,6 @@ class Small_Local_Bloom:
 class Small_Local_Neo:
 
     """
-    This is a class for BigScience's bloom-560 LLM
 
     Attributes:
         model_uri (str): Hugging Face Endpoint for LLM
@@ -359,7 +358,7 @@ class Small_Local_LLama:
         tokenizer_loader: Loads the tokenizer into memory
         generate: Generates a response from a given prompt with the loaded LLM and tokenizer
     """
-    def __init__(self,model_uri="openlm-research/open_llama_3b"): # tokenizer_kw_args=None,model_kw_args=None
+    def __init__(self,model_uri="openlm-research/open_llama_3b_v2"): # tokenizer_kw_args=None,model_kw_args=None
         self.model_uri = model_uri
         self.tokenizer=self.tokenizer_loader()
         self.model= self.model_loader()
