@@ -115,7 +115,8 @@ class Client:
             use_rebel_agent = True
 
         try:
-            openai.api_key = self.openai_key
+            if openai_key:
+                openai.api_key = self.openai_key
         except:
             return  {"status":0, "resp":"Issue with OpenAI key"}
     
