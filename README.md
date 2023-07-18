@@ -4,8 +4,8 @@ standing by to help out!  https://discord.gg/YmNvCAk6W6
 
 
 # 🤖 Anarchy LLM-VM 🤖
-
-This is [Anarchy's](https://anarchy.ai) effort for building 🏗️ generalized artificial intelligence 🤖 through the LLM-VM: a way to give your LLMs superpowers 🦸 and superspeed 🚄.
+*Simplifying finetuning LLMs for local development*
+This is [Anarchy's](https://anarchy.ai) effort for building 🏗️ open generalized artificial intelligence 🤖 through the LLM-VM: a way to give your LLMs superpowers 🦸 and superspeed 🚄. 
 
 You can find instructions to try it live here: [anarchy.ai](https://anarchy.ai)
 
@@ -94,9 +94,9 @@ from llm_vm.client import Client
 client = Client(big_model = 'chat_gpt')
 
 # Put in your prompt and go!
-response = client.complete('What is Anarchy?')
+response = client.complete(prompt = 'What is Anarchy?', context = '', openai_key = 'ENTER_YOUR_API_KEY')
 print(response)
-# Anarchy is a political system in which the state is abolished and the people are free...
+# Anarchy is a political ideology that advocates for the absence of government...
 ```
 
 ### Locally Run an LLM
@@ -104,18 +104,21 @@ print(response)
 # import our client
 from llm_vm.client import Client
 
-# Select which LLM you want to use, here we have openAI's 
-client = Client(big_model = 'llama',small_model='llama')
+# Select the LlaMA model
+client = Client(big_model = 'llama')
 
 # Put in your prompt and go!
-response = client.complete('What is Anarchy?')
+response = client.complete(prompt = 'What is Anarchy?', context = '')
 print(response)
-# Anarchy is a political system in which the state is abolished and the people are free...
+# Anarchy is a political philosophy that advocates no government...
 ```
 
 
 ### Supported Models
-
+Select from the following models
+```python
+Supported_Models = ['chat_gpt','gpt','neo','llama','bloom']
+```
 
 
 ### 🏃‍♀️ Running Standalone
@@ -258,7 +261,10 @@ Alternatively, to run a simple interface and choose an agent to run from the CLI
 and follow the command prompt instructions. 
 
 ## Acknowledgements 
-
+Matthew Mirman
+Abhirgya Sodani
+Carter Schonwald
+Andrew Nelson
 
 
 ## License
