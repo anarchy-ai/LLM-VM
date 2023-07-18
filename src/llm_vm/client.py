@@ -2,7 +2,6 @@ import openai
 import llm_vm.onsite_llm as llms
 from llm_vm.agents.REBEL import agent
 from llm_vm.completion.optimize import LocalOptimizer
-import llm_vm.completion.models as models
 import os
 
 
@@ -116,7 +115,8 @@ class Client:
             use_rebel_agent = True
 
         try:
-            openai.api_key = self.openai_key
+            if openai_key:
+                openai.api_key = self.openai_key
         except:
             return  {"status":0, "resp":"Issue with OpenAI key"}
     

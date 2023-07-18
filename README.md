@@ -4,8 +4,9 @@ standing by to help out!  https://discord.gg/YmNvCAk6W6
 
 
 # 🤖 Anarchy LLM-VM 🤖
+*Simplifying AGIs for accelerating development*
 
-This is [Anarchy's](https://anarchy.ai) effort for building 🏗️ generalized artificial intelligence 🤖 through the LLM-VM: a way to give your LLMs superpowers 🦸 and superspeed 🚄.
+This is [Anarchy's](https://anarchy.ai) effort for building 🏗️ open generalized artificial intelligence 🤖 through the LLM-VM: a way to give your LLMs superpowers 🦸 and superspeed 🚄. 
 
 You can find instructions to try it live here: [anarchy.ai](https://anarchy.ai)
 
@@ -94,9 +95,9 @@ from llm_vm.client import Client
 client = Client(big_model = 'chat_gpt')
 
 # Put in your prompt and go!
-response = client.complete('What is Anarchy?')
+response = client.complete(prompt = 'What is Anarchy?', context = '', openai_key = 'ENTER_YOUR_API_KEY')
 print(response)
-# Anarchy is a political system in which the state is abolished and the people are free...
+# Anarchy is a political ideology that advocates for the absence of government...
 ```
 
 ### Locally Run an LLM
@@ -104,18 +105,21 @@ print(response)
 # import our client
 from llm_vm.client import Client
 
-# Select which LLM you want to use, here we have openAI's 
-client = Client(big_model = 'llama',small_model='llama')
+# Select the LlaMA model
+client = Client(big_model = 'llama')
 
 # Put in your prompt and go!
-response = client.complete('What is Anarchy?')
+response = client.complete(prompt = 'What is Anarchy?', context = '')
 print(response)
-# Anarchy is a political system in which the state is abolished and the people are free...
+# Anarchy is a political philosophy that advocates no government...
 ```
 
 
 ### Supported Models
-
+Select from the following models
+```python
+Supported_Models = ['chat_gpt','gpt','neo','llama','bloom']
+```
 
 
 ### 🏃‍♀️ Running Standalone
@@ -142,6 +146,7 @@ The package defaults to using chatGPT as the big model that we use for completio
 - `temperature`?: Number - The temperature of the model. A higher temperature offers a more diverse range of answers, but a higher chance of straying from the context. 
 - `finetune`?: Boolean - True if you want to finetune the model and False if not.
 - `data_synthesis`?: Boolean - True if you want to finetune the model and False if not.
+- `stoptoken`?: String or Array of String - Sequence of tokens that will stop generation and return the result up to and before the sequence provided.
 - `tools`?: JSON Array
 	- `description`: String - description of what the tool does.
 	- `url`: String: Endpoint - of the tool you want to use
@@ -210,46 +215,7 @@ The code in `src/llm_vm/completion/` provides an optimizing completion library. 
 
 #### Usage
 
-To use the local optimizer:
-
-```python
-from optimize import LocalOptimizer
-
-optimizer = LocalOptimizer(MIN_TRAIN_EXS=2)  # Require 2 examples before fine-tuning a new model
-
-completion = optimizer.complete(
-    "Please convert this line to some haskell:", # Description of the task
-    "x = 5",   # Prompt to complete
-    max_tokens=100, 
-    temperature=0.0
-)
-print(completion)
-# Haskell:
-# x = 5
-```
-
-To use the hosted optimizer:
-
-```python
-from optimize import HostedOptimizer
-from dotenv import load_dotenv
-
-load_dotenv()
-
-optimizer = HostedOptimizer(anarchy_key=os.getenv('ANARCHY_KEY'), openai_key=os.getenv('OPENAI_KEY'), MIN_TRAIN_EXS=2)  
-
-completion = optimizer.complete(
-    "Please convert this line to some haskell:", 
-    "x = 5",
-    max_tokens=100, 
-    temperature=0.0
-)
-print(completion)
-# Haskell:  
-# x = 5
-```
-
-There are three agents: FLAT, REBEL, and BACKWARD_CHAINING. 
+There are two agents: FLAT and REBEL. 
 
 Run the agents separately by going into the `src/llm_vm/agents/<AGENT_FOLDER>` and running the file that is 
 titled `agent.py`. 
@@ -258,7 +224,7 @@ Alternatively, to run a simple interface and choose an agent to run from the CLI
 and follow the command prompt instructions. 
 
 ## Acknowledgements 
-
+Matthew Mirman, Abhirgya Sodani, Carter Schonwald, Andrew Nelson
 
 
 ## License
