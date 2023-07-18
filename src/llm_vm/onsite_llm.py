@@ -176,8 +176,8 @@ class Small_Local_OPT:
         generate: Generates a response from a given prompt with the loaded LLM and tokenizer
     """
     
-    def __init__(self,model_uri_override="facebook/opt-350m"): # tokenizer_kw_args=None,model_kw_args=None
-        self.model_uri = model_uri_override
+    def __init__(self,model_uri="facebook/opt-350m"): # tokenizer_kw_args=None,model_kw_args=None
+        self.model_uri = model_uri
         self.tokenizer=self.tokenizer_loader()
         self.model= self.model_loader()
 
@@ -267,8 +267,8 @@ class Small_Local_Bloom:
         tokenizer_loader: Loads the tokenizer into memory
         generate: Generates a response from a given prompt with the loaded LLM and tokenizer
     """
-    def __init__(self,model_uri_override="bigscience/bloom-560m"): # tokenizer_kw_args=None,model_kw_args=None
-        self.model_uri = model_uri_override
+    def __init__(self,model_uri="bigscience/bloom-560m"): # tokenizer_kw_args=None,model_kw_args=None
+        self.model_uri = model_uri
         self.tokenizer=self.tokenizer_loader()
         self.model= self.model_loader()
 
@@ -360,8 +360,8 @@ class Small_Local_Neo:
         tokenizer_loader: Loads the tokenizer into memory
         generate: Generates a response from a given prompt with the loaded LLM and tokenizer
     """
-    def __init__(self,model_uri_override="EleutherAI/gpt-neo-1.3B"): # tokenizer_kw_args=None,model_kw_args=None
-        self.model_uri = model_uri_override
+    def __init__(self,model_uri="EleutherAI/gpt-neo-1.3B"): # tokenizer_kw_args=None,model_kw_args=None
+        self.model_uri = model_uri
         self.tokenizer=self.tokenizer_loader()
         self.model= self.model_loader()
 
@@ -452,8 +452,8 @@ class Small_Local_LLama:
         tokenizer_loader: Loads the tokenizer into memory
         generate: Generates a response from a given prompt with the loaded LLM and tokenizer
     """
-    def __init__(self,model_uri_override="openlm-research/open_llama_3b"): # tokenizer_kw_args=None,model_kw_args=None
-        self.model_uri = model_uri_override
+    def __init__(self,model_uri="openlm-research/open_llama_3b"): # tokenizer_kw_args=None,model_kw_args=None
+        self.model_uri = model_uri
         self.tokenizer=self.tokenizer_loader()
         self.model= self.model_loader()
 
@@ -545,8 +545,8 @@ class Small_Local_Flan_T5:
         tokenizer_loader: Loads the tokenizer into memory
         generate: Generates a response from a given prompt with the loaded LLM and tokenizer
     """
-    def __init__(self,model_uri_override="google/flan-t5-small"): # tokenizer_kw_args=None,model_kw_args=None
-        self.model_uri = model_uri_override
+    def __init__(self,model_uri="google/flan-t5-small"): # tokenizer_kw_args=None,model_kw_args=None
+        self.model_uri = model_uri
         self.tokenizer=self.tokenizer_loader()
         self.model= self.model_loader()
 
