@@ -1,13 +1,14 @@
 import json
 import sys 
 from sentence_transformers import SentenceTransformer, util
+import openai
 
 
 class DataSynthesis:
      def __init__(self, variance, examples_to_generate):
          self.variance = variance
          self.examples_to_generate = examples_to_generate
-     def data_synthesis(self, optimizer, prompt, response, example_delim="<Datum-Separator/>", semantic_sim=True, **kwargs):
+     def data_synthesis(self, optimizer, prompt, response, example_delim="<Datum-Separator/>", openai_key=None, semantic_sim=True, **kwargs):
         """
         This method generates QA pairs using the larger LLM to be used as training data for fine-tuning the smaller LLM.
 
@@ -27,23 +28,20 @@ class DataSynthesis:
         model = SentenceTransformer("all-MiniLM-L6-v2")
         final_prompt = None
         if type(prompt) is str:
-            final_prompt = '{"prompt": "' +prompt+'"  , "response": "' +response+'" }'+ \
-                '\nGenerate '+str(self.examples_to_generate)+F""" more JSONS each with a prompt and response field like the given one. 
-                The content of the prompt and response fields must be similar to the given JSON. 
-                Separate each JSON with the XML tag {example_delim}."""
+            final_prompt = '{"prompt": "' +prompt+'"  , "response": "' +response+'" }'+example_delim
         elif type(prompt) is list:
             json_str = ""
             for idx,p in enumerate(prompt):
-               example_str = '{"prompt": "' + p +'"  , "response": "' + response[idx] +'" } \n'
+               example_str = '{"prompt": "' + p +'"  , "response": "' + str(response[idx]) +'" }'+example_delim+'\n'
                json_str += example_str
-            final_prompt = json_str + 'Generate '+str(self.examples_to_generate)+F""" more JSONS each with a prompt and response field like the given examples. 
-                The content of the prompt and response fields must be similar to the given JSON. 
-                Separate each JSON with the XML tag {example_delim}."""
-
+            final_prompt = json_str 
+        final_prompt = "Generate 50 more jsons like the ones below. Use "+example_delim+" as a delimeter between JSONs.\n" + final_prompt
+        print(final_prompt)
         data = None       
-        response=optimizer.call_big(final_prompt , **kwargs)
+        openai.api_key=openai_key
+        response=openai.Completion.create(prompt=final_prompt,model="text-davinci-003",max_tokens=1000,temperature=1).choices[0].text
         datapoints = []
-        print(response,file=sys.stderr)
+        print("REPLY"+response,file=sys.stderr)
         split_response = response.split(sep=example_delim)
         print(f"Generated {len(split_response)}/{self.examples_to_generate} examples.", file=sys.stderr )
         if semantic_sim:
@@ -84,9 +82,12 @@ class DataSynthesis:
         datum_failure = 0 
         bad_key_failure =0
         resp_filter = {}
+        
         for d in split_response:
+            print(d)
+            
             try: 
-                the_data = json.loads(d)
+                the_data = json.loads(d.replace("\n",""))
                 the_tuple = (the_data["prompt"],the_data["response"])
                 if the_tuple in resp_filter:
                     continue   # dont save a response if its already happened

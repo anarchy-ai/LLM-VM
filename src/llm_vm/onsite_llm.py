@@ -112,7 +112,7 @@ class Small_Local_OPT:
         generate_ids=self.model.generate(inputs.input_ids,max_length=max_length)
         resp= self.tokenizer.batch_decode(generate_ids,skip_special_tokens=True,clean_up_tokenization_spaces=False)[0]
         # need to drop the len(prompt) prefix with these sequences generally 
-        return resp[len(prompt):]
+        return resp
     def finetune(self,data, optimizer, c_id):
         def asynctune():
             old_model = optimizer.storage.get_model(c_id)
@@ -203,7 +203,7 @@ class Small_Local_Bloom:
         generate_ids=self.model.generate(inputs.input_ids,max_length=max_length)
         resp= self.tokenizer.batch_decode(generate_ids,skip_special_tokens=True,clean_up_tokenization_spaces=False)[0]
         # need to drop the len(prompt) prefix with these sequences generally 
-        return resp[len(prompt):]
+        return resp
     
     def finetune(self,data, optimizer, c_id):
         def asynctune():
@@ -296,7 +296,7 @@ class Small_Local_Neo:
         generate_ids=self.model.generate(inputs.input_ids,max_length=max_length)
         resp= self.tokenizer.batch_decode(generate_ids,skip_special_tokens=True,clean_up_tokenization_spaces=False)[0]
         # need to drop the len(prompt) prefix with these sequences generally 
-        return resp[len(prompt):]
+        return resp
     
     def finetune(self,data, optimizer, c_id):
         def asynctune():
@@ -389,7 +389,7 @@ class Small_Local_LLama:
         generate_ids=self.model.generate(inputs.input_ids,max_length=max_length)
         resp= self.tokenizer.batch_decode(generate_ids,skip_special_tokens=True,clean_up_tokenization_spaces=False)[0]
         # need to drop the len(prompt) prefix with these sequences generally 
-        return resp[len(prompt):]
+        return resp
     
     def finetune(self,data, optimizer, c_id):
         def asynctune():
@@ -475,7 +475,7 @@ class Small_Local_Flan_T5:
         generate_ids=self.model.generate(inputs.input_ids,max_length=max_length)
         resp= self.tokenizer.batch_decode(generate_ids,skip_special_tokens=True,clean_up_tokenization_spaces=False)[0]
         # need to drop the len(prompt) prefix with these sequences generally 
-        return resp[len(prompt):]
+        return resp
     
     def finetune(self,data, optimizer, c_id):
         pass

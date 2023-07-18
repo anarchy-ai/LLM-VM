@@ -58,13 +58,13 @@ class Client:
         print("Using model: " + big_model) # announce the primary LLM that is generating results
 
         # These functions allow for proper initialization of the optimizer
-        def CALL_BIG(prompt, **kwargs):
+        def CALL_BIG(prompt, max_len=256, **kwargs):
             
-            return self.teacher.generate(prompt,**kwargs)
+            return self.teacher.generate(prompt, max_len,**kwargs)
 
-        def CALL_SMALL(prompt,**kwargs):
+        def CALL_SMALL(prompt, max_len=256, **kwargs):
            
-            return self.student.generate(prompt,**kwargs)
+            return self.student.generate(prompt, max_len,**kwargs)
         
         # load the optimizer into object memory for use by the complete function
         self.optimizer = LocalOptimizer(MIN_TRAIN_EXS=2,openai_key=None, call_big=CALL_BIG, call_small= CALL_SMALL, 
