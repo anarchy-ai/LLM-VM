@@ -224,10 +224,7 @@ Alternatively, to run a simple interface and choose an agent to run from the CLI
 and follow the command prompt instructions. 
 
 ## Acknowledgements 
-Matthew Mirman
-Abhirgya Sodani
-Carter Schonwald
-Andrew Nelson
+Matthew Mirman, Abhirgya Sodani, Carter Schonwald, Andrew Nelson
 
 
 ## License
