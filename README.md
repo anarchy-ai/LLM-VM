@@ -5,6 +5,7 @@ standing by to help out!  https://discord.gg/YmNvCAk6W6
 
 # 🤖 Anarchy LLM-VM 🤖
 *Simplifying finetuning LLMs for local development*
+
 This is [Anarchy's](https://anarchy.ai) effort for building 🏗️ open generalized artificial intelligence 🤖 through the LLM-VM: a way to give your LLMs superpowers 🦸 and superspeed 🚄. 
 
 You can find instructions to try it live here: [anarchy.ai](https://anarchy.ai)
