@@ -20,7 +20,8 @@ You can find instructions to try it live here: [anarchy.ai](https://anarchy.ai)
     * [What](#-what-is-the-anarchy-llm-vm)
     * [Why](#-why-use-the-anarchy-llm-vm)
     * [Features and Roadmap](#-features-and-roadmap)
-* [Quick Start]
+* [Quick Start and Installation](#-quickstart-)
+
 
 
 
@@ -120,6 +121,44 @@ Select from the following models
 ```python
 Supported_Models = ['chat_gpt','gpt','neo','llama','bloom']
 ```
+
+
+
+
+### Picking a Different Model
+LLM-VM default model sizes for local models is intended to make experimentation 
+with LLMs accessible to everyone, but if you have the memory required, larger parameter models 
+will perform far better!
+
+for example if you want to use a large and small neo model  for your teacher and student,
+
+
+```python
+# import our client
+from llm_vm.client import Client
+
+# Select the LlaMA model
+client = Client(big_model = 'neo',big_model_config={'uri_override'})
+
+# Put in your prompt and go!
+response = client.complete(prompt = 'What is Anarchy?', context = '')
+print(response)
+# Anarchy is a political philosophy that advocates no government...
+```
+
+
+#### Neo Model 
+ | URI | Model Params | Checkpoint file size | Is Default?
+ -----------------------------------------------------------
+| EleutherAI/gpt-neo-125m | 125m | 526 MB | ❌
+| EleutherAI/gpt-neo-1.3B | 1.3B | 5.31 GB | ✅
+| EleutherAI/gpt-neo-2.7B | 2.7B | 10.7 GB | ❌
+| EleutherAI/gpt-neox-20b | 20B | 41.3 GB  | ❌
+
+#### Bloom Model  
+
+
+||
 
 
 ### 🏃‍♀️ Running Standalone

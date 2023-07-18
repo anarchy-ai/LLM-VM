@@ -38,9 +38,9 @@ class FinetuningDataset(torch.utils.data.Dataset):
         return self.dataset[idx]
     
 class Base_Onsite_LLM(ABC):
-    def __init__(self,model_uri_override=None,tokenizer_kw_args=None,model_kw_args=None):
-        if model_uri_override != None:
-            self.model_uri= model_uri_override 
+    def __init__(self,model_uri=None,tokenizer_kw_args=None,model_kw_args=None):
+        if model_uri != None:
+            self.model_uri= model_uri 
         self.model=model_loader()
  
     @property
