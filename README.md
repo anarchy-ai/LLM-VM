@@ -146,6 +146,7 @@ The package defaults to using chatGPT as the big model that we use for completio
 - `temperature`?: Number - The temperature of the model. A higher temperature offers a more diverse range of answers, but a higher chance of straying from the context. 
 - `finetune`?: Boolean - True if you want to finetune the model and False if not.
 - `data_synthesis`?: Boolean - True if you want to finetune the model and False if not.
+- `stoptoken`?: String or Array of String - Sequence of tokens that will stop generation and return the result up to and before the sequence provided.
 - `tools`?: JSON Array
 	- `description`: String - description of what the tool does.
 	- `url`: String: Endpoint - of the tool you want to use
@@ -214,46 +215,7 @@ The code in `src/llm_vm/completion/` provides an optimizing completion library. 
 
 #### Usage
 
-To use the local optimizer:
-
-```python
-from optimize import LocalOptimizer
-
-optimizer = LocalOptimizer(MIN_TRAIN_EXS=2)  # Require 2 examples before fine-tuning a new model
-
-completion = optimizer.complete(
-    "Please convert this line to some haskell:", # Description of the task
-    "x = 5",   # Prompt to complete
-    max_tokens=100, 
-    temperature=0.0
-)
-print(completion)
-# Haskell:
-# x = 5
-```
-
-To use the hosted optimizer:
-
-```python
-from optimize import HostedOptimizer
-from dotenv import load_dotenv
-
-load_dotenv()
-
-optimizer = HostedOptimizer(anarchy_key=os.getenv('ANARCHY_KEY'), openai_key=os.getenv('OPENAI_KEY'), MIN_TRAIN_EXS=2)  
-
-completion = optimizer.complete(
-    "Please convert this line to some haskell:", 
-    "x = 5",
-    max_tokens=100, 
-    temperature=0.0
-)
-print(completion)
-# Haskell:  
-# x = 5
-```
-
-There are three agents: FLAT, REBEL, and BACKWARD_CHAINING. 
+There are two agents: FLAT and REBEL. 
 
 Run the agents separately by going into the `src/llm_vm/agents/<AGENT_FOLDER>` and running the file that is 
 titled `agent.py`. 
