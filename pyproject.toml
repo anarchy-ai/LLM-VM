@@ -10,10 +10,11 @@ requires-python = ">=3.8" # this could be lower if need be
 readme = "README.md"
 license = {text = "MIT"}
 dependencies = [
-    "python-dotenv>=1.0.0",
+    "dynaconf>=3.2.0",
     "openai>=0.27.6",
     "numpy>=1.22.4",
     "watchdog>=3.0.0",
+    "xdg>=6.0.0",
     "accelerate>=0.21.0",
     "transformers>=4.29.0",
     "flask>=2.3.2",
@@ -24,12 +25,12 @@ dependencies = [
     "sentence-transformers>=2.2.2",
     "requests>=2.26.0",
     "spacy>=3.5.3",
-    "en_core_web_md @ https://github.com/explosion/spacy-models/releases/download/en_core_web_md-3.6.0/en_core_web_md-3.6.0-py3-none-any.whl"
+    "en_core_web_md @ https://github.com/explosion/spacy-models/releases/download/en_core_web_md-3.6.0/en_core_web_md-3.6.0-py3-none-any.whl",
 ]
 
 
 
-[project.scripts] # these names are just placeholders 
+[project.scripts] # these names are just placeholders
 llm_vm_test_optimize = "llm_vm.completion.test_optimize:run_test_stub"
 llm_vm_server = "llm_vm.server.main:cli"
 

@@ -42,7 +42,7 @@ try:
         memory_check,
         replace_variables_for_values,
     )
-    
+
 except:
     from bothandler import (
         question_split,
@@ -441,9 +441,9 @@ class Agent:
 
         split_allowed
             a boolean to allow the question to be split into sub-questions if set to True
-        
+
         max_level
-            param that indicates the maximum recursive level we want to allow. 
+            param that indicates the maximum recursive level we want to allow.
 
         Returns
         ----------
@@ -466,9 +466,9 @@ class Agent:
 
         if split_allowed:
             subq = question_split(question, self.tools, mem)
-        
+
             subq_final = []
-        
+
             if len(subq[1]) == 1:
                 split_allowed = False
 
@@ -521,7 +521,7 @@ class Agent:
 
         tool_to_use = tool_picker(self.tools, question, 3)
 
-        
+
         print_big(
             "".join(
                 [
@@ -577,7 +577,7 @@ class Agent:
                 mem + "\nQ:" + question + "\nANSWER Q, DO NOT MAKE UP INFORMATION.",
             )
             answer = call_ChatGPT(self, prompt, stop="</AI>", max_tokens=256).strip()
-        
+
 
         return (answer, [(question, answer)])
 
@@ -585,7 +585,7 @@ def rebel_main():
     tools = buildExampleTools()
 
 
-    label = Agent(os.getenv("OPENAI_API_KEY"), tools, verbose=1)
+    label = Agent(os.getenv("LLM_VM_OPENAI_API_KEY"), tools, verbose=1)
     conversation_history = []
     last = ""
     while True:
@@ -594,5 +594,5 @@ def rebel_main():
         conversation_history = return_value[1]
         last = "AI: " + str(return_value[0]) + "\n"
 
-if __name__ == "__main__":    
+if __name__ == "__main__":
     rebel_main()

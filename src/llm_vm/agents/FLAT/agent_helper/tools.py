@@ -1,4 +1,4 @@
-import os 
+import os
 import sys
 
 # Get the current file's directory to grab the python files with common functionality in the utils/ folder
@@ -18,8 +18,8 @@ CUSTOM_TOOL_ANSWER_EMBEDDING = "/answer_embedding"
 def __get_generic_tools():
     # # wolfram
 
-    WOLFRAM_KEY = os.getenv("WOLFRAM_KEY")
-    GOOGLE_MAPS_KEY = os.getenv("GOOGLE_MAPS_KEY")
+    WOLFRAM_KEY = os.getenv("LLM_VM_WOLFRAM_KEY")
+    GOOGLE_MAPS_KEY = os.getenv("LLM_VM_GOOGLE_MAPS_KEY")
     wolfram_tool = {
         'description': "Useful to query questions about people, events, anything that can change, complicated math, live data retrieval, current date and other data.",
         # {'description': "The tool returns the results of free-form queries similar to those used for wolfram alpha. This is useful for complicated math or live data retrieval.  Can be used to get the current date.",

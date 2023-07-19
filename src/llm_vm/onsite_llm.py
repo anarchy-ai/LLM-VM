@@ -4,21 +4,22 @@ import openai
 import math
 from transformers import (
     AutoModelForSeq2SeqLM,
-    AutoTokenizer, 
+    AutoTokenizer,
     OPTForCausalLM,
     BloomForCausalLM,
-    LlamaTokenizer, 
-    LlamaForCausalLM, 
-    GPTNeoForCausalLM, 
-    GPT2Tokenizer, 
+    LlamaTokenizer,
+    LlamaForCausalLM,
+    GPTNeoForCausalLM,
+    GPT2Tokenizer,
     DataCollatorForLanguageModeling,
-    TrainingArguments, 
+    TrainingArguments,
     Trainer)
 import time
 import tempfile
 import json
 import os
 import torch
+
 
 def create_jsonl_file(data_list):
     out = tempfile.TemporaryFile('w+')
@@ -27,21 +28,22 @@ def create_jsonl_file(data_list):
     out.seek(0)
     return out
 
+
 class FinetuningDataset(torch.utils.data.Dataset):
     def __init__(self,iterable_dataset,length):
-        self.dataset = list(iterable_dataset)   
+        self.dataset = list(iterable_dataset)
         self.length = length
     def __len__(self):
         return self.length
     def __getitem__(self, idx):
         return self.dataset[idx]
-    
+
 class Base_Onsite_LLM(ABC):
     def __init__(self,model_uri_override=None,tokenizer_kw_args=None,model_kw_args=None):
         if model_uri_override != None:
-            self.model_uri= model_uri_override 
+            self.model_uri= model_uri_override
         self.model=model_loader()
- 
+
     @property
     def model_uri(self):
         pass
@@ -68,7 +70,7 @@ as likely being more general, aside from covering hugging face transformers
 """
 
 class Small_Local_OPT:
-    
+
     """
     This is a class for Facebook's OPT-350m LLM
 
@@ -82,7 +84,7 @@ class Small_Local_OPT:
         tokenizer_loader: Loads the tokenizer into memory
         generate: Generates a response from a given prompt with the loaded LLM and tokenizer
     """
-    
+
     def __init__(self,model_uri_override="facebook/opt-350m"): # tokenizer_kw_args=None,model_kw_args=None
         self.model_uri = model_uri_override
         self.tokenizer=self.tokenizer_loader()
@@ -103,7 +105,7 @@ class Small_Local_OPT:
 
         Returns:
             str: LLM Generated Response
-        
+
         Example:
            >>> Small_Local_OPT.generate("How long does it take for an apple to grow?)
            I think it takes about a week for the apple to grow.
@@ -111,7 +113,7 @@ class Small_Local_OPT:
         inputs=self.tokenizer(prompt,return_tensors="pt")
         generate_ids=self.model.generate(inputs.input_ids,max_length=max_length)
         resp= self.tokenizer.batch_decode(generate_ids,skip_special_tokens=True,clean_up_tokenization_spaces=False)[0]
-        # need to drop the len(prompt) prefix with these sequences generally 
+        # need to drop the len(prompt) prefix with these sequences generally
         return resp[len(prompt):]
     def finetune(self,data, optimizer, c_id):
         def asynctune():
@@ -159,6 +161,7 @@ class Small_Local_OPT:
             return math.exp(eval_results['eval_loss']) #perplexity is the metric we use for finetuning measurement
         return asynctune
 
+
 class Small_Local_Bloom:
 
     """
@@ -194,7 +197,7 @@ class Small_Local_Bloom:
 
         Returns:
             str: LLM Generated Response
-        
+
         Example:
            >>> Small_Local_OPT.generate("How long does it take for an apple to grow?)
             How long does it take for a tomato...
@@ -202,9 +205,9 @@ class Small_Local_Bloom:
         inputs=self.tokenizer(prompt,return_tensors="pt")
         generate_ids=self.model.generate(inputs.input_ids,max_length=max_length)
         resp= self.tokenizer.batch_decode(generate_ids,skip_special_tokens=True,clean_up_tokenization_spaces=False)[0]
-        # need to drop the len(prompt) prefix with these sequences generally 
+        # need to drop the len(prompt) prefix with these sequences generally
         return resp[len(prompt):]
-    
+
     def finetune(self,data, optimizer, c_id):
         def asynctune():
             old_model = optimizer.storage.get_model(c_id)
@@ -250,7 +253,7 @@ class Small_Local_Bloom:
             optimizer.storage.set_model(c_id, new_model)
             return math.exp(eval_results['eval_loss']) #perplexity is the metric we use for finetuning measurement
         return asynctune
- 
+
 
 class Small_Local_Neo:
 
@@ -287,7 +290,7 @@ class Small_Local_Neo:
 
         Returns:
             str: LLM Generated Response
-        
+
         Example:
            >>> Small_Local_OPT.generate("How long does it take for an apple to grow?)
            The apple tree is a very slow growing plant...
@@ -295,9 +298,9 @@ class Small_Local_Neo:
         inputs=self.tokenizer(prompt,return_tensors="pt")
         generate_ids=self.model.generate(inputs.input_ids,max_length=max_length)
         resp= self.tokenizer.batch_decode(generate_ids,skip_special_tokens=True,clean_up_tokenization_spaces=False)[0]
-        # need to drop the len(prompt) prefix with these sequences generally 
+        # need to drop the len(prompt) prefix with these sequences generally
         return resp[len(prompt):]
-    
+
     def finetune(self,data, optimizer, c_id):
         def asynctune():
             old_model = optimizer.storage.get_model(c_id)
@@ -328,7 +331,7 @@ class Small_Local_Neo:
                 eval_dataset=test_set,
                 data_collator=data_collator,
             )
-            
+
             if tokenized_final_dataset:
                 trainer.train()
                 eval_results = trainer.evaluate()
@@ -343,7 +346,8 @@ class Small_Local_Neo:
             optimizer.storage.set_model(c_id, new_model)
             return math.exp(eval_results['eval_loss']) #perplexity is the metric we use for finetuning measurement
         return asynctune
-    
+
+
 class Small_Local_LLama:
 
     """
@@ -379,7 +383,7 @@ class Small_Local_LLama:
 
         Returns:
             str: LLM Generated Response
-        
+
         Example:
            >>> Small_Local_OPT.generate("How long does it take for an apple to grow?)
            How long does it take for an apple tree to grow?
@@ -388,9 +392,9 @@ class Small_Local_LLama:
         # the example calls for max_new_tokens
         generate_ids=self.model.generate(inputs.input_ids,max_length=max_length)
         resp= self.tokenizer.batch_decode(generate_ids,skip_special_tokens=True,clean_up_tokenization_spaces=False)[0]
-        # need to drop the len(prompt) prefix with these sequences generally 
+        # need to drop the len(prompt) prefix with these sequences generally
         return resp[len(prompt):]
-    
+
     def finetune(self,data, optimizer, c_id):
         def asynctune():
             old_model = optimizer.storage.get_model(c_id)
@@ -421,7 +425,7 @@ class Small_Local_LLama:
                 eval_dataset=test_set,
                 data_collator=data_collator,
             )
-            
+
             if tokenized_final_dataset:
                 trainer.train()
                 eval_results = trainer.evaluate()
@@ -436,6 +440,7 @@ class Small_Local_LLama:
             optimizer.storage.set_model(c_id, new_model)
             return math.exp(eval_results['eval_loss']) #perplexity is the metric we use for finetuning measurement
         return asynctune
+
 
 class Small_Local_Flan_T5:
 
@@ -474,12 +479,13 @@ class Small_Local_Flan_T5:
         inputs=self.tokenizer(prompt,return_tensors="pt")
         generate_ids=self.model.generate(inputs.input_ids,max_length=max_length)
         resp= self.tokenizer.batch_decode(generate_ids,skip_special_tokens=True,clean_up_tokenization_spaces=False)[0]
-        # need to drop the len(prompt) prefix with these sequences generally 
+        # need to drop the len(prompt) prefix with these sequences generally
         return resp[len(prompt):]
-    
+
     def finetune(self,data, optimizer, c_id):
         pass
-    
+
+
 class GPT3:
 
     """
@@ -488,7 +494,7 @@ class GPT3:
     Methods:
         generate: Generates a response from a given prompt with OpenAI's completion endpoint
     """
-    
+
     def generate(self,prompt, max_length=100,**kwargs): # both tokenizer and model take kwargs :(
         """
         This function uses openAI's API to generate a response from the prompt
@@ -500,7 +506,7 @@ class GPT3:
 
         Returns:
             str: LLM Generated Response
-        
+
         Example:
             >>> Small_Local_OPT.generate("How long does it take for an apple to grow?)
             It typically takes about 100-200 days...
@@ -508,8 +514,8 @@ class GPT3:
 
         ans = openai.Completion.create(prompt= prompt, model="text-davinci-003", **kwargs)
         return ans['choices'][0]['text']
-    
-    
+
+
     def finetune(self, dataset, optimizer, c_id):
         old_model = optimizer.storage.get_model(c_id)
         training_file = create_jsonl_file(dataset)
@@ -544,7 +550,7 @@ class Chat_GPT:
     Methods:
         generate: Generates a response from a given prompt through OpenAI's endpoint
     """
-    
+
     def generate(self,prompt, max_length=100,**kwargs): # both tokenizer and model take kwargs :(
         """
         This function uses openAI's API to generate a response from the prompt
@@ -556,7 +562,7 @@ class Chat_GPT:
 
         Returns:
             str: LLM Generated Response
-        
+
         Example:
             >>> Small_Local_OPT.generate("How long does it take for an apple to grow?)
             It typically takes about 100-200 days...

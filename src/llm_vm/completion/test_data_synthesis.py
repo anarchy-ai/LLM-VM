@@ -10,12 +10,12 @@ if __name__ == "__main__":
         load_dotenv()
     except:
         pass
-    openai.api_key = os.getenv('OPENAI_KEY')
+    openai.api_key = os.getenv('LLM_VM_OPENAI_API_KEY')
     print("key:", openai.api_key)
 
     data_synthesizer = data_synthesis.DataSynthesis(0.87, 50)
     optimizer = LocalOptimizer(MIN_TRAIN_EXS=2)
-    
+
     # for one-shot prompt
     prompt = "What is the currency in myanmmar?"
     response = CALL_BIG(prompt, temperature = 0.0)
