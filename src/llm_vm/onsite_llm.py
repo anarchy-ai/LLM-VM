@@ -10,6 +10,7 @@ from transformers import (
     LlamaTokenizer, 
     LlamaForCausalLM, 
     GPTNeoForCausalLM, 
+    GPTNeoXForCausalLM, 
     GPT2Tokenizer, 
     DataCollatorForLanguageModeling,
     TrainingArguments, 
@@ -19,6 +20,12 @@ import tempfile
 import json
 import os
 import torch
+
+
+# this is a hack till we add dynaconf or something?
+homepath = os.environ.get("HOME")
+model_path_default = os.path.join( homepath , ".llm_vm", "models")
+os.mkdirs(model_path_default)
 
 def create_jsonl_file(data_list):
     out = tempfile.TemporaryFile('w+')
@@ -66,7 +73,99 @@ class Base_Onsite_LLM(ABC):
 this factorization isn't necessarily the greatest, nor should it be viewed
 as likely being more general, aside from covering hugging face transformers
 """
+    
+class Small_Local_Pythia:
+    """
+    This is a class for ElutherAI's Pythia-70m LLM
 
+    Attributes:
+        model_uri (str): Hugging Face Endpoint for LLM
+        tokenizer (AutoTokenizer): Tokenizer from Transformer's library
+        model (LLM): The large language model
+
+    Methods:
+        model_loader: Loads the LLM into memory
+        tokenizer_loader: Loads the tokenizer into memory
+        generate: Generates a response from a given prompt with the loaded LLM and tokenizer
+    """
+    
+    def __init__(self,model_uri_override="EleutherAI/pythia-70m-deduped"): # tokenizer_kw_args=None,model_kw_args=None
+        self.model_uri = model_uri_override
+        self.tokenizer=self.tokenizer_loader()
+        self.model= self.model_loader()
+
+    def model_loader(self):
+        return GPTNeoXForCausalLM.from_pretrained(self.model_uri)
+    def tokenizer_loader(self):
+        return AutoTokenizer.from_pretrained(self.model_uri)
+    def generate(self,prompt,max_length=100,**kwargs): # both tokenizer and model take kwargs :(
+        """
+        This function uses the class's llm and tokenizer to generate a response given a user's prompt
+
+        Parameters:
+            prompt (str): Prompt to send to LLM
+            max_length (int): Optional parameter limiting response length
+
+
+        Returns:
+            str: LLM Generated Response
+        
+        Example:
+           >>> Small_Local_OPT.generate("How long does it take for an apple to grow?)
+           I think it takes about a week for the apple to grow.
+        """
+        inputs=self.tokenizer(prompt,return_tensors="pt")
+        generate_ids=self.model.generate(inputs.input_ids,max_length=max_length)
+        resp= self.tokenizer.batch_decode(generate_ids,skip_special_tokens=True,clean_up_tokenization_spaces=False)[0]
+        # need to drop the len(prompt) prefix with these sequences generally 
+        return resp[len(prompt):]
+    
+    def finetune(self,data, optimizer, c_id):
+        def asynctune():
+            old_model = optimizer.storage.get_model(c_id)
+            if old_model is not None:
+                self.model.load_state_dict(torch.load(old_model))
+            untokenized_final_dataset = []
+            for prompt,response in data:
+                untokenized_final_dataset.append(prompt + response)
+            tokenized_final_dataset = map(self.tokenizer,untokenized_final_dataset)
+            self.tokenizer.pad_token = self.tokenizer.eos_token
+            data_collator = DataCollatorForLanguageModeling(tokenizer=self.tokenizer, mlm=False)
+            optimizer.storage.set_training_in_progress(c_id, True)
+            training_args = TrainingArguments(
+                output_dir=os.join(model_path_default,"Pythia_finetuned",)
+                evaluation_strategy="epoch",
+                learning_rate=2e-5,
+                per_device_train_batch_size = 1,
+                per_device_eval_batch_size = 1,
+                num_train_epochs=1,
+                weight_decay=0.01,
+            )
+            test_set = FinetuningDataset(tokenized_final_dataset,len(untokenized_final_dataset))
+
+            trainer = Trainer(
+                model=self.model,
+                args=training_args,
+                train_dataset=test_set,
+                eval_dataset=test_set,
+                data_collator=data_collator,
+            )
+
+            if tokenized_final_dataset:
+                trainer.train()
+                eval_results = trainer.evaluate()
+            optimizer.storage.set_training_in_progress(c_id, False)
+            new_model = ""
+            if old_model is not None:
+                new_model = os.join(model_path_default,"finetuned_models","pythia_"+str(int(old_model.split("_")[2].split(".")[0])+1)+".pt")
+            else:
+                new_model = os.join(model_path_default,"finetuned_models","pythia_0.pt")
+            open(new_model,"a")
+            torch.save(self.model.state_dict(), new_model)
+            optimizer.storage.set_model(c_id, new_model)
+            return math.exp(eval_results['eval_loss']) #perplexity is the metric we use for finetuning measurement
+        return asynctune
+    
 class Small_Local_OPT:
     
     """
@@ -112,7 +211,7 @@ class Small_Local_OPT:
         generate_ids=self.model.generate(inputs.input_ids,max_length=max_length)
         resp= self.tokenizer.batch_decode(generate_ids,skip_special_tokens=True,clean_up_tokenization_spaces=False)[0]
         # need to drop the len(prompt) prefix with these sequences generally 
-        return resp[len(prompt):]
+        return resp
     def finetune(self,data, optimizer, c_id):
         def asynctune():
             old_model = optimizer.storage.get_model(c_id)
@@ -126,7 +225,7 @@ class Small_Local_OPT:
             data_collator = DataCollatorForLanguageModeling(tokenizer=self.tokenizer, mlm=False)
             optimizer.storage.set_training_in_progress(c_id, True)
             training_args = TrainingArguments(
-                output_dir="OPT_finetuned",
+                output_dir=os.join(model_path_default,"OPT_finetuned",)
                 evaluation_strategy="epoch",
                 learning_rate=2e-5,
                 per_device_train_batch_size = 1,
@@ -150,9 +249,9 @@ class Small_Local_OPT:
             optimizer.storage.set_training_in_progress(c_id, False)
             new_model = ""
             if old_model is not None:
-                new_model = "finetuned_models/opt_"+str(int(old_model.split("_")[2].split(".")[0])+1)+".pt"
+                new_model = os.join("finetuned_models","opt_"+str(int(old_model.split("_")[2].split(".")[0])+1)+".pt")
             else:
-                new_model = "finetuned_models/opt_0.pt"
+                new_model = os.join("finetuned_models","opt_0.pt")
             open(new_model,"a")
             torch.save(self.model.state_dict(), new_model)
             optimizer.storage.set_model(c_id, new_model)
@@ -203,7 +302,7 @@ class Small_Local_Bloom:
         generate_ids=self.model.generate(inputs.input_ids,max_length=max_length)
         resp= self.tokenizer.batch_decode(generate_ids,skip_special_tokens=True,clean_up_tokenization_spaces=False)[0]
         # need to drop the len(prompt) prefix with these sequences generally 
-        return resp[len(prompt):]
+        return resp
     
     def finetune(self,data, optimizer, c_id):
         def asynctune():
@@ -218,7 +317,7 @@ class Small_Local_Bloom:
             data_collator = DataCollatorForLanguageModeling(tokenizer=self.tokenizer, mlm=False)
             optimizer.storage.set_training_in_progress(c_id, True)
             training_args = TrainingArguments(
-                output_dir="Bloom_finetuned",
+                output_dir=os.join(model_path_default,"Bloom_finetuned",)
                 evaluation_strategy="epoch",
                 learning_rate=2e-5,
                 per_device_train_batch_size = 1,
@@ -242,9 +341,9 @@ class Small_Local_Bloom:
             optimizer.storage.set_training_in_progress(c_id, False)
             new_model = ""
             if old_model is not None:
-                new_model = "finetuned_models/bloom_"+str(int(old_model.split("_")[2].split(".")[0])+1)+".pt"
+                new_model = os.join(model_path_default,"finetuned_models","bloom_"+str(int(old_model.split("_")[2].split(".")[0])+1)+".pt")
             else:
-                new_model = "finetuned_models/bloom_0.pt"
+                new_model = os.join(model_path_default"finetuned_models","bloom_0.pt")
             open(new_model,"a")
             torch.save(self.model.state_dict(), new_model)
             optimizer.storage.set_model(c_id, new_model)
@@ -295,7 +394,7 @@ class Small_Local_Neo:
         generate_ids=self.model.generate(inputs.input_ids,max_length=max_length)
         resp= self.tokenizer.batch_decode(generate_ids,skip_special_tokens=True,clean_up_tokenization_spaces=False)[0]
         # need to drop the len(prompt) prefix with these sequences generally 
-        return resp[len(prompt):]
+        return resp
     
     def finetune(self,data, optimizer, c_id):
         def asynctune():
@@ -310,7 +409,7 @@ class Small_Local_Neo:
             data_collator = DataCollatorForLanguageModeling(tokenizer=self.tokenizer, mlm=False)
             optimizer.storage.set_training_in_progress(c_id, True)
             training_args = TrainingArguments(
-                output_dir = "Neo_finetuning_checkpoints",
+                output_dir = os.join(model_path_default,"Neo_finetuning_checkpoints",)
                 evaluation_strategy="epoch",
                 learning_rate=2e-5,
                 per_device_train_batch_size = 1,
@@ -334,9 +433,9 @@ class Small_Local_Neo:
             optimizer.storage.set_training_in_progress(c_id, False)
             new_model = ""
             if old_model is not None:
-                new_model = "finetuned_models/neo_"+str(int(old_model.split("_")[2].split(".")[0])+1)+".pt"
+                new_model = os.join("finetuned_models","neo_"+str(int(old_model.split("_")[2].split(".")[0])+1)+".pt")
             else:
-                new_model = "finetuned_models/neo_0.pt"
+                new_model = os.join("finetuned_models","neo_0.pt")
             open(new_model,"a")
             torch.save(self.model.state_dict(), new_model)
             optimizer.storage.set_model(c_id, new_model)
@@ -388,7 +487,7 @@ class Small_Local_LLama:
         generate_ids=self.model.generate(inputs.input_ids,max_length=max_length)
         resp= self.tokenizer.batch_decode(generate_ids,skip_special_tokens=True,clean_up_tokenization_spaces=False)[0]
         # need to drop the len(prompt) prefix with these sequences generally 
-        return resp[len(prompt):]
+        return resp
     
     def finetune(self,data, optimizer, c_id):
         def asynctune():
@@ -403,7 +502,7 @@ class Small_Local_LLama:
             data_collator = DataCollatorForLanguageModeling(tokenizer=self.tokenizer, mlm=False)
             optimizer.storage.set_training_in_progress(c_id, True)
             training_args = TrainingArguments(
-                output_dir="Llama_finetuned",
+                output_dir=os.join(model_path_default,"Llama_finetuned",)
                 evaluation_strategy="epoch",
                 learning_rate=2e-5,
                 per_device_train_batch_size = 1,
@@ -427,9 +526,9 @@ class Small_Local_LLama:
             optimizer.storage.set_training_in_progress(c_id, False)
             new_model = ""
             if old_model is not None:
-                new_model = "finetuned_models/llama_"+str(int(old_model.split("_")[2].split(".")[0])+1)+".pt"
+                new_model =os.join( "finetuned_models/llama_"+str(int(old_model.split("_")[2].split(".")[0])+1)+".pt")
             else:
-                new_model = "finetuned_models/llama_0.pt"
+                new_model = os.join(model_path_default,"finetuned_models/llama_0.pt")
             open(new_model,"a")
             torch.save(self.model.state_dict(), new_model)
             optimizer.storage.set_model(c_id, new_model)
@@ -474,10 +573,11 @@ class Small_Local_Flan_T5:
         generate_ids=self.model.generate(inputs.input_ids,max_length=max_length)
         resp= self.tokenizer.batch_decode(generate_ids,skip_special_tokens=True,clean_up_tokenization_spaces=False)[0]
         # need to drop the len(prompt) prefix with these sequences generally 
-        return resp[len(prompt):]
+        return resp
     
     def finetune(self,data, optimizer, c_id):
         pass
+        # TODO ADD ME 
     
 class GPT3:
 
