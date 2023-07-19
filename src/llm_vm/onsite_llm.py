@@ -45,14 +45,14 @@ class FinetuningDataset(torch.utils.data.Dataset):
         return self.dataset[idx]
     
 class Base_Onsite_LLM(ABC):
-    def __init__(self,model_uri=None,tokenizer_kw_args=None,model_kw_args=None):
+    def __init__(self,model_uri=None,tokenizer_kw_args={},model_kw_args={}):
         if model_uri != None :
             self.model_uri= model_uri 
         if model_uri is None and self.model_uri is None:
             raise ValueError('A very specific bad thing happened.')
-
-        self.model=model_loader(**model_kw_args)
-        self.tokenizer=tokenizer_loader(**tokenizer_kw_args)
+        self.model_name : str = self.model_uri.split('/')[-1] # our default for deriving model name 
+        self.model=self.model_loader(**model_kw_args)
+        self.tokenizer=self.tokenizer_loader(**tokenizer_kw_args)
     
     @property
     @abstractmethod
@@ -63,7 +63,7 @@ class Base_Onsite_LLM(ABC):
     def model_uri(self,val):
         self.model_uri=val # check if this is correct
 
-    model_name : str = model_uri.split('/')[-1]
+    # model_name : str = self.model_uri.split('/')[-1]
 
     @abstractmethod
     def model_loader(self):
@@ -110,7 +110,7 @@ class Base_Onsite_LLM(ABC):
             data_collator = DataCollatorForLanguageModeling(tokenizer=self.tokenizer, mlm=False)
             optimizer.storage.set_training_in_progress(c_id, True)
             training_args = TrainingArguments(
-                output_dir=os.join(model_path_default,"finetuned_models_",),
+                output_dir=os.path.join(model_path_default,"finetuned_models_",),
                 evaluation_strategy="epoch",
                 learning_rate=2e-5,
                 per_device_train_batch_size = 1,
@@ -167,10 +167,10 @@ class Small_Local_Pythia(Base_Onsite_LLM):
         tokenizer_loader: Loads the tokenizer into memory
         generate: Generates a response from a given prompt with the loaded LLM and tokenizer
     """
-    def __init__(self,**kwargs):
-        self.model_uri = "EleutherAI/pythia-70m-deduped" 
-        super().__init__(kwargs) ## this line is required 
-
+    # def __init__(self,**kwargs):
+    #     # self.model_uri = 
+    #     super().__init__(kwargs) ## this line is required 
+    model_uri = "EleutherAI/pythia-70m-deduped" 
     def model_loader(self):
         return GPTNeoXForCausalLM.from_pretrained(self.model_uri)
     def tokenizer_loader(self):
