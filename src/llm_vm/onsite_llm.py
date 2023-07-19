@@ -110,7 +110,7 @@ class Base_Onsite_LLM(ABC):
             data_collator = DataCollatorForLanguageModeling(tokenizer=self.tokenizer, mlm=False)
             optimizer.storage.set_training_in_progress(c_id, True)
             training_args = TrainingArguments(
-                output_dir=os.path.join(model_path_default,"finetuned_models_",),
+                output_dir=os.path.join(model_path_default,"finetuned_models",),
                 evaluation_strategy="epoch",
                 learning_rate=2e-5,
                 per_device_train_batch_size = 1,
@@ -127,16 +127,15 @@ class Base_Onsite_LLM(ABC):
                 eval_dataset=test_set,
                 data_collator=data_collator,
             )
-            os.makedirs(model_path_default,"finetuned_models")
+            os.makedirs(os.path.join(model_path_default,"finetuned_models", self.model_name), exist_ok=True)
             if tokenized_final_dataset:
                 trainer.train()
                 eval_results = trainer.evaluate()
             optimizer.storage.set_training_in_progress(c_id, False)
 
-            timestamp_raw =  datetime.now()
-            timestamp_raw.microsecond=0# we dont need that resolution, AND it might confuse some users
-            timestamp = timestamp_raw.isoformat()
-            new_model = os.join(model_path_default,"finetuned_models",self.model_name, timestamp + self.model_name + ".pt" )
+        
+            timestamp = datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
+            new_model = os.path.join(model_path_default,"finetuned_models",self.model_name, timestamp + '_' + self.model_name + ".pt" )
             open(new_model,"a")
             torch.save(self.model.state_dict(), new_model) # the model in memory is different now
             self.model_name = self.model_name + "_ft_"+  timestamp 
