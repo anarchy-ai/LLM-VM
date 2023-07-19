@@ -24,7 +24,11 @@ import torch
 
 
 # this is a hack till we add dynaconf or something?
-homepath = os.environ.get("HOME")
+if os.name == "nt":
+    homepath = os.path.join('C:','Users',os.getlogin())
+else:
+    homepath = os.environ.get("HOME")
+    
 model_path_default = os.path.join( homepath , ".llm_vm", "models")
 os.makedirs(model_path_default, exist_ok = True)
 
