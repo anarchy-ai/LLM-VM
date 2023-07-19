@@ -127,7 +127,7 @@ class Base_Onsite_LLM(ABC):
                 eval_dataset=test_set,
                 data_collator=data_collator,
             )
-            os.makedirs((model_path_default,"finetuned_models")
+            os.makedirs(model_path_default,"finetuned_models")
             if tokenized_final_dataset:
                 trainer.train()
                 eval_results = trainer.evaluate()
@@ -167,7 +167,7 @@ class Small_Local_Pythia(Base_Onsite_LLM):
         tokenizer_loader: Loads the tokenizer into memory
         generate: Generates a response from a given prompt with the loaded LLM and tokenizer
     """
-    def __init__(self,**kwargs)
+    def __init__(self,**kwargs):
         self.model_uri = "EleutherAI/pythia-70m-deduped" 
         super().__init__(kwargs) ## this line is required 
 
