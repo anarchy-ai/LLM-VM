@@ -74,43 +74,6 @@ class Base_Onsite_LLM(ABC):
     def tokenizer_loader(self):
         pass
 
-<<<<<<< HEAD
-    @abstractmethod
-    def generate(self): # this is where the meat and potatoes should live?
-        pass
-
-"""
-this factorization isn't necessarily the greatest, nor should it be viewed
-as likely being more general, aside from covering hugging face transformers
-"""
-
-class Small_Local_Pythia:
-    """
-    This is a class for ElutherAI's Pythia-70m LLM
-
-    Attributes:
-        model_uri (str): Hugging Face Endpoint for LLM
-        tokenizer (AutoTokenizer): Tokenizer from Transformer's library
-        model (LLM): The large language model
-
-    Methods:
-        model_loader: Loads the LLM into memory
-        tokenizer_loader: Loads the tokenizer into memory
-        generate: Generates a response from a given prompt with the loaded LLM and tokenizer
-    """
-
-    def __init__(self,model_uri_override="EleutherAI/pythia-70m-deduped"): # tokenizer_kw_args=None,model_kw_args=None
-        self.model_uri = model_uri_override
-        self.tokenizer=self.tokenizer_loader()
-        self.model= self.model_loader()
-
-    def model_loader(self):
-        return GPTNeoXForCausalLM.from_pretrained(self.model_uri)
-    def tokenizer_loader(self):
-        return AutoTokenizer.from_pretrained(self.model_uri)
-=======
-
->>>>>>> main
     def generate(self,prompt,max_length=100,**kwargs): # both tokenizer and model take kwargs :(
         """
         This function uses the class's llm and tokenizer to generate a response given a user's prompt
@@ -130,14 +93,9 @@ class Small_Local_Pythia:
         inputs=self.tokenizer(prompt,return_tensors="pt")
         generate_ids=self.model.generate(inputs.input_ids,max_length=max_length)
         resp= self.tokenizer.batch_decode(generate_ids,skip_special_tokens=True,clean_up_tokenization_spaces=False)[0]
-<<<<<<< HEAD
-        # need to drop the len(prompt) prefix with these sequences generally
-        return resp[len(prompt):]
-=======
         # need to drop the len(prompt) prefix with these sequences generally
         # because they include the prompt.
         return resp[len(prompt):]
->>>>>>> main
 
     def finetune(self,data, optimizer, c_id):
         def asynctune():
@@ -184,9 +142,6 @@ class Small_Local_Pythia:
             optimizer.storage.set_model(c_id, new_model)
             return math.exp(eval_results['eval_loss']) #perplexity is the metric we use for finetuning measurement
         return asynctune
-<<<<<<< HEAD
-
-=======
 
 
     def finetune_immediately(self):
@@ -221,7 +176,6 @@ class Small_Local_Pythia(Base_Onsite_LLM):
         return AutoTokenizer.from_pretrained(self.model_uri)
 
 
->>>>>>> main
 class Small_Local_OPT:
 
     """
