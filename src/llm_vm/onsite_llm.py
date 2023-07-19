@@ -25,7 +25,7 @@ import torch
 # this is a hack till we add dynaconf or something?
 homepath = os.environ.get("HOME")
 model_path_default = os.path.join( homepath , ".llm_vm", "models")
-os.mkdirs(model_path_default)
+os.makedirs(model_path_default, exist_ok = True)
 
 def create_jsonl_file(data_list):
     out = tempfile.TemporaryFile('w+')
