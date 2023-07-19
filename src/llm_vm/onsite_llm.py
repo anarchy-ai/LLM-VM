@@ -50,14 +50,16 @@ class Base_Onsite_LLM(ABC):
         self.model=model_loader(**model_kw_args)
         self.tokenizer=tokenizer_loader(**tokenizer_kw_args)
     
-    # @abstractmethod
     @property
+    @abstractmethod
     def model_uri(self):
         pass
 
     @model_uri.setter
     def model_uri(self,val):
         self.model_uri=val # check if this is correct
+
+    model_name : str = model_uri.split('/')[-1]
 
     @abstractmethod
     def model_loader(self):
@@ -88,7 +90,8 @@ class Base_Onsite_LLM(ABC):
         generate_ids=self.model.generate(inputs.input_ids,max_length=max_length)
         resp= self.tokenizer.batch_decode(generate_ids,skip_special_tokens=True,clean_up_tokenization_spaces=False)[0]
         # need to drop the len(prompt) prefix with these sequences generally 
-        return resp[len(prompt):]
+        # because they include the prompt. 
+        return resp[len(prompt):] 
 
     def finetune(self):
         pass 
