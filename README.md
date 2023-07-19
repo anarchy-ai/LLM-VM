@@ -88,6 +88,7 @@ This will install both the library and test-server.
 ### Generating Completions
 Our LLM-VM gets you working directly with popular LLMs locally in just 3 lines. Once you've installed (as above), just load your model and start generating!
 
+
 ```python
 # import our client
 from llm_vm.client import Client
