@@ -58,6 +58,9 @@ python_files = "*.py"
 # python_classes = "Check"
 # python_functions = "*_check"
 
+[tool.mypy]
+exclude = ['venv', '.venv','src/llm_vm/agents'] # agents is complicated
+
 # these are strawman configs
 [tool.black]
 line-length = 140
