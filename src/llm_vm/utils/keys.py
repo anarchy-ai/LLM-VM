@@ -1,19 +1,19 @@
 """
 API Key Definitions and Regex Pattern for Pure Interpolations.
 
-This section defines and retrieves the API keys required for various services from the environment variables. 
+This section defines and retrieves the API keys required for various services from the environment variables.
 It also includes a regular expression pattern used to identify pure interpolations.
 
 API Key Definitions:
 - OPENAI_DEFAULT_KEY: The API key for OPENAI.
 - GOOGLE_MAPS_KEY: The API key for Google Maps.
 - SERPAPI_KEY: The API key for SERPAPI (Anarchy AI)
-- WOLFRAM_KEY: The API key for Wolfram. 
+- WOLFRAM_KEY: The API key for Wolfram.
 
 
-Note: The corresponding environment variables should be set before running 
-any of the agents. Set the environment variables without quotes. 
-E.g.: WOLFRAM_KEY=an-encypted-key 
+Note: The corresponding environment variables should be set before running
+any of the agents. Set the environment variables without quotes.
+E.g.: WOLFRAM_KEY=an-encypted-key
 """
 import os
 import openai
@@ -32,11 +32,11 @@ def set_api_key(key, key_type="OPENAI_API_KEY"):
     Set the API key in the environment variable.
 
     Parameters:
-    - key:  The API key to set. Defaults to OPENAI_DEFAULT_KEY. 
+    - key:  The API key to set. Defaults to OPENAI_DEFAULT_KEY.
             There are four options:
-                - OPENAI_DEFAULT_KEY 
+                - OPENAI_DEFAULT_KEY
                 - GOOGLE_MAPS_KEY
-                - GOOGLE_KEY 
+                - GOOGLE_KEY
                 - GOOGLE_CX
     - key_type: The type of API key. Defaults to "OPENAI_API_KEY".
                 There are four options:

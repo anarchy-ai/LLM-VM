@@ -1,4 +1,4 @@
-import os 
+import os
 import sys
 
 # Get the current file's directory to grab the python files with common functionality in the utils/ folder

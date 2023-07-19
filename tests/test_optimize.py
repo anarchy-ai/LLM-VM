@@ -16,8 +16,8 @@ def call_gpt(state, cur_prompt: str, stop: str, max_tokens = 20, quality = "best
         print_op("ASK_TOKENS:", ask_tokens)
     if (ask_tokens) > 2049:
         quality = 'best'
-    model = { 'best' : ("text-davinci-003", 0.02), 
-              'okay' : ("text-curie-001", 0.002), 
+    model = { 'best' : ("text-davinci-003", 0.02),
+              'okay' : ("text-curie-001", 0.002),
              }[quality]
     def calcCost(p):
         return (len(p) / 2700.0) * model[1]
@@ -44,9 +44,9 @@ def call_gpt(state, cur_prompt: str, stop: str, max_tokens = 20, quality = "best
         print_op(prepPrintPromptContext(response_text))
         print_op("GPT output fin.\n")
     return response_text
-def delete_file(file_name):  
+def delete_file(file_name):
     location = os.getcwd()
-    path = os.path.join(location, file_name)  
+    path = os.path.join(location, file_name)
     os.remove(path)
     return True
 def call_ChatGPT(cur_prompt, stop = None, max_tokens = 20, temperature = 0.2, gpt4 = False):
@@ -109,14 +109,14 @@ def run_test_stub():
     # anarchy_key = os.getenv('ANARCHY_KEY')
     print("key:", openai.api_key[0:5])
     optimizer = LocalOptimizer(MIN_TRAIN_EXS=1,openai_key=openai_api_key)
-    #optimizer = HostedOptimizer(openai_key = openai.api_key, 
-    #                            anarchy_key = anarchy_key, 
+    #optimizer = HostedOptimizer(openai_key = openai.api_key,
+    #                            anarchy_key = anarchy_key,
     #                            MIN_TRAIN_EXS=2)
     i = 0
     optimizer.complete("Answer question Q. ","Q: What is the currency in myanmmar", \
                  temperature = 0.0, data_synthesis = True,\
                  min_examples_for_synthesis=0,finetune=True)
-    
+
 if __name__ == "__main__":
     run_test_stub()
     '''

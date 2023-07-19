@@ -19,11 +19,11 @@ def __get_random_tool_subset(tool_id: int, shuffle_value: int = 0, shuffle_modul
     )
 
 def __get_toolpicker_model(tools_input_model: ToolpickerInputModel) -> ToolpickerInputModel:
-    
+
     current_dir = os.path.dirname(os.path.abspath(__file__))
     file_path = os.path.abspath(os.path.join(current_dir, f'../../raw_data/toolpicker_data.json'))
     json_data: List[QuestionSplitModelJSONData] = json.load(open(file_path, "r"))["data"]
-    
+
     tools_input_model["data"] = json_data
     complete_tools: List[ToolpickerInputModelData] = []
     for t in tools_input_model["data"]:
@@ -32,7 +32,7 @@ def __get_toolpicker_model(tools_input_model: ToolpickerInputModel) -> Toolpicke
         answer_value = ALL_TOOLS_MAP[answer_key].value if answer_key in ALL_TOOLS_MAP else None
         if (answer_value == None):
             raise Exception("Invalid tool name/value: " + answer_key)
-        
+
         # tool_id_to_use = __use_tool(answer_value, rand_value) if answer_value > 0 else answer_value
         tool_id_to_use = 0
         complete_tools.append({
@@ -42,7 +42,7 @@ def __get_toolpicker_model(tools_input_model: ToolpickerInputModel) -> Toolpicke
             "answer": tool_id_to_use,
             "tools": __get_random_tool_subset(tool_id_to_use, rand_value)
         })
-    
+
     complete_model: ToolpickerInputModel = {
         "openai_model": tools_input_model["openai_model"],
         "data": complete_tools

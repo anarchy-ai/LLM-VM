@@ -6,10 +6,10 @@ import time
 def persist_models(models: LLModels, openai_key: str, is_test: bool = False) -> None:
     if is_test:
         return
-    
+
     current_dir = os.path.dirname(os.path.abspath(__file__))
     file_name = os.path.join(current_dir, '../models.json')
-    
+
     model_json: List[LLModels] = []
     with open(file_name, "r") as output_file:
         loaded_json = json.loads(output_file.read() or "[]")

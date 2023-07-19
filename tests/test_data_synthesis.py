@@ -12,21 +12,21 @@ if __name__ == "__main__":
     except:
         pass
 
- 
+
     data_synthesizer = data_synthesis.DataSynthesis(0.87, 50)
-    
+
     # for one-shot prompt
     prompt = "What is the currency in myanmmar?"
     response = client.complete(prompt=prompt, context = "", openai_key="",temperature = 0.0)["completion"]
     print(f"Prompt: {prompt} /nResponse: {response}")
-    
+
     # for k-shot prompt
     prompt_list = ["What is the currency in Madagascar?", "What is the currency in myanmmar?", "What is the currency in Morocco?"]
     response_list = []
     for p in prompt_list:
         res = client.complete(prompt=p, context = "", openai_key="", temperature = 0.0)
         response_list.append(res["completion"])
-    
+
 
 
 

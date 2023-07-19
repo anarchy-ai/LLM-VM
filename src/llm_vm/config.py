@@ -36,11 +36,11 @@ MODELS_AVAILABLE = set([
 if args.big_model not in MODELS_AVAILABLE:
     print(args.big_model + " is an invalid Model selection for Big LLM Model")
     exit()
-    
+
 if args.small_model not in MODELS_AVAILABLE:
     print(args.small_model + " is an invalid Model selection for Small LLM Model")
     exit()
-    
+
 # check args.port is a valid port number
 if not (1024 < args.port < 65535):
     # we start at 1024 because port numbers below there are typical system processes

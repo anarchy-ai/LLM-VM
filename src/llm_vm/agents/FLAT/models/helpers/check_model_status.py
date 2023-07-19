@@ -6,11 +6,11 @@ def check_model_status (
     label: str
 ) -> Dict:
     finetuned_model = openai.FineTune.retrieve(id=job_id)
-        
+
     print(
-        label, 
-        finetuned_model["status"], 
+        label,
+        finetuned_model["status"],
         flush=True
     )
-    
+
     return finetuned_model

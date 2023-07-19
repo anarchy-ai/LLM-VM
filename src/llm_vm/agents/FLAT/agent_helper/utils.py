@@ -21,7 +21,7 @@ random_fixed_seed = random.Random(4)
 
 def print_op(*kargs, **kwargs):
     print(*kargs, **kwargs, flush=True)
-    
+
 def verbose_answer(data, answer):
     return f'''<{L_ANSWER_DATA}>{str(data)}</{L_ANSWER_DATA}><{L_ANSWER_SUMMARY}>{answer}</{L_ANSWER_SUMMARY}>'''
 
@@ -29,7 +29,7 @@ def remove_tags_from_html_string(html_string):
     # if not isinstance(html_string, str):
     #     return ""
     # return re.compile(r'<[^>]+>').sub("", html_string), False
-    
+
 
     soup = BeautifulSoup(html_string, 'html.parser')
     has_friendly_tags: bool = False
@@ -58,7 +58,7 @@ def print_big(data, label = ""):
             print(do_format(str(label).upper()), data, flush=True)
         else:
             print(do_format(str(data)), flush=True)
-            
+
     except:
         print(label, flush=True)
 
@@ -82,16 +82,16 @@ def remove_similars(similars_list, tolerance = 3):
 def make_interaction_request(human_question, ai_response, data, Q = L_QUESTION, A = L_ANSWER, D = L_ANSWER_DATA, INTERACTION = L_INTERACTION):
 
     interaction_text = f"<{INTERACTION}>\n<{Q}>{human_question}</{Q}>\n"
-    
+
     if data and len(data) and isinstance(data, str):
         interaction_text += f'''<{D}>{data}</{D}>'''
-        
+
     interaction_text += f'''<{A}>{ai_response if ai_response else ''}'''
 
     stop = f"</{A}>\n</{INTERACTION}>"
-    
+
     return interaction_text, stop
-    
+
 def make_interaction(human_question, ai_response, data = '',
                      Q = L_QUESTION,
                      A = L_ANSWER,
@@ -106,14 +106,14 @@ def get_tool_by_id(tools, tool_id):
             return tool
     raise Exception(f"No tool corresponds to id='{tool_id}'")
 
-def tidy_up_subquestions(subquestions_str, main_question): 
+def tidy_up_subquestions(subquestions_str, main_question):
     sub_questions_raw = subquestions_str.replace("\n", "").split(SUBQ_SPLITTER)
-    
+
     # First, clear the subquestions of extra symbols that might be confusing
     sub_questions_raw = list(filter(lambda q: len(q) > 1, [q.strip() for q in sub_questions_raw]))
     # then, remove similar subquestions
     unique_subquestions = remove_similars(sub_questions_raw)
-    
+
     # if we only have one sub question, we don't need to "summarise" at the end => main question == subquestion.
     if len(unique_subquestions) == 1:
         return [main_question], None
