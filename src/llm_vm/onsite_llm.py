@@ -547,7 +547,7 @@ class Small_Local_LLama:
             return math.exp(eval_results['eval_loss']) #perplexity is the metric we use for finetuning measurement
         return asynctune
 
-class Small_Local_Flan_T5:
+class Small_Local_Flan_T5(Base_Onsite_LLM):
 
     """
     This is a class for Google's flan-t5 LLM
@@ -562,7 +562,7 @@ class Small_Local_Flan_T5:
         tokenizer_loader: Loads the tokenizer into memory
         generate: Generates a response from a given prompt with the loaded LLM and tokenizer
     """
-    
+
     model_uri="google/flan-t5-small"
     def model_loader(self):
         return AutoModelForSeq2SeqLM.from_pretrained(self.model_uri)
