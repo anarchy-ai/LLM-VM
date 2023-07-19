@@ -31,7 +31,7 @@ dependencies = [
 
 
 [project.scripts] # these names are just placeholders
-llm_vm_test_optimize = "llm_vm.completion.test_optimize:run_test_stub"
+#llm_vm_test_optimize = "tests.test_optimize:run_test_stub"
 llm_vm_server = "llm_vm.server.main:cli"
 
 llm_vm_run_agent = "llm_vm.agents.agent_interface:call_agent"
@@ -51,7 +51,7 @@ build-backend = "setuptools.build_meta"
 minversion = "6.0"
 addopts = "-ra -q"
 testpaths = [
-    "tests/src",
+    "tests/",
     # "integration_tests", # this dir is for stuff that requires api key or server running
 ]
 python_files = "*.py"

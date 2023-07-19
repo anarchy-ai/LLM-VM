@@ -20,7 +20,8 @@ You can find instructions to try it live here: [anarchy.ai](https://anarchy.ai)
     * [What](#-what-is-the-anarchy-llm-vm)
     * [Why](#-why-use-the-anarchy-llm-vm)
     * [Features and Roadmap](#-features-and-roadmap)
-* [Quick Start]
+* [Quick Start and Installation](#-quickstart-)
+
 
 
 
@@ -87,6 +88,7 @@ This will install both the library and test-server.
 ### Generating Completions
 Our LLM-VM gets you working directly with popular LLMs locally in just 3 lines. Once you've installed (as above), just load your model and start generating!
 
+
 ```python
 # import our client
 from llm_vm.client import Client
@@ -118,94 +120,74 @@ print(response)
 ### Supported Models
 Select from the following models
 ```python
-Supported_Models = ['chat_gpt','gpt','neo','llama','bloom']
+Supported_Models = ['chat_gpt','gpt','neo','llama','bloom','opt']
 ```
 
 
-### 🏃‍♀️ Running Standalone
 
-After you have installed (as above), you now have an anarchy server which provides an completion API (using flask).
 
-```bash
-> cd LLM-VM
-> llm_vm_server
+### Picking a Different Model
+LLM-VM default model sizes for local models is intended to make experimentation 
+with LLMs accessible to everyone, but if you have the memory required, larger parameter models 
+will perform far better!
+
+for example if you want to use a large and small neo model  for your teacher and student, and you 
+have enough ram:
+
+
+```python
+# import our client
+from llm_vm.client import Client
+
+# Select the LlaMA model
+client = Client(big_model = 'neo', big_model_config={'model_uri':'EleutherAI/gpt-neox-20b'}, 
+                small_model ='neo', small_model_config={'model_uri':'EleutherAI/gpt-neox-125m'})
+
+# Put in your prompt and go!
+response = client.complete(prompt = 'What is Anarchy?', context = '')
+print(response)
+# Anarchy is a political philosophy that advocates no government...
 ```
 
-This will start a flask server at https://localhost:3002/ and will create an endpoint https://localhost:3002/v1/completion.
 
-## 🕸️ API Usage 🕸️
+#### Neo Model 
+ | URI | Model Params | Checkpoint file size | Is Default?
+ -----------------------------------------------------------
+| EleutherAI/gpt-neo-125m | 125m | 526 MB | ❌
+| EleutherAI/gpt-neo-1.3B | 1.3B | 5.31 GB | ✅
+| EleutherAI/gpt-neo-2.7B | 2.7B | 10.7 GB | ❌
+| EleutherAI/gpt-neox-20b | 20B | 41.3 GB  | ❌
 
-### Submitting a Request
+#### Bloom Model  
 
-The package defaults to using chatGPT as the big model that we use for completion, and GPT3 is the small model that we use for fine tuning. These can be adjusted in src/llm_vm/completion/config.json.
-
-#### Request Paramaters
-- `prompt`: String - The natural language query that is passed to the LLM
-- `context`: String - The context for the prompt. We fine tune models with respect to the context window. Can be empty
-- `openai_key`: String - your personal open.ai key. You can generate one [here](https://platform.openai.com/account/api-keys)
-- `temperature`?: Number - The temperature of the model. A higher temperature offers a more diverse range of answers, but a higher chance of straying from the context. 
-- `finetune`?: Boolean - True if you want to finetune the model and False if not.
-- `data_synthesis`?: Boolean - True if you want to finetune the model and False if not.
-- `stoptoken`?: String or Array of String - Sequence of tokens that will stop generation and return the result up to and before the sequence provided.
-- `tools`?: JSON Array
-	- `description`: String - description of what the tool does.
-	- `url`: String: Endpoint - of the tool you want to use
-	- `dynamic_params`: JSON {"key":"value"} - Parameters that change with each api call, like a stock ticker symbol you are interested in
-	- `method`: String - GET/POST
-	- `static_params`: JSON {"key":"value"} - Parameters that are the same for every api call, like the token or API key
+ | URI | Model Params | Checkpoint file size | Is Default?
+ -----------------------------------------------------------
+| bigscience/bloom-560m | 1.7B | 1.12 GB | ✅
+| bigscience/bloom-1b7/ | 1.7B | 3.4GB   | ❌
+| bigscience/bloom-3b | 3B | 6.01 GB     | ❌
+| bigscience/bloom-7b1 | 7.1B | 14 GB |    ❌
 
 
-#### Submitting a Request to the LLM
+#### Open Llama
 
-Post requests can be sent to this endpoint `https://localhost:3002/` in the following format:
-
-```
-{
-    "prompt":"What is 2+2",
-    "context":"Answer the math problem with just a number.",
-    "openai_key": <OPENAI-KEY>,
-    "temperature":0,
-    "finetune": true,
-    "data_synthesis: true
-}
-```
-
-If no `temperature`, `finetune`, or `data_synthesis` are provided, these values will default to `0`, `false`, and `false` respectively. 
-
-## 🛠️ Tool Using Agents 🛠️
+| URI | Model Params | Checkpoint file size | Is Default?
+-----------------------------------------------------------
+| openlm-research/open_llama_3b_v2 | 3B  | 6.85 GB | ✅
+| openlm-research/open_llama_7b_v2  | 7B | 13 GB   | ❌
+| openlm-research/open_llama_13b | 13B | 26 GB   | ❌
 
 
-#### Submitting a Request to the REBEL Agent
 
-An agent is an algorithm that uses the LLM in a way to increase its reasoning capabilities such as allowing the use of outside tools or allowing the LLM to answer compositional questions. To use the REBEL (REcursion Based Extensible Llm) endpoint with tools, add a tool in the following way. We have used the finnhub api to get stocks data as an example.
+#### OPT
 
-Post requests can be sent to this endpoint `https://localhost:3002/` with the tools optional parameter:
-```
-{
-    "prompt":"What is the price of apple stock?",
-    "context":"",
-    "tools":[{
-        "description":"Find the current price of a stock.",
-        "url":"https://finnhub.io/api/v1/quote",
-        "dynamic_params":{"symbol": "the symbol of the stock"},
-        "method":"GET",
-        "static_params":{"token":<Finnhub Key>}
-    }],
-    "openai_key": <OpenAI Key>,
-    "temperature":0,
-    "finetune": true
-}
-
-```
-
-To access the completion endpoint programmatically, after starting up the server on your machine, import llm_vm.py into your code and call the completion function. Currently, we do not support tools through the programmatic completion function. To test that the server is working correctly, after starting it, run 
-```
-python test_llm_vm.py
-```
-
-## 🚅 Optimizing Completion 🚅
-
-The code in `src/llm_vm/completion/` provides an optimizing completion library.  This technique intelligently analyzes call-site usage and automatically initiates student-teacher distillation to fine-tune purpose-specialized small and efficient models from slow and accurate general purpose models.
+| URI | Model Params | Checkpoint file size | Is Default?
+-----------------------------------------------------------
+| facebook/opt-125m  | 125mm | 250 MB   | ❌
+| facebook/opt-350m | 350m | 622 MB  | ✅
+| facebook/opt-1.3b  | 1.3 B | 2.63 GB   | ❌
+| facebook/opt-2.7b  | 2.7 B | 5.3 GB   | ❌
+| facebook/opt-6.7b  | 2.7 B | 13 GB   | ❌
+| facebook/opt-66b  | 66 B | 133 GB   | ❌
 
 
 #### Files
