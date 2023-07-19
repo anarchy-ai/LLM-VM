@@ -8,7 +8,7 @@ in the root LLM-VM directory. In the quickstart_REBEL.py file it is shown how on
 
 Below we present data on the REBEL agent and its merits. 
 
-**Abstract**
+📚**Abstract**📚
 
 While large language models (LLMs) have demonstrated impressive performance in question answering tasks, their performance is limited when the questions require knowledge that is not
 included in the model’s training data and can only be acquired through direct observation or interaction with the real world. Existing methods decompose reasoning tasks through the use of modules invoked sequentially, limiting their ability to answer deep reasoning tasks. We introduce a method, Recursion based extensible LLM
@@ -16,11 +16,11 @@ included in the model’s training data and can only be acquired through direct 
 uses are specified only by natural language description. We further demonstrate REBEL capabilities on a set of problems that require a deeply nested use of external tools in a compositional
 and conversational setting.
 
-**Evaluation**
+📚**Evaluation**📚
 
 In this section we first introduce the experimental setup, including the benchmarks used for evaluation, and then present the results.
 
-**Experimental Setup**
+📚**Experimental Setup**📚
 
 We tested REBEL on 3 datasets: Compositional Celebrities (Ofir Press, 2022), FEVER (Thorne et al., 2018), and
 HotPotQA (Yang et al., 2018). On these datasets, correctness was determined by a human
@@ -34,7 +34,7 @@ REBEL. FEVER has 3 types of potential output labels (SUPPORTS, REFUTES, NOT ENOU
 REBEL system, only questions with the SUPPORTS and REFUTES labels were considered. For this experiment REBEL was only allowed to use a search tool to query the internet, as that is the only tool
 that the ReAct system has access to. Our code, which can be found at rebel.anarchy.ai, was implemented in Python using the OpenAI Completion API to access GPT-3 (da-vinci-003).
 
-**Results**
+📚**Results**📚
 
 We found that REBEL outperformed ReAct on answering questions that require i) the gathering of many facts to determine an answer ii) very specific search queries that return
 large amounts of unstructured data. With our experimental results we were able to show that REBEL is a state-of-the-art system in terms of its ability to consistently answer
