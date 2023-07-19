@@ -47,8 +47,10 @@ class Base_Onsite_LLM(ABC):
     def __init__(self,model_uri=None,tokenizer_kw_args=None,model_kw_args=None):
         if model_uri != None:
             self.model_uri= model_uri 
-        self.model=model_loader()
- 
+        self.model=model_loader(**model_kw_args)
+        self.tokenizer=tokenizer_loader(**tokenizer_kw_args)
+    
+    # @abstractmethod
     @property
     def model_uri(self):
         pass
@@ -65,16 +67,41 @@ class Base_Onsite_LLM(ABC):
     def tokenizer_loader(self):
         pass
 
-    @abstractmethod
-    def generate(self): # this is where the meat and potatoes should live?
-        pass
+    
+    def generate(self,prompt,max_length=100,**kwargs): # both tokenizer and model take kwargs :(
+        """
+        This function uses the class's llm and tokenizer to generate a response given a user's prompt
+
+        Parameters:
+            prompt (str): Prompt to send to LLM
+            max_length (int): Optional parameter limiting response length
+
+
+        Returns:
+            str: LLM Generated Response
+        
+        Example:
+           >>> Small_Local_OPT.generate("How long does it take for an apple to grow?)
+           I think it takes about a week for the apple to grow.
+        """
+        inputs=self.tokenizer(prompt,return_tensors="pt")
+        generate_ids=self.model.generate(inputs.input_ids,max_length=max_length)
+        resp= self.tokenizer.batch_decode(generate_ids,skip_special_tokens=True,clean_up_tokenization_spaces=False)[0]
+        # need to drop the len(prompt) prefix with these sequences generally 
+        return resp[len(prompt):]
+
+    def finetune(self):
+        pass 
+
+    def finetune_immediately(self):
+        finetune()()
 
 """
 this factorization isn't necessarily the greatest, nor should it be viewed
 as likely being more general, aside from covering hugging face transformers
 """
     
-class Small_Local_Pythia:
+class Small_Local_Pythia(Base_Onsite_LLM):
     """
     This is a class for ElutherAI's Pythia-70m LLM
 
@@ -89,8 +116,8 @@ class Small_Local_Pythia:
         generate: Generates a response from a given prompt with the loaded LLM and tokenizer
     """
     
-    def __init__(self,model_uri_override="EleutherAI/pythia-70m-deduped"): # tokenizer_kw_args=None,model_kw_args=None
-        self.model_uri = model_uri_override
+    def __init__(self,model_uri="EleutherAI/pythia-70m-deduped"): # tokenizer_kw_args=None,model_kw_args=None
+        self.model_uri = model_uri
         self.tokenizer=self.tokenizer_loader()
         self.model= self.model_loader()
 
