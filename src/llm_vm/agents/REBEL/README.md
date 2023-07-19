@@ -1,4 +1,4 @@
-![Anarchy Logo](anarchy_logo.svg)
+![Anarchy Logo](../../../../anarchy_logo.svg)
 **Abstract**
 
 While large language models (LLMs) have demonstrated impressive performance in question answering tasks, their performance is limited when the questions require knowledge that is not
