@@ -1,4 +1,13 @@
 ![Anarchy Logo](../../../../anarchy_logo.svg)
+
+To run the REBEL agent run 
+```
+python quickstart_REBEL.py
+```
+in the root LLM-VM directory. In the quickstart_REBEL.py file it is shown how one can use the LLM-VM client function to declare tools and use the REBEL agent. 
+
+Below we present data on the REBEL agent and its merits. 
+
 **Abstract**
 
 While large language models (LLMs) have demonstrated impressive performance in question answering tasks, their performance is limited when the questions require knowledge that is not
