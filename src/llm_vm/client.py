@@ -13,6 +13,8 @@ def load_model_closure(model_name):
         "neo":llms.Small_Local_Neo,
         "llama":llms.Small_Local_LLama,
         "pythia":llms.Small_Local_Pythia,
+        "flan-t5": llms.Small_Local_Flan_T5,
+        "bert": llms.Small_Local_BERT,
         "gpt":llms.GPT3,
         "chat_gpt":llms.Chat_GPT
         }
