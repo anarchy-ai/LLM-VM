@@ -502,7 +502,7 @@ class Small_Local_LLama:
             data_collator = DataCollatorForLanguageModeling(tokenizer=self.tokenizer, mlm=False)
             optimizer.storage.set_training_in_progress(c_id, True)
             training_args = TrainingArguments(
-                output_dir=os.join(model_path_default,"Llama_finetuned",)
+                output_dir=os.join(model_path_default,"Llama_finetuned"),
                 evaluation_strategy="epoch",
                 learning_rate=2e-5,
                 per_device_train_batch_size = 1,
