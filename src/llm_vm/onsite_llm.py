@@ -562,36 +562,14 @@ class Small_Local_Flan_T5:
         tokenizer_loader: Loads the tokenizer into memory
         generate: Generates a response from a given prompt with the loaded LLM and tokenizer
     """
-    def __init__(self,model_uri="google/flan-t5-small"): # tokenizer_kw_args=None,model_kw_args=None
-        self.model_uri = model_uri
-        self.tokenizer=self.tokenizer_loader()
-        self.model= self.model_loader()
-
+    
+    model_uri="google/flan-t5-small"
     def model_loader(self):
         return AutoModelForSeq2SeqLM.from_pretrained(self.model_uri)
     def tokenizer_loader(self):
         return AutoTokenizer.from_pretrained(self.model_uri)
-
-    def generate(self,prompt,max_length=100,**kwargs): # both tokenizer and model take kwargs :(
-        """
-        This function uses the class's llm and tokenizer to generate a response given a user's prompt
-        Parameters:
-            prompt (str): Prompt to send to LLM
-            max_length (int): Optional parameter limiting response length
-        Returns:
-            str: LLM Generated Response
-        """
-        inputs=self.tokenizer(prompt,return_tensors="pt")
-        generate_ids=self.model.generate(inputs.input_ids,max_length=max_length)
-        resp= self.tokenizer.batch_decode(generate_ids,skip_special_tokens=True,clean_up_tokenization_spaces=False)[0]
-        # need to drop the len(prompt) prefix with these sequences generally 
-        return resp
-    
-    def finetune(self,data, optimizer, c_id):
-        pass
-        # TODO ADD ME
    
-class Small_Local_BERT:
+class Small_Local_BERT(Base_Onsite_LLM):
 
     """
     This is a class for BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding
@@ -607,34 +585,12 @@ class Small_Local_BERT:
         tokenizer_loader: Loads the tokenizer into memory
         generate: Generates a response from a given prompt with the loaded LLM and tokenizer
     """
-    def __init__(self,model_uri="bert-base-cased"): # tokenizer_kw_args=None,model_kw_args=None
-        self.model_uri = model_uri
-        self.tokenizer=self.tokenizer_loader()
-        self.model= self.model_loader()
 
+    model_uri = "bert-base-cased" 
     def model_loader(self):
         return AutoModelForMaskedLM.from_pretrained(self.model_uri)
     def tokenizer_loader(self):
         return BertTokenizer.from_pretrained(self.model_uri)
-
-    def generate(self,prompt,max_length=100,**kwargs): # both tokenizer and model take kwargs :(
-        """
-        This function uses the class's llm and tokenizer to generate a response given a user's prompt
-        Parameters:
-            prompt (str): Prompt to send to LLM
-            max_length (int): Optional parameter limiting response length
-        Returns:
-            str: LLM Generated Response
-        """
-        inputs=self.tokenizer(prompt,return_tensors="pt")
-        generate_ids=self.model.generate(inputs.input_ids,max_length=max_length)
-        resp= self.tokenizer.batch_decode(generate_ids,skip_special_tokens=True,clean_up_tokenization_spaces=False)[0]
-        # need to drop the len(prompt) prefix with these sequences generally 
-        return resp
-    
-    def finetune(self,data, optimizer, c_id):
-        pass
-        # TODO ADD ME
     
 class GPT3:
 
