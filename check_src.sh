@@ -1,2 +1,2 @@
 #! /usr/bin/env bash
-mypy src/  --check-untyped-defs --explicit-package-base
+mypy  --config-file pyproject.toml src/  --check-untyped-defs --explicit-package-base

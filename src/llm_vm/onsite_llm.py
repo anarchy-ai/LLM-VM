@@ -16,6 +16,7 @@ from transformers import (
     TrainingArguments, 
     Trainer)
 import time
+from datetime import datetime
 import tempfile
 import json
 import os
@@ -44,12 +45,17 @@ class FinetuningDataset(torch.utils.data.Dataset):
         return self.dataset[idx]
     
 class Base_Onsite_LLM(ABC):
-    def __init__(self,model_uri=None,tokenizer_kw_args=None,model_kw_args=None):
-        if model_uri != None:
+    def __init__(self,model_uri=None,tokenizer_kw_args={},model_kw_args={}):
+        if model_uri != None :
             self.model_uri= model_uri 
-        self.model=model_loader()
- 
+        if model_uri is None and self.model_uri is None:
+            raise ValueError('A very specific bad thing happened.')
+        self.model_name : str = self.model_uri.split('/')[-1] # our default for deriving model name 
+        self.model=self.model_loader(**model_kw_args)
+        self.tokenizer=self.tokenizer_loader(**tokenizer_kw_args)
+    
     @property
+    @abstractmethod
     def model_uri(self):
         pass
 
@@ -57,6 +63,8 @@ class Base_Onsite_LLM(ABC):
     def model_uri(self,val):
         self.model_uri=val # check if this is correct
 
+    # model_name : str = self.model_uri.split('/')[-1]
+
     @abstractmethod
     def model_loader(self):
         pass
@@ -65,39 +73,7 @@ class Base_Onsite_LLM(ABC):
     def tokenizer_loader(self):
         pass
 
-    @abstractmethod
-    def generate(self): # this is where the meat and potatoes should live?
-        pass
-
-"""
-this factorization isn't necessarily the greatest, nor should it be viewed
-as likely being more general, aside from covering hugging face transformers
-"""
     
-class Small_Local_Pythia:
-    """
-    This is a class for ElutherAI's Pythia-70m LLM
-
-    Attributes:
-        model_uri (str): Hugging Face Endpoint for LLM
-        tokenizer (AutoTokenizer): Tokenizer from Transformer's library
-        model (LLM): The large language model
-
-    Methods:
-        model_loader: Loads the LLM into memory
-        tokenizer_loader: Loads the tokenizer into memory
-        generate: Generates a response from a given prompt with the loaded LLM and tokenizer
-    """
-    
-    def __init__(self,model_uri_override="EleutherAI/pythia-70m-deduped"): # tokenizer_kw_args=None,model_kw_args=None
-        self.model_uri = model_uri_override
-        self.tokenizer=self.tokenizer_loader()
-        self.model= self.model_loader()
-
-    def model_loader(self):
-        return GPTNeoXForCausalLM.from_pretrained(self.model_uri)
-    def tokenizer_loader(self):
-        return AutoTokenizer.from_pretrained(self.model_uri)
     def generate(self,prompt,max_length=100,**kwargs): # both tokenizer and model take kwargs :(
         """
         This function uses the class's llm and tokenizer to generate a response given a user's prompt
@@ -118,8 +94,9 @@ class Small_Local_Pythia:
         generate_ids=self.model.generate(inputs.input_ids,max_length=max_length)
         resp= self.tokenizer.batch_decode(generate_ids,skip_special_tokens=True,clean_up_tokenization_spaces=False)[0]
         # need to drop the len(prompt) prefix with these sequences generally 
-        return resp[len(prompt):]
-    
+        # because they include the prompt. 
+        return resp[len(prompt):] 
+
     def finetune(self,data, optimizer, c_id):
         def asynctune():
             old_model = optimizer.storage.get_model(c_id)
@@ -133,7 +110,7 @@ class Small_Local_Pythia:
             data_collator = DataCollatorForLanguageModeling(tokenizer=self.tokenizer, mlm=False)
             optimizer.storage.set_training_in_progress(c_id, True)
             training_args = TrainingArguments(
-                output_dir=os.join(model_path_default,"Pythia_finetuned",),
+                output_dir=os.path.join(model_path_default,"finetuned_models",),
                 evaluation_strategy="epoch",
                 learning_rate=2e-5,
                 per_device_train_batch_size = 1,
@@ -150,22 +127,55 @@ class Small_Local_Pythia:
                 eval_dataset=test_set,
                 data_collator=data_collator,
             )
-
+            os.makedirs(os.path.join(model_path_default,"finetuned_models", self.model_name), exist_ok=True)
             if tokenized_final_dataset:
                 trainer.train()
                 eval_results = trainer.evaluate()
             optimizer.storage.set_training_in_progress(c_id, False)
-            new_model = ""
-            if old_model is not None:
-                new_model = os.join(model_path_default,"finetuned_models","pythia_"+str(int(old_model.split("_")[2].split(".")[0])+1)+".pt")
-            else:
-                new_model = os.join(model_path_default,"finetuned_models","pythia_0.pt")
+
+        
+            timestamp = datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
+            new_model = os.path.join(model_path_default,"finetuned_models",self.model_name, timestamp + '_' + self.model_name + ".pt" )
             open(new_model,"a")
-            torch.save(self.model.state_dict(), new_model)
+            torch.save(self.model.state_dict(), new_model) # the model in memory is different now
+            self.model_name = self.model_name + "_ft_"+  timestamp 
             optimizer.storage.set_model(c_id, new_model)
             return math.exp(eval_results['eval_loss']) #perplexity is the metric we use for finetuning measurement
         return asynctune
     
+
+    def finetune_immediately(self):
+        finetune()()
+
+"""
+this factorization isn't necessarily the greatest, nor should it be viewed
+as likely being more general, aside from covering hugging face transformers
+"""
+    
+class Small_Local_Pythia(Base_Onsite_LLM):
+    """
+    This is a class for ElutherAI's Pythia-70m LLM
+
+    Attributes:
+        model_uri (str): Hugging Face Endpoint for LLM
+        tokenizer (AutoTokenizer): Tokenizer from Transformer's library
+        model (LLM): The large language model
+
+    Methods:
+        model_loader: Loads the LLM into memory
+        tokenizer_loader: Loads the tokenizer into memory
+        generate: Generates a response from a given prompt with the loaded LLM and tokenizer
+    """
+    # def __init__(self,**kwargs):
+    #     # self.model_uri = 
+    #     super().__init__(kwargs) ## this line is required 
+    model_uri = "EleutherAI/pythia-70m-deduped" 
+    def model_loader(self):
+        return GPTNeoXForCausalLM.from_pretrained(self.model_uri)
+    def tokenizer_loader(self):
+        return AutoTokenizer.from_pretrained(self.model_uri)
+
+  
 class Small_Local_OPT:
     
     """
