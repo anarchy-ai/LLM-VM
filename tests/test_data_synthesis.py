@@ -29,4 +29,5 @@ if __name__ == "__main__":
     
 
 
+
     data_synthesizer.data_synthesis(client.optimizer, prompt_list, response_list,openai_key="", temperature=0.0)

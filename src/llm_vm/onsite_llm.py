@@ -23,6 +23,12 @@ import json
 import os
 import torch
 
+
+# this is a hack till we add dynaconf or something?
+homepath = os.environ.get("HOME")
+model_path_default = os.path.join( homepath , ".llm_vm", "models")
+os.makedirs(model_path_default, exist_ok = True)
+
 def create_jsonl_file(data_list):
     out = tempfile.TemporaryFile('w+')
     for a,b in data_list:
@@ -40,9 +46,9 @@ class FinetuningDataset(torch.utils.data.Dataset):
         return self.dataset[idx]
     
 class Base_Onsite_LLM(ABC):
-    def __init__(self,model_uri_override=None,tokenizer_kw_args=None,model_kw_args=None):
-        if model_uri_override != None:
-            self.model_uri= model_uri_override 
+    def __init__(self,model_uri=None,tokenizer_kw_args=None,model_kw_args=None):
+        if model_uri != None:
+            self.model_uri= model_uri 
         self.model=model_loader()
  
     @property
@@ -129,7 +135,7 @@ class Small_Local_Pythia:
             data_collator = DataCollatorForLanguageModeling(tokenizer=self.tokenizer, mlm=False)
             optimizer.storage.set_training_in_progress(c_id, True)
             training_args = TrainingArguments(
-                output_dir="Pythia_finetuned",
+                output_dir=os.join(model_path_default,"Pythia_finetuned",),
                 evaluation_strategy="epoch",
                 learning_rate=2e-5,
                 per_device_train_batch_size = 1,
@@ -153,9 +159,9 @@ class Small_Local_Pythia:
             optimizer.storage.set_training_in_progress(c_id, False)
             new_model = ""
             if old_model is not None:
-                new_model = "finetuned_models/pythia_"+str(int(old_model.split("_")[2].split(".")[0])+1)+".pt"
+                new_model = os.join(model_path_default,"finetuned_models","pythia_"+str(int(old_model.split("_")[2].split(".")[0])+1)+".pt")
             else:
-                new_model = "finetuned_models/pythia_0.pt"
+                new_model = os.join(model_path_default,"finetuned_models","pythia_0.pt")
             open(new_model,"a")
             torch.save(self.model.state_dict(), new_model)
             optimizer.storage.set_model(c_id, new_model)
@@ -221,7 +227,7 @@ class Small_Local_OPT:
             data_collator = DataCollatorForLanguageModeling(tokenizer=self.tokenizer, mlm=False)
             optimizer.storage.set_training_in_progress(c_id, True)
             training_args = TrainingArguments(
-                output_dir="OPT_finetuned",
+                output_dir=os.join(model_path_default,"OPT_finetuned"),
                 evaluation_strategy="epoch",
                 learning_rate=2e-5,
                 per_device_train_batch_size = 1,
@@ -245,9 +251,9 @@ class Small_Local_OPT:
             optimizer.storage.set_training_in_progress(c_id, False)
             new_model = ""
             if old_model is not None:
-                new_model = "finetuned_models/opt_"+str(int(old_model.split("_")[2].split(".")[0])+1)+".pt"
+                new_model = os.join("finetuned_models","opt_"+str(int(old_model.split("_")[2].split(".")[0])+1)+".pt")
             else:
-                new_model = "finetuned_models/opt_0.pt"
+                new_model = os.join("finetuned_models","opt_0.pt")
             open(new_model,"a")
             torch.save(self.model.state_dict(), new_model)
             optimizer.storage.set_model(c_id, new_model)
@@ -313,7 +319,7 @@ class Small_Local_Bloom:
             data_collator = DataCollatorForLanguageModeling(tokenizer=self.tokenizer, mlm=False)
             optimizer.storage.set_training_in_progress(c_id, True)
             training_args = TrainingArguments(
-                output_dir="Bloom_finetuned",
+                output_dir=os.join(model_path_default,"Bloom_finetuned"),
                 evaluation_strategy="epoch",
                 learning_rate=2e-5,
                 per_device_train_batch_size = 1,
@@ -337,9 +343,9 @@ class Small_Local_Bloom:
             optimizer.storage.set_training_in_progress(c_id, False)
             new_model = ""
             if old_model is not None:
-                new_model = "finetuned_models/bloom_"+str(int(old_model.split("_")[2].split(".")[0])+1)+".pt"
+                new_model = os.path.join(model_path_default,"finetuned_models","bloom_"+str(int(old_model.split("_")[2].split(".")[0])+1)+".pt")
             else:
-                new_model = "finetuned_models/bloom_0.pt"
+                new_model = os.path.join(model_path_default,"finetuned_models","bloom_0.pt")
             open(new_model,"a")
             torch.save(self.model.state_dict(), new_model)
             optimizer.storage.set_model(c_id, new_model)
@@ -350,7 +356,6 @@ class Small_Local_Bloom:
 class Small_Local_Neo:
 
     """
-    This is a class for BigScience's bloom-560 LLM
 
     Attributes:
         model_uri (str): Hugging Face Endpoint for LLM
@@ -406,7 +411,7 @@ class Small_Local_Neo:
             data_collator = DataCollatorForLanguageModeling(tokenizer=self.tokenizer, mlm=False)
             optimizer.storage.set_training_in_progress(c_id, True)
             training_args = TrainingArguments(
-                output_dir = "Neo_finetuning_checkpoints",
+                output_dir = os.path.join(model_path_default,"Neo_finetuning_checkpoints"),
                 evaluation_strategy="epoch",
                 learning_rate=2e-5,
                 per_device_train_batch_size = 1,
@@ -430,9 +435,9 @@ class Small_Local_Neo:
             optimizer.storage.set_training_in_progress(c_id, False)
             new_model = ""
             if old_model is not None:
-                new_model = "finetuned_models/neo_"+str(int(old_model.split("_")[2].split(".")[0])+1)+".pt"
+                new_model = os.join("finetuned_models","neo_"+str(int(old_model.split("_")[2].split(".")[0])+1)+".pt")
             else:
-                new_model = "finetuned_models/neo_0.pt"
+                new_model = os.join("finetuned_models","neo_0.pt")
             open(new_model,"a")
             torch.save(self.model.state_dict(), new_model)
             optimizer.storage.set_model(c_id, new_model)
@@ -454,7 +459,7 @@ class Small_Local_LLama:
         tokenizer_loader: Loads the tokenizer into memory
         generate: Generates a response from a given prompt with the loaded LLM and tokenizer
     """
-    def __init__(self,model_uri="openlm-research/open_llama_3b"): # tokenizer_kw_args=None,model_kw_args=None
+    def __init__(self,model_uri="openlm-research/open_llama_3b_v2"): # tokenizer_kw_args=None,model_kw_args=None
         self.model_uri = model_uri
         self.tokenizer=self.tokenizer_loader()
         self.model= self.model_loader()
@@ -499,7 +504,7 @@ class Small_Local_LLama:
             data_collator = DataCollatorForLanguageModeling(tokenizer=self.tokenizer, mlm=False)
             optimizer.storage.set_training_in_progress(c_id, True)
             training_args = TrainingArguments(
-                output_dir="Llama_finetuned",
+                output_dir=os.join(model_path_default,"Llama_finetuned"),
                 evaluation_strategy="epoch",
                 learning_rate=2e-5,
                 per_device_train_batch_size = 1,
@@ -523,9 +528,9 @@ class Small_Local_LLama:
             optimizer.storage.set_training_in_progress(c_id, False)
             new_model = ""
             if old_model is not None:
-                new_model = "finetuned_models/llama_"+str(int(old_model.split("_")[2].split(".")[0])+1)+".pt"
+                new_model =os.join( "finetuned_models/llama_"+str(int(old_model.split("_")[2].split(".")[0])+1)+".pt")
             else:
-                new_model = "finetuned_models/llama_0.pt"
+                new_model = os.join(model_path_default,"finetuned_models/llama_0.pt")
             open(new_model,"a")
             torch.save(self.model.state_dict(), new_model)
             optimizer.storage.set_model(c_id, new_model)
@@ -574,7 +579,8 @@ class Small_Local_Flan_T5:
     
     def finetune(self,data, optimizer, c_id):
         pass
-
+        # TODO ADD ME
+   
 class Small_Local_BERT:
 
     """
@@ -618,6 +624,7 @@ class Small_Local_BERT:
     
     def finetune(self,data, optimizer, c_id):
         pass
+        # TODO ADD ME
     
 class GPT3:
 
