@@ -1,5 +1,5 @@
-import os 
-import sys 
+import os
+import sys
 import re
 import random
 from llm_vm.agents.FLAT.agent_helper.business_logic import promptf
@@ -16,7 +16,7 @@ class Agent:
         self.verbose = verbose
         self.set_tools((GENERIC_TOOLS + tools) if tools else GENERIC_TOOLS)
         self.bot_instructions = f"<{L_BOT_INSTRUCTIONS}>{bot_instructions}<{L_BOT_INSTRUCTIONS}>" if bot_instructions else ""
-        
+
         # set the openai key to make calls to the API
         set_api_key(openai_key)
     def set_tools(self, tools):
@@ -32,7 +32,7 @@ class Agent:
                 tool['dynamic_params'] = {}
             if not 'id' in tool:
                 tool['id'] = len(self.tools) + 1
-            
+
             self.tools += [tool]
 
 
@@ -40,7 +40,7 @@ class Agent:
         try:
             answer, _, calls, debug_return, price = promptf(
                 question,
-                memory, 
+                memory,
                 self.tools,
                 self.bot_instructions,
                 self.verbose
@@ -54,7 +54,7 @@ class Agent:
             print("Main thread exception: ", e, flush=True)
             answer, calls, debug_return, price, has_friendly_tags = "Error: " + str(e), [], [], 0, False
 
-    
+
         if self.verbose > -1:
             print_big("GPT-3.5 Price = ~{:.1f} cents".format(price * 100))
 
@@ -67,12 +67,12 @@ def flat_main():
     term may also be the business\'s name, such as "Starbucks"', 'price': 'Pricing levels to filter the search result with: 1 = \
     $, 2 = $$, 3 = $$$, 4 = $$$$. The price filter can be a list of comma delimited pricing levels. e.g., "1, 2, 3" will filter the \
     results to show the ones that are $, $$, or $$$.'}, "description":"This tool searches for a business on yelp.  It's useful for finding restaurants and \
-    whatnot.", 'args' :{'url': 'https://api.yelp.com/v3/businesses/search', 'cert': '', 'json': {}, 'params': {'limit': '1', 
+    whatnot.", 'args' :{'url': 'https://api.yelp.com/v3/businesses/search', 'cert': '', 'json': {}, 'params': {'limit': '1',
                                                                                                               'open_now': 'true', 'location': '{location}', 'term': '{term}', 'price': '{price}'}, 'data': {},
                        'headers': {'authorization': 'Bearer OaEqVSw9OV6llVnvh9IJo92ZCnseQ9tftnUUVwjYXTNzPxDjxRafYkz99oJKI9WHEwUYkiwULXjoBcLJm7JhHj479Xqv6C0lKVXS7N91ni-nRWpGomaPkZ6Z1T0GZHYx',
                                    'accept': 'application/json'}}}]
 
-    label = Agent(os.getenv("OPENAI_API_KEY"), tools, verbose=4)
+    label = Agent(os.getenv("LLM_VM_OPENAI_API_KEY"), tools, verbose=4)
     conversation_history = []
     last = ""
     while True:

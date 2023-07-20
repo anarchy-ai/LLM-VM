@@ -12,7 +12,7 @@ def call_open_ai(request: LLMCallParams) -> LLMCallReturnType:
     cur_prompt = request['prompt']
     temperature = request['temperature'] if 'temperature' in request else 0.0
     chat = request['llm']
-    
+
     if isinstance(model, tuple):
         model, api_key = model[0], model[1]
     else:
@@ -29,9 +29,9 @@ def call_open_ai(request: LLMCallParams) -> LLMCallReturnType:
         os.environ["OPENAI_API_KEY"] = api_key
         openai.api_key = api_key
     else:
-        api_key = os.getenv("OPENAI_API_KEY")
+        api_key = os.getenv("LLM_VM_OPENAI_API_KEY")
         openai.api_key = api_key
-        
+
     if chat == LLMCallType.OPENAI_CHAT:
         response = openai.ChatCompletion.create(
                 model="gpt-3.5-turbo-0301",
@@ -52,11 +52,11 @@ def call_open_ai(request: LLMCallParams) -> LLMCallReturnType:
             )
 
         response_text = response['choices'][0]['text']
-        
+
     if current_key:
         openai.api_key = current_key
         os.environ["OPENAI_API_KEY"] = current_key
-         
+
     usage = response["usage"]["total_tokens"]
     price = __tokens_to_dollars(usage)
     return response_text.strip("\n "), price

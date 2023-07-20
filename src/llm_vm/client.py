@@ -19,9 +19,6 @@ def load_model_closure(model_name):
     return models[model_name]
 
 
-
-
-
 class Client:
     """
     This is a class sets up a Local optimizer around a LLM for easy access.
@@ -51,7 +48,7 @@ class Client:
         self.teacher = load_model_closure(big_model)(**big_model_config)
         self.student = load_model_closure(small_model)(**small_model_config)
 
-        ## FIXME, do something like $HOME/.llm_vm/finetuned_models/ 
+        ## FIXME, do something like $HOME/.llm_vm/finetuned_models/
         if os.path.isdir("finetuned_models") == False:
             os.mkdir("finetuned_models")
         # Specify the model strategy the user will use
@@ -60,23 +57,23 @@ class Client:
 
         # These functions allow for proper initialization of the optimizer
         # def CALL_BIG(prompt, max_len=256, **kwargs):
-            
+
         #     return self.teacher.generate(prompt, max_len,**kwargs)
 
         def CALL_SMALL(prompt, max_len=256, **kwargs):
-           
+
             return self.student.generate(prompt, max_len,**kwargs)
-        
+
         # load the optimizer into object memory for use by the complete function
-        self.optimizer = LocalOptimizer(MIN_TRAIN_EXS=2,openai_key=None, call_big=self.CALL_BIG, call_small= CALL_SMALL, 
+        self.optimizer = LocalOptimizer(MIN_TRAIN_EXS=2,openai_key=None, call_big=self.CALL_BIG, call_small= CALL_SMALL,
                                         big_model = self.teacher, small_model = self.student)
         self.rebel_agent = agent.Agent("", [], verbose=1)
 
     # These functions allow for proper initialization of the optimizer
     def CALL_BIG(self, prompt, max_len=256, **kwargs):
-        
+
         return self.teacher.generate(prompt, max_len,**kwargs)
-    
+
     def complete(self, prompt,
                  context,
                  openai_key = "",
@@ -98,7 +95,7 @@ class Client:
 
         Returns:
             str: LLM Generated Response
-        
+
         Example:
            >>> Small_Local_OPT.generate("How long does it take for an apple to grow?)
            How long does it take for an apple tree to grow?
@@ -107,15 +104,15 @@ class Client:
         dynamic_prompt = prompt
         use_rebel_agent = False
         kwargs = {}
-    
+
         kwargs.update({"temperature":temperature})
 
         if openai_key:
             self.openai_key = openai_key
-            
+
         if stoptoken is not None:
             kwargs.update({"stop":stoptoken})
-            
+
         if tools is not None:
             if type(tools) != list:
                 return Exception("Wrong data type for tools. Should be a list")
@@ -143,7 +140,7 @@ class Client:
                 openai.api_key = self.openai_key
         except:
             return  {"status":0, "resp":"Issue with OpenAI key"}
-    
+
         self.optimizer.openai_key = openai.api_key
         agent.set_api_key(openai.api_key,"OPENAI_API_KEY")
 
@@ -158,4 +155,4 @@ class Client:
 
     def load_finetune(self, model_filename=None):
         self.teacher.load_finetune(model_filename)
-       
+

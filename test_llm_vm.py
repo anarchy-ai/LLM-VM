@@ -1,7 +1,7 @@
-# import llm_vm.client as l 
+# import llm_vm.client as l
 import os, requests, json
 
-openai_key = os.getenv('OPENAI_API_KEY')
+openai_key = os.getenv('LLM_VM_OPENAI_API_KEY')
 
 url = "http://localhost:3002/v1/complete"
 json_payload = {"prompt": "what is the economic situation in canada?",
@@ -10,6 +10,6 @@ json_payload = {"prompt": "what is the economic situation in canada?",
                 "openai_key": openai_key,
                 # "finetune": True,
                 }
-                
+
 response = requests.post(url, data=json.dumps(json_payload))
 print(response.text)

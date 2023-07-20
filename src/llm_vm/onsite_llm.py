@@ -5,17 +5,17 @@ import math
 from transformers import (
     AutoModelForMaskedLM,
     AutoModelForSeq2SeqLM,
-    AutoTokenizer, 
+    AutoTokenizer,
     BertTokenizer,
     OPTForCausalLM,
     BloomForCausalLM,
-    LlamaTokenizer, 
-    LlamaForCausalLM, 
-    GPTNeoForCausalLM, 
-    GPTNeoXForCausalLM, 
-    GPT2Tokenizer, 
+    LlamaTokenizer,
+    LlamaForCausalLM,
+    GPTNeoForCausalLM,
+    GPTNeoXForCausalLM,
+    GPT2Tokenizer,
     DataCollatorForLanguageModeling,
-    TrainingArguments, 
+    TrainingArguments,
     Trainer)
 import time
 from datetime import datetime
@@ -30,7 +30,7 @@ if os.name == "nt":
     homepath = os.path.join('C:\\','Users',os.getlogin())
 else:
     homepath = os.environ.get("HOME")
-    
+
 model_path_default = os.path.join( homepath , ".llm_vm", "models")
 os.makedirs(model_path_default, exist_ok = True)
 
@@ -41,25 +41,26 @@ def create_jsonl_file(data_list):
     out.seek(0)
     return out
 
+
 class FinetuningDataset(torch.utils.data.Dataset):
     def __init__(self,iterable_dataset,length):
-        self.dataset = list(iterable_dataset)   
+        self.dataset = list(iterable_dataset)
         self.length = length
     def __len__(self):
         return self.length
     def __getitem__(self, idx):
         return self.dataset[idx]
-    
+
 class Base_Onsite_LLM(ABC):
     def __init__(self,model_uri=None,tokenizer_kw_args={},model_kw_args={}):
         if model_uri != None :
-            self.model_uri= model_uri 
+            self.model_uri= model_uri
         if model_uri is None and self.model_uri is None:
             raise ValueError('A very specific bad thing happened.')
-        self.model_name : str = self.model_uri.split('/')[-1] # our default for deriving model name 
+        self.model_name : str = self.model_uri.split('/')[-1] # our default for deriving model name
         self.model=self.model_loader(**model_kw_args)
         self.tokenizer=self.tokenizer_loader(**tokenizer_kw_args)
-    
+
     @property
     @abstractmethod
     def model_uri(self):
@@ -81,8 +82,8 @@ class Base_Onsite_LLM(ABC):
 
     def load_finetune(self, model_filename):
         self.model.load_state_dict(torch.load(os.path.join(model_path_default,"finetuned_models", self.model_name, model_filename)))
-       
-        
+
+
     def generate(self,prompt,max_length=100,**kwargs): # both tokenizer and model take kwargs :(
         """
         This function uses the class's llm and tokenizer to generate a response given a user's prompt
@@ -94,7 +95,7 @@ class Base_Onsite_LLM(ABC):
 
         Returns:
             str: LLM Generated Response
-        
+
         Example:
            >>> Small_Local_OPT.generate("How long does it take for an apple to grow?)
            I think it takes about a week for the apple to grow.
@@ -102,9 +103,9 @@ class Base_Onsite_LLM(ABC):
         inputs=self.tokenizer(prompt,return_tensors="pt")
         generate_ids=self.model.generate(inputs.input_ids,max_length=max_length)
         resp= self.tokenizer.batch_decode(generate_ids,skip_special_tokens=True,clean_up_tokenization_spaces=False)[0]
-        # need to drop the len(prompt) prefix with these sequences generally 
-        # because they include the prompt. 
-        return resp[len(prompt):] 
+        # need to drop the len(prompt) prefix with these sequences generally
+        # because they include the prompt.
+        return resp[len(prompt):]
 
     def finetune(self,data, optimizer, c_id):
         def asynctune():
@@ -149,11 +150,11 @@ class Base_Onsite_LLM(ABC):
             new_model = os.path.join(model_path_default,"finetuned_models",self.model_name, timestamp + '_' + self.model_name + ".pt" )
             open(new_model,"a")
             torch.save(self.model.state_dict(), new_model) # the model in memory is different now
-            self.model_name = self.model_name + "_ft_"+  timestamp 
+            self.model_name = self.model_name + "_ft_"+  timestamp
             optimizer.storage.set_model(c_id, new_model)
             return math.exp(eval_results['eval_loss']) #perplexity is the metric we use for finetuning measurement
         return asynctune
-    
+
 
     def finetune_immediately(self):
         finetune()()
@@ -162,7 +163,7 @@ class Base_Onsite_LLM(ABC):
 this factorization isn't necessarily the greatest, nor should it be viewed
 as likely being more general, aside from covering hugging face transformers
 """
-    
+
 class Small_Local_Pythia(Base_Onsite_LLM):
     """
     This is a class for ElutherAI's Pythia-70m LLM
@@ -178,17 +179,17 @@ class Small_Local_Pythia(Base_Onsite_LLM):
         generate: Generates a response from a given prompt with the loaded LLM and tokenizer
     """
     # def __init__(self,**kwargs):
-    #     # self.model_uri = 
-    #     super().__init__(kwargs) ## this line is required 
-    model_uri = "EleutherAI/pythia-70m-deduped" 
+    #     # self.model_uri =
+    #     super().__init__(kwargs) ## this line is required
+    model_uri = "EleutherAI/pythia-70m-deduped"
     def model_loader(self):
         return GPTNeoXForCausalLM.from_pretrained(self.model_uri)
     def tokenizer_loader(self):
         return AutoTokenizer.from_pretrained(self.model_uri)
 
-  
+
 class Small_Local_OPT(Base_Onsite_LLM):
-    
+
     """
     This is a class for Facebook's OPT-350m LLM
 
@@ -201,13 +202,13 @@ class Small_Local_OPT(Base_Onsite_LLM):
         model_loader: Loads the LLM into memory
         tokenizer_loader: Loads the tokenizer into memory
         generate: Generates a response from a given prompt with the loaded LLM and tokenizer
-    """ 
+    """
     model_uri="facebook/opt-350m"
     def model_loader(self):
         return OPTForCausalLM.from_pretrained(self.model_uri)
     def tokenizer_loader(self):
         return AutoTokenizer.from_pretrained(self.model_uri)
- 
+
 class Small_Local_Bloom(Base_Onsite_LLM):
 
     """
@@ -229,7 +230,7 @@ class Small_Local_Bloom(Base_Onsite_LLM):
         return BloomForCausalLM.from_pretrained(self.model_uri)
     def tokenizer_loader(self):
         return AutoTokenizer.from_pretrained(self.model_uri)
- 
+
 class Small_Local_Neo(Base_Onsite_LLM):
 
     """
@@ -250,7 +251,7 @@ class Small_Local_Neo(Base_Onsite_LLM):
         return GPTNeoForCausalLM.from_pretrained(self.model_uri)
     def tokenizer_loader(self):
         return GPT2Tokenizer.from_pretrained(self.model_uri)
-    
+
 class Small_Local_LLama(Base_Onsite_LLM):
 
     """
@@ -294,12 +295,12 @@ class Small_Local_Flan_T5(Base_Onsite_LLM):
         return AutoModelForSeq2SeqLM.from_pretrained(self.model_uri)
     def tokenizer_loader(self):
         return AutoTokenizer.from_pretrained(self.model_uri)
-   
+
 class Small_Local_BERT(Base_Onsite_LLM):
 
     """
     This is a class for BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding
-    The base model needs finetuning in almost all cases.  
+    The base model needs finetuning in almost all cases.
 
     Attributes:
         model_uri (str): Hugging Face Endpoint for LLM
@@ -312,12 +313,12 @@ class Small_Local_BERT(Base_Onsite_LLM):
         generate: Generates a response from a given prompt with the loaded LLM and tokenizer
     """
 
-    model_uri = "bert-base-cased" 
+    model_uri = "bert-base-cased"
     def model_loader(self):
         return AutoModelForMaskedLM.from_pretrained(self.model_uri)
     def tokenizer_loader(self):
         return BertTokenizer.from_pretrained(self.model_uri)
-    
+
 class GPT3:
 
     """
@@ -326,7 +327,7 @@ class GPT3:
     Methods:
         generate: Generates a response from a given prompt with OpenAI's completion endpoint
     """
-    
+
     def generate(self,prompt, max_length=100,**kwargs): # both tokenizer and model take kwargs :(
         """
         This function uses openAI's API to generate a response from the prompt
@@ -338,7 +339,7 @@ class GPT3:
 
         Returns:
             str: LLM Generated Response
-        
+
         Example:
             >>> Small_Local_OPT.generate("How long does it take for an apple to grow?)
             It typically takes about 100-200 days...
@@ -346,8 +347,8 @@ class GPT3:
 
         ans = openai.Completion.create(prompt= prompt, model="text-davinci-003", **kwargs)
         return ans['choices'][0]['text']
-    
-    
+
+
     def finetune(self, dataset, optimizer, c_id):
         old_model = optimizer.storage.get_model(c_id)
         training_file = create_jsonl_file(dataset)
@@ -382,7 +383,7 @@ class Chat_GPT:
     Methods:
         generate: Generates a response from a given prompt through OpenAI's endpoint
     """
-    
+
     def generate(self,prompt, max_length=100,**kwargs): # both tokenizer and model take kwargs :(
         """
         This function uses openAI's API to generate a response from the prompt
@@ -394,7 +395,7 @@ class Chat_GPT:
 
         Returns:
             str: LLM Generated Response
-        
+
         Example:
             >>> Small_Local_OPT.generate("How long does it take for an apple to grow?)
             It typically takes about 100-200 days...

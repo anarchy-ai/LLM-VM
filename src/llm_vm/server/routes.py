@@ -4,11 +4,11 @@ import os
 import openai
 from llm_vm.agents.REBEL import agent
 from llm_vm.client import Client
-from llm_vm.config import args
+from llm_vm.config import settings
 # load optimizer for endpoint use
 # optimizer = LocalOptimizer(MIN_TRAIN_EXS=2,openai_key=None)
 
-client = Client( big_model=args.big_model, small_model=args.small_model)
+client = Client( big_model=settings.big_model, small_model=settings.small_model)
 
 print('optimizer loaded')
 
@@ -18,7 +18,7 @@ bp = Blueprint('bp',__name__)
 def home():
     return '''home'''
 
-@bp.route('/v1/complete', methods=['POST']) 
+@bp.route('/v1/complete', methods=['POST'])
 def optimizing_complete():
     rebel_agent = agent.Agent("", [], verbose=1)
     data = json.loads(request.data)
@@ -30,7 +30,7 @@ def optimizing_complete():
     kwargs = {}
     if "openai_key" not in data.keys():
         return {"status":0, "resp":"No OpenAI key provided"}
-        
+
     if "temperature" in data.keys():
         if type(data["temperature"]) != float and type(data["temperature"]) != int:
             return {"status":0, "resp":"Wrong Data Type for temperature"}
@@ -38,7 +38,7 @@ def optimizing_complete():
             kwargs.update({"temperature":data["temperature"]})
 
     if "stoptoken" in data.keys():
-       
+
         if type(data["stoptoken"]) != str and type(data["stoptoken"]) != list:
             # stop can either be a string or array of strings
             return {"status":0, "resp":"Wrong Data Type for stop"}
@@ -51,20 +51,20 @@ def optimizing_complete():
                     return {"status":0, "resp":"Wrong Data Type for stop"}
             kwargs.update({"stop": data["stoptoken"]})
         else:
-            kwargs.update({"stop":data["stoptoken"]})                 
-        
+            kwargs.update({"stop":data["stoptoken"]})
+
     if "data_synthesis" in data.keys():
         if type(data["data_synthesis"])==bool:
             data_synthesis = data["data_synthesis"]
         else:
             return {"status":0, "resp":"Wrong Data Type for data_synthesis"}
-    
+
     if "finetune" in data.keys():
         if type(data["finetune"])==bool:
             finetune = data["finetune"]
         else:
             return {"status":0, "resp":"Wrong Data Type for finetune"}
-    
+
     if "tools" in data.keys():
         if type(data["tools"]) != list:
             return {"status":0, "resp":"Wrong data type for tools list"}
@@ -90,7 +90,7 @@ def optimizing_complete():
         openai.api_key = data["openai_key"]
     except:
         return  {"status":0, "resp":"Issue with OpenAI key"}
-    
+
     # optimizer.openai_key = openai.api_key
     agent.set_api_key(openai.api_key,"OPENAI_API_KEY")
     try:
@@ -100,6 +100,6 @@ def optimizing_complete():
             completion = rebel_agent.run(static_context+dynamic_prompt,[])[0]
     except Exception as e:
         return {"status":0, "resp": str(e)}
-    
+
     # return {"completion":completion, "status": 200}
     return completion
