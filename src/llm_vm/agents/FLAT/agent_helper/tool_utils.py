@@ -1,5 +1,5 @@
 import json
-import os 
+import os
 import sys
 
 # # Get the current file's directory to grab the python files with common functionality in the utils/ folder
@@ -43,7 +43,7 @@ def make_tool_desc(tool: SingleTool):
 def generate_convo_history(memory: TupleList = [], facts: TupleList = []) -> str:
     if len(memory) + len(facts) == 0:
         return ""
-    
+
     return (
         "\n".join([make_interaction(p, a, '', L_QUESTION, L_ANSWER, L_ANSWER_DATA, INTERACTION = L_INT_HUMAN) for p, a in memory]) + \
         "\n".join([make_interaction(p, a, '', L_QUESTION, L_ANSWER, L_ANSWER_DATA, INTERACTION = L_INT_AI) for p, a in facts])
@@ -68,17 +68,17 @@ def get_training_tool_subset (
        or tool_id_always_returned == DefaultTools.I_DONT_KNOW.value \
        or tool_id_always_returned == DefaultTools.ANSWER_FROM_MEMORY.value:
         return sample(list_of_tools, max_num_elements - 1)
-    
+
     specific_tool = next(tool for tool in list_of_tools if tool["id"] == tool_id_always_returned)
     subset_of_tools = sample(list_of_tools, max_num_elements - 1)
     # make sure it doesn't have our specific_tool inside
     subset_of_tools = [tool for tool in subset_of_tools if tool["id"] != tool_id_always_returned] + [specific_tool]
-    
+
     # VERY IMPORTANT - otherwise the model thinks that the last answer is always the correct one.
     shuffle(subset_of_tools)
-    
+
     return subset_of_tools
-    
+
 
 def splitter_prompt(elements: List[QuestionSplitModelData]) -> Tuple[str, str]:
 
@@ -100,7 +100,7 @@ def splitter_prompt(elements: List[QuestionSplitModelData]) -> Tuple[str, str]:
 }
 <{L_QUESTION}>{element["question"]}</{L_QUESTION}>
 <{L_ANSWER}>'''
-    
+
         if "answer" in element and element["answer"]:
             response += f'''{SUBQ_SPLITTER.join(element["answer"])}{stopper}\n'''
             last_stop = None
@@ -116,10 +116,10 @@ def toolpicker_prompt(elements: List[ToolpickerInputModelData], tools: ToolList)
     shuffle(shuffled_tools)
     tools_html = "\n".join([__create_tool_tag(_tool) for _tool in shuffled_tools])
     last_stop = None
-    
+
     prompt: str = f'''<{L_BOT_INSTRUCTIONS}><{L_DESCRIPTION}>
 We have a list of tools in <{L_TOOL_LIST}/>, and a question <{L_QUESTION}/> that we want to answer.
-Which of the <{L_TOOL}/> in <{L_TOOL_LIST}/> can be used to best answer <{L_QUESTION}/>? 
+Which of the <{L_TOOL}/> in <{L_TOOL_LIST}/> can be used to best answer <{L_QUESTION}/>?
 Answer only with the 'id' of the most relevant <{L_TOOL}/> (i.e.: {", ".join([str(t['id']) for t in shuffled_tools])}).
 Answer {DefaultTools.ANSWER_FROM_MEMORY.value} if the answer is in <{L_CONVERSATION}/>.
 Answer {DefaultTools.I_DONT_KNOW.value} if no tool can be used to answer <{L_QUESTION}/>.
@@ -132,13 +132,13 @@ Answer {DefaultTools.I_DONT_KNOW.value} if no tool can be used to answer <{L_QUE
 '''
 
     for element in elements:
-        
+
         prompt += f'''<{L_INTERACTION}>'''
-        
+
         prompt += f'''<{L_CONVERSATION}>
             {"".join([make_interaction(mem_q, mem_a) for mem_q, mem_a in (element["mem"])
         ])}</{L_CONVERSATION}>''' if "mem" in element and isinstance(element["mem"], list) and len(element["mem"]) else ""
-        
+
         prompt += f'''{
       f'<{L_THOUGHT}>{element["thought"]}</{L_THOUGHT}>' if "thought" in element and element["thought"] else ""
 }
@@ -146,7 +146,7 @@ Answer {DefaultTools.I_DONT_KNOW.value} if no tool can be used to answer <{L_QUE
 <{L_ANSWER}>'''
 
         stopper = f'''</{L_ANSWER}>\n</{L_INTERACTION}>'''
-        
+
         if "answer" in element:
             prompt += f'''{element["answer"]}{stopper}\n'''
             last_stop = None
@@ -160,14 +160,14 @@ def create_memory_prompt(elements: List[AnswerInMemoryModelData]) -> Tuple[str, 
     do_you_know_the_answer = f"<{L_BOT_INSTRUCTIONS}>Is the answer to <{L_QUESTION}/> found in the memory or in your knowledge base already? Answer with a yes or no.</{L_BOT_INSTRUCTIONS}>"
 
     stop = f"</{L_ANSWER}></{L_INTERACTION}>"
-    
+
     last_stop = None
-    
+
     prompt: str = f'''{do_you_know_the_answer}\n'''
-    
+
     for element in elements:
         conversation_history = generate_convo_history(
-            element["mem"] if "mem" in element and element["mem"] else [], 
+            element["mem"] if "mem" in element and element["mem"] else [],
             element["facts"] if "facts" in element and element["facts"] else []
         )
         prompt += f'''<{L_INTERACTION}>\n'''
@@ -177,7 +177,7 @@ def create_memory_prompt(elements: List[AnswerInMemoryModelData]) -> Tuple[str, 
     {conversation_history}
 </{L_CONVERSATION}>\n'''
         prompt += f'''<{L_QUESTION}>{element["question"]}</{L_QUESTION}>\n<{L_ANSWER}>'''
-        
+
         if "answer" in element and isinstance(element["answer"], bool):
             prompt += f'''{"yes" if element["answer"] else "no"}{stop}'''
             last_stop = None
@@ -189,7 +189,7 @@ def create_memory_prompt(elements: List[AnswerInMemoryModelData]) -> Tuple[str, 
 
 
 
-    
+
 def make_tool_input_case(
     q_facts: TupleList,
     q_question: str,
@@ -203,9 +203,9 @@ def make_tool_input_case(
 We have the following {answer_label}: <{answer_label}>{json.dumps(tool_params)}</{answer_label}>. Each key describes what its value is.\n
 The {answer_label} is used where: <{L_DESCRIPTION}>{tool_descr}</{L_DESCRIPTION}>\n
 We need a {answer_label} object with the same keys as <{answer_label}/> to answer <{L_QUESTION}/>{f""" (we can use the <{L_CONVERSATION}/> for contextual info as well)""" if len(q_facts) else ""}. Must be a valid {answer_label}!'''
-    
+
     stopper: str = f"</{L_ANSWER}>\n</{wrapper_tag}>"
-    
+
     mem = generate_convo_history(facts=q_facts)
     return f"\n<{wrapper_tag}>\n" \
         + f"  <{L_BOT_INSTRUCTIONS}>{system_instructions}</{L_BOT_INSTRUCTIONS}>" \

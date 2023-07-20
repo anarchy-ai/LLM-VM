@@ -1,5 +1,5 @@
 import json
-import sys 
+import sys
 from sentence_transformers import SentenceTransformer, util
 import openai
 
@@ -34,10 +34,10 @@ class DataSynthesis:
             for idx,p in enumerate(prompt):
                example_str = '{"prompt": "' + p +'"  , "response": "' + str(response[idx]) +'" }'+example_delim+'\n'
                json_str += example_str
-            final_prompt = json_str 
+            final_prompt = json_str
         final_prompt = "Generate 50 more jsons like the ones below. Use "+example_delim+" as a delimeter between JSONs.\n" + final_prompt
         print(final_prompt)
-        data = None       
+        data = None
         openai.api_key=openai_key
         response=openai.Completion.create(prompt=final_prompt,model="text-davinci-003",max_tokens=1000,temperature=1).choices[0].text
         datapoints = []
@@ -79,21 +79,21 @@ class DataSynthesis:
                 f"Found {len(split_response)} valid examples. Removed {num_responses - len(split_response)} duplicate examples.",
                 file=sys.stderr,
             )
-        datum_failure = 0 
+        datum_failure = 0
         bad_key_failure =0
         resp_filter = {}
-        
+
         for d in split_response:
             print(d)
-            
-            try: 
+
+            try:
                 the_data = json.loads(d.replace("\n",""))
                 the_tuple = (the_data["prompt"],the_data["response"])
                 if the_tuple in resp_filter:
                     continue   # dont save a response if its already happened
                 resp_filter[the_tuple]=True  # for now we're treating the (Q,A) pair as a single value
                 datapoints.append(the_tuple)
-            except json.decoder.JSONDecodeError as err: 
+            except json.decoder.JSONDecodeError as err:
                 print(F'data_synthesis response parsing failed with: { err } \nExpected a valid JSON Object but received {type(d)} of length {len(d)}',file=sys.stderr)
                 datum_failure+=1
             except LookupError as err : # i have no evidence that this will happen

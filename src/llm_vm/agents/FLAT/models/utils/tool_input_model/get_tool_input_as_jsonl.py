@@ -7,7 +7,7 @@ from llm_vm.agents.FLAT.models.utils.tool_input_model.tool_input_model_data impo
 
 def __get_tool_input_jsonl(data: List[ToolInputModelData]) -> List[PromptModelEntry]:
     jsonl_entries: List[PromptModelEntry] = []
-    
+
     for entry in data:
         prompt, stopper = make_tool_input_case(
             entry["mem"],

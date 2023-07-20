@@ -1,6 +1,6 @@
 """
 This file contains a list of common functions across
-the different agents that format and print output to the CLI. 
+the different agents that format and print output to the CLI.
 """
 
 def print_big(data, label = ""):
@@ -15,6 +15,6 @@ def print_big(data, label = ""):
             print(do_format(str(label).upper()), data, flush=True)
         else:
             print(do_format(str(data)), flush=True)
-            
+
     except:
         print(label, flush=True)

@@ -1,9 +1,9 @@
 """
 This file contains common tools (JSON API request objects) that are used
-for all the agents to retrieve information for questions across various topics. 
+for all the agents to retrieve information for questions across various topics.
 """
 
-import os 
+import os
 import sys
 
 # Get the current file's directory to grab the python files with common functionality in the utils/ folder

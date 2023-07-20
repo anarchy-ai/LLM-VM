@@ -1,9 +1,9 @@
 import openai
 import re
 
-    
+
 def tool_picker(tools_list, question, starting_tool_num):
-    
+
     tools=""
     prompt= '''
 {tools}
@@ -28,7 +28,7 @@ Which tool (number only), if any, would you use to answer the following question
     )
 
     return (calcCost(prompt),str(int(re.sub("[^0-9]", "",ans['choices'][0]['text'].strip()))+starting_tool_num))
-   
+
 
 def calcCost(p):
             return (len(p) / 2700.0) * 0.02
@@ -40,7 +40,7 @@ def question_split(question,tools_list,memory):
     for i in range(len(tools_list)-starting_tool_num):
         tools+="tool "+str(i+starting_tool_num)+": "+str(tools_list[starting_tool_num+i]["description"])+"\n"
         count+=1
-    tools+="tool "+str(count)+": "+str("Use this tool when the question can be answered without using any tool or if the question is a greeting or a casual conversation.")+"\n"  
+    tools+="tool "+str(count)+": "+str("Use this tool when the question can be answered without using any tool or if the question is a greeting or a casual conversation.")+"\n"
 
     prompt='''
 Tools we have access to =
@@ -79,10 +79,10 @@ Q:"If I am in Miami how far am I from Atlanta?"
 Look at the tools we have access to. Split Q into subquestions to answer Q that can each be solved with one use of one tool. Make as few subquestions as possible. Split each subquestion with a comma and have no extra information other than the subquestions.
 
 
-Tools we have access to = 
+Tools we have access to =
 {tools}
 Q= "{question}"
-Look at the tools we have access to. Split Q into subquestions to answer Q that can each be solved with one use of one tool. Make as few subquestions as possible. Split each subquestion with a comma and have no extra information other than the subquestions. 
+Look at the tools we have access to. Split Q into subquestions to answer Q that can each be solved with one use of one tool. Make as few subquestions as possible. Split each subquestion with a comma and have no extra information other than the subquestions.
     '''
     prompt=prompt.format(**{"question":question,"tools":tools,"memory":memory})
     ans = openai.Completion.create(
@@ -95,8 +95,8 @@ Look at the tools we have access to. Split Q into subquestions to answer Q that 
     ans=ans['choices'][0]['text'].replace("\n","").split(",")
     return (calcCost(prompt),ans)
 
-    
-def memory_check(memory,question):    
+
+def memory_check(memory,question):
 
     prompt='''
 Q: "What's up?"
@@ -128,7 +128,7 @@ Is the answer to Q found in the memory or in your knowledge base already? Answer
             )
 
     ans=ans['choices'][0]['text']
- 
+
     if "yes" in ans.lower():
         return (calcCost(prompt),True)
     else:

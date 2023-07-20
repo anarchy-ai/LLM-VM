@@ -37,7 +37,7 @@ def __get_tool_input(
 
     if verbose > 3:
         print_big(gpt_prompt, f"GPT PROMPT [tool={tool['id']}]")
-        
+
     gpt_suggested_input, price = call_llm({
         "llm": LLMCallType.OPENAI_COMPLETION,
         "model": get_newest_decision_model(DecisionStep.INPUT),
