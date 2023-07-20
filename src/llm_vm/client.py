@@ -157,8 +157,5 @@ class Client:
         return {"completion":completion, "status": 200}
 
     def load_finetune(self, model_filename=None):
-        print('Parent Model response:')
-        print(self.CALL_BIG('run this test'))
         self.teacher.load_finetune(model_filename)
-        print('Client model response:')
-        print(self.complete(prompt = 'run this test', context = ''))
+       
