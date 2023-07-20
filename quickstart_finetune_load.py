@@ -6,7 +6,7 @@ import os
 client = Client(big_model='pythia')
 
 # specify the file name of the finetuned model to load
-model_name = '2023-07-19T22:42:35_pythia-70m-deduped.pt'
+model_name = '<filename_of_your_model>.pt'
 client.load_finetune(model_name)
 
 # Put in your prompt and go!
