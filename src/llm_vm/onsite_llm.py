@@ -79,7 +79,17 @@ class Base_Onsite_LLM(ABC):
     def tokenizer_loader(self):
         pass
 
-    
+    def load_finetune(self, model_filename):
+        self.model.load_state_dict(torch.load(os.path.join(model_path_default,"finetuned_models", self.model_name, model_filename)))
+        print('Testing finetune...')
+        inputs = self.tokenizer('run this test', return_tensors='pt')
+        generate_ids = self.model.generate(inputs.input_ids, max_length=100)
+        response = self.tokenizer.batch_decode(generate_ids,skip_special_tokens=True, clean_up_tokenization_spaces=False)
+        print('Fine tune response:')
+        print(response)
+        print('actual model response inside onsite_llm:')
+        print(self.generate('run this test'))
+        
     def generate(self,prompt,max_length=100,**kwargs): # both tokenizer and model take kwargs :(
         """
         This function uses the class's llm and tokenizer to generate a response given a user's prompt
