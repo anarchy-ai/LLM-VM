@@ -3,8 +3,10 @@ from abc import ABC,abstractmethod
 import openai
 import math
 from transformers import (
+    AutoModelForMaskedLM,
     AutoModelForSeq2SeqLM,
     AutoTokenizer, 
+    BertTokenizer,
     OPTForCausalLM,
     BloomForCausalLM,
     LlamaTokenizer, 
@@ -182,7 +184,7 @@ class Small_Local_Pythia(Base_Onsite_LLM):
         return AutoTokenizer.from_pretrained(self.model_uri)
 
   
-class Small_Local_OPT:
+class Small_Local_OPT(Base_Onsite_LLM):
     
     """
     This is a class for Facebook's OPT-350m LLM
@@ -196,85 +198,14 @@ class Small_Local_OPT:
         model_loader: Loads the LLM into memory
         tokenizer_loader: Loads the tokenizer into memory
         generate: Generates a response from a given prompt with the loaded LLM and tokenizer
-    """
-    
-    def __init__(self,model_uri="facebook/opt-350m"): # tokenizer_kw_args=None,model_kw_args=None
-        self.model_uri = model_uri
-        self.tokenizer=self.tokenizer_loader()
-        self.model= self.model_loader()
-
+    """ 
+    model_uri="facebook/opt-350m"
     def model_loader(self):
         return OPTForCausalLM.from_pretrained(self.model_uri)
     def tokenizer_loader(self):
         return AutoTokenizer.from_pretrained(self.model_uri)
-    def generate(self,prompt,max_length=100,**kwargs): # both tokenizer and model take kwargs :(
-        """
-        This function uses the class's llm and tokenizer to generate a response given a user's prompt
-
-        Parameters:
-            prompt (str): Prompt to send to LLM
-            max_length (int): Optional parameter limiting response length
-
-
-        Returns:
-            str: LLM Generated Response
-        
-        Example:
-           >>> Small_Local_OPT.generate("How long does it take for an apple to grow?)
-           I think it takes about a week for the apple to grow.
-        """
-        inputs=self.tokenizer(prompt,return_tensors="pt")
-        generate_ids=self.model.generate(inputs.input_ids,max_length=max_length)
-        resp= self.tokenizer.batch_decode(generate_ids,skip_special_tokens=True,clean_up_tokenization_spaces=False)[0]
-        # need to drop the len(prompt) prefix with these sequences generally 
-        return resp
-    def finetune(self,data, optimizer, c_id):
-        def asynctune():
-            old_model = optimizer.storage.get_model(c_id)
-            if old_model is not None:
-                self.model.load_state_dict(torch.load(old_model))
-            untokenized_final_dataset = []
-            for prompt,response in data:
-                untokenized_final_dataset.append(prompt + response)
-            tokenized_final_dataset = map(self.tokenizer,untokenized_final_dataset)
-            self.tokenizer.pad_token = self.tokenizer.eos_token
-            data_collator = DataCollatorForLanguageModeling(tokenizer=self.tokenizer, mlm=False)
-            optimizer.storage.set_training_in_progress(c_id, True)
-            training_args = TrainingArguments(
-                output_dir=os.join(model_path_default,"OPT_finetuned"),
-                evaluation_strategy="epoch",
-                learning_rate=2e-5,
-                per_device_train_batch_size = 1,
-                per_device_eval_batch_size = 1,
-                num_train_epochs=1,
-                weight_decay=0.01,
-            )
-            test_set = FinetuningDataset(tokenized_final_dataset,len(untokenized_final_dataset))
-
-            trainer = Trainer(
-                model=self.model,
-                args=training_args,
-                train_dataset=test_set,
-                eval_dataset=test_set,
-                data_collator=data_collator,
-            )
-
-            if tokenized_final_dataset:
-                trainer.train()
-                eval_results = trainer.evaluate()
-            optimizer.storage.set_training_in_progress(c_id, False)
-            new_model = ""
-            if old_model is not None:
-                new_model = os.join("finetuned_models","opt_"+str(int(old_model.split("_")[2].split(".")[0])+1)+".pt")
-            else:
-                new_model = os.join("finetuned_models","opt_0.pt")
-            open(new_model,"a")
-            torch.save(self.model.state_dict(), new_model)
-            optimizer.storage.set_model(c_id, new_model)
-            return math.exp(eval_results['eval_loss']) #perplexity is the metric we use for finetuning measurement
-        return asynctune
-
-class Small_Local_Bloom:
+ 
+class Small_Local_Bloom(Base_Onsite_LLM):
 
     """
     This is a class for BigScience's bloom-560 LLM
@@ -289,85 +220,14 @@ class Small_Local_Bloom:
         tokenizer_loader: Loads the tokenizer into memory
         generate: Generates a response from a given prompt with the loaded LLM and tokenizer
     """
-    def __init__(self,model_uri="bigscience/bloom-560m"): # tokenizer_kw_args=None,model_kw_args=None
-        self.model_uri = model_uri
-        self.tokenizer=self.tokenizer_loader()
-        self.model= self.model_loader()
+    model_uri="bigscience/bloom-560m"
 
     def model_loader(self):
         return BloomForCausalLM.from_pretrained(self.model_uri)
     def tokenizer_loader(self):
         return AutoTokenizer.from_pretrained(self.model_uri)
-    def generate(self,prompt,max_length=100,**kwargs): # both tokenizer and model take kwargs :(
-        """
-        This function uses the class's llm and tokenizer to generate a response given a user's prompt
-
-        Parameters:
-            prompt (str): Prompt to send to LLM
-            max_length (int): Optional parameter limiting response length
-
-
-        Returns:
-            str: LLM Generated Response
-        
-        Example:
-           >>> Small_Local_OPT.generate("How long does it take for an apple to grow?)
-            How long does it take for a tomato...
-        """
-        inputs=self.tokenizer(prompt,return_tensors="pt")
-        generate_ids=self.model.generate(inputs.input_ids,max_length=max_length)
-        resp= self.tokenizer.batch_decode(generate_ids,skip_special_tokens=True,clean_up_tokenization_spaces=False)[0]
-        # need to drop the len(prompt) prefix with these sequences generally 
-        return resp
-    
-    def finetune(self,data, optimizer, c_id):
-        def asynctune():
-            old_model = optimizer.storage.get_model(c_id)
-            if old_model is not None:
-                self.model.load_state_dict(torch.load(old_model))
-            untokenized_final_dataset = []
-            for prompt,response in data:
-                untokenized_final_dataset.append(prompt + response)
-            tokenized_final_dataset = map(self.tokenizer,untokenized_final_dataset)
-            self.tokenizer.pad_token = self.tokenizer.eos_token
-            data_collator = DataCollatorForLanguageModeling(tokenizer=self.tokenizer, mlm=False)
-            optimizer.storage.set_training_in_progress(c_id, True)
-            training_args = TrainingArguments(
-                output_dir=os.join(model_path_default,"Bloom_finetuned"),
-                evaluation_strategy="epoch",
-                learning_rate=2e-5,
-                per_device_train_batch_size = 1,
-                per_device_eval_batch_size = 1,
-                num_train_epochs=1,
-                weight_decay=0.01,
-            )
-            test_set = FinetuningDataset(tokenized_final_dataset,len(untokenized_final_dataset))
-
-            trainer = Trainer(
-                model=self.model,
-                args=training_args,
-                train_dataset=test_set,
-                eval_dataset=test_set,
-                data_collator=data_collator,
-            )
-
-            if tokenized_final_dataset:
-                trainer.train()
-                eval_results = trainer.evaluate()
-            optimizer.storage.set_training_in_progress(c_id, False)
-            new_model = ""
-            if old_model is not None:
-                new_model = os.path.join(model_path_default,"finetuned_models","bloom_"+str(int(old_model.split("_")[2].split(".")[0])+1)+".pt")
-            else:
-                new_model = os.path.join(model_path_default,"finetuned_models","bloom_0.pt")
-            open(new_model,"a")
-            torch.save(self.model.state_dict(), new_model)
-            optimizer.storage.set_model(c_id, new_model)
-            return math.exp(eval_results['eval_loss']) #perplexity is the metric we use for finetuning measurement
-        return asynctune
  
-
-class Small_Local_Neo:
+class Small_Local_Neo(Base_Onsite_LLM):
 
     """
 
@@ -381,84 +241,14 @@ class Small_Local_Neo:
         tokenizer_loader: Loads the tokenizer into memory
         generate: Generates a response from a given prompt with the loaded LLM and tokenizer
     """
-    def __init__(self,model_uri="EleutherAI/gpt-neo-1.3B"): # tokenizer_kw_args=None,model_kw_args=None
-        self.model_uri = model_uri
-        self.tokenizer=self.tokenizer_loader()
-        self.model= self.model_loader()
+    model_uri="EleutherAI/gpt-neo-1.3B"
 
     def model_loader(self):
         return GPTNeoForCausalLM.from_pretrained(self.model_uri)
     def tokenizer_loader(self):
         return GPT2Tokenizer.from_pretrained(self.model_uri)
-    def generate(self,prompt,max_length=100,**kwargs): # both tokenizer and model take kwargs :(
-        """
-        This function uses the class's llm and tokenizer to generate a response given a user's prompt
-
-        Parameters:
-            prompt (str): Prompt to send to LLM
-            max_length (int): Optional parameter limiting response length
-
-
-        Returns:
-            str: LLM Generated Response
-        
-        Example:
-           >>> Small_Local_OPT.generate("How long does it take for an apple to grow?)
-           The apple tree is a very slow growing plant...
-        """
-        inputs=self.tokenizer(prompt,return_tensors="pt")
-        generate_ids=self.model.generate(inputs.input_ids,max_length=max_length)
-        resp= self.tokenizer.batch_decode(generate_ids,skip_special_tokens=True,clean_up_tokenization_spaces=False)[0]
-        # need to drop the len(prompt) prefix with these sequences generally 
-        return resp
     
-    def finetune(self,data, optimizer, c_id):
-        def asynctune():
-            old_model = optimizer.storage.get_model(c_id)
-            if old_model is not None:
-                self.model.load_state_dict(torch.load(old_model))
-            untokenized_final_dataset = []
-            for prompt,response in data:
-                untokenized_final_dataset.append(prompt + response)
-            tokenized_final_dataset = map(self.tokenizer,untokenized_final_dataset)
-            self.tokenizer.pad_token = self.tokenizer.eos_token
-            data_collator = DataCollatorForLanguageModeling(tokenizer=self.tokenizer, mlm=False)
-            optimizer.storage.set_training_in_progress(c_id, True)
-            training_args = TrainingArguments(
-                output_dir = os.path.join(model_path_default,"Neo_finetuning_checkpoints"),
-                evaluation_strategy="epoch",
-                learning_rate=2e-5,
-                per_device_train_batch_size = 1,
-                per_device_eval_batch_size = 1,
-                num_train_epochs=1,
-                weight_decay=0.01,
-            )
-            test_set = FinetuningDataset(tokenized_final_dataset,len(untokenized_final_dataset))
-
-            trainer = Trainer(
-                model=self.model,
-                args=training_args,
-                train_dataset=test_set,
-                eval_dataset=test_set,
-                data_collator=data_collator,
-            )
-            
-            if tokenized_final_dataset:
-                trainer.train()
-                eval_results = trainer.evaluate()
-            optimizer.storage.set_training_in_progress(c_id, False)
-            new_model = ""
-            if old_model is not None:
-                new_model = os.join("finetuned_models","neo_"+str(int(old_model.split("_")[2].split(".")[0])+1)+".pt")
-            else:
-                new_model = os.join("finetuned_models","neo_0.pt")
-            open(new_model,"a")
-            torch.save(self.model.state_dict(), new_model)
-            optimizer.storage.set_model(c_id, new_model)
-            return math.exp(eval_results['eval_loss']) #perplexity is the metric we use for finetuning measurement
-        return asynctune
-    
-class Small_Local_LLama:
+class Small_Local_LLama(Base_Onsite_LLM):
 
     """
     This is a class for Openlm-Research's open_llama-3b LLM
@@ -473,85 +263,14 @@ class Small_Local_LLama:
         tokenizer_loader: Loads the tokenizer into memory
         generate: Generates a response from a given prompt with the loaded LLM and tokenizer
     """
-    def __init__(self,model_uri="openlm-research/open_llama_3b_v2"): # tokenizer_kw_args=None,model_kw_args=None
-        self.model_uri = model_uri
-        self.tokenizer=self.tokenizer_loader()
-        self.model= self.model_loader()
+    model_uri="openlm-research/open_llama_3b_v2"
 
     def model_loader(self):
         return LlamaForCausalLM.from_pretrained(self.model_uri)
     def tokenizer_loader(self):
         return LlamaTokenizer.from_pretrained(self.model_uri)
-    def generate(self,prompt,max_length=100,**kwargs): # both tokenizer and model take kwargs :(
-        """
-        This function uses the class's llm and tokenizer to generate a response given a user's prompt
 
-        Parameters:b
-            prompt (str): Prompt to send to LLM
-            max_length (int): Optional parameter limiting response length
-
-
-        Returns:
-            str: LLM Generated Response
-        
-        Example:
-           >>> Small_Local_OPT.generate("How long does it take for an apple to grow?)
-           How long does it take for an apple tree to grow?
-        """
-        inputs=self.tokenizer(prompt,return_tensors="pt")
-        # the example calls for max_new_tokens
-        generate_ids=self.model.generate(inputs.input_ids,max_length=max_length)
-        resp= self.tokenizer.batch_decode(generate_ids,skip_special_tokens=True,clean_up_tokenization_spaces=False)[0]
-        # need to drop the len(prompt) prefix with these sequences generally 
-        return resp
-    
-    def finetune(self,data, optimizer, c_id):
-        def asynctune():
-            old_model = optimizer.storage.get_model(c_id)
-            if old_model is not None:
-                self.model.load_state_dict(torch.load(old_model))
-            untokenized_final_dataset = []
-            for prompt,response in data:
-                untokenized_final_dataset.append(prompt + response)
-            tokenized_final_dataset = map(self.tokenizer,untokenized_final_dataset)
-            self.tokenizer.pad_token = self.tokenizer.eos_token
-            data_collator = DataCollatorForLanguageModeling(tokenizer=self.tokenizer, mlm=False)
-            optimizer.storage.set_training_in_progress(c_id, True)
-            training_args = TrainingArguments(
-                output_dir=os.join(model_path_default,"Llama_finetuned"),
-                evaluation_strategy="epoch",
-                learning_rate=2e-5,
-                per_device_train_batch_size = 1,
-                per_device_eval_batch_size = 1,
-                num_train_epochs=1,
-                weight_decay=0.01,
-            )
-            test_set = FinetuningDataset(tokenized_final_dataset,len(untokenized_final_dataset))
-
-            trainer = Trainer(
-                model=self.model,
-                args=training_args,
-                train_dataset=test_set,
-                eval_dataset=test_set,
-                data_collator=data_collator,
-            )
-            
-            if tokenized_final_dataset:
-                trainer.train()
-                eval_results = trainer.evaluate()
-            optimizer.storage.set_training_in_progress(c_id, False)
-            new_model = ""
-            if old_model is not None:
-                new_model =os.join( "finetuned_models/llama_"+str(int(old_model.split("_")[2].split(".")[0])+1)+".pt")
-            else:
-                new_model = os.join(model_path_default,"finetuned_models/llama_0.pt")
-            open(new_model,"a")
-            torch.save(self.model.state_dict(), new_model)
-            optimizer.storage.set_model(c_id, new_model)
-            return math.exp(eval_results['eval_loss']) #perplexity is the metric we use for finetuning measurement
-        return asynctune
-
-class Small_Local_Flan_T5:
+class Small_Local_Flan_T5(Base_Onsite_LLM):
 
     """
     This is a class for Google's flan-t5 LLM
@@ -566,34 +285,35 @@ class Small_Local_Flan_T5:
         tokenizer_loader: Loads the tokenizer into memory
         generate: Generates a response from a given prompt with the loaded LLM and tokenizer
     """
-    def __init__(self,model_uri="google/flan-t5-small"): # tokenizer_kw_args=None,model_kw_args=None
-        self.model_uri = model_uri
-        self.tokenizer=self.tokenizer_loader()
-        self.model= self.model_loader()
 
+    model_uri="google/flan-t5-small"
     def model_loader(self):
         return AutoModelForSeq2SeqLM.from_pretrained(self.model_uri)
     def tokenizer_loader(self):
         return AutoTokenizer.from_pretrained(self.model_uri)
+   
+class Small_Local_BERT(Base_Onsite_LLM):
 
-    def generate(self,prompt,max_length=100,**kwargs): # both tokenizer and model take kwargs :(
-        """
-        This function uses the class's llm and tokenizer to generate a response given a user's prompt
-        Parameters:
-            prompt (str): Prompt to send to LLM
-            max_length (int): Optional parameter limiting response length
-        Returns:
-            str: LLM Generated Response
-        """
-        inputs=self.tokenizer(prompt,return_tensors="pt")
-        generate_ids=self.model.generate(inputs.input_ids,max_length=max_length)
-        resp= self.tokenizer.batch_decode(generate_ids,skip_special_tokens=True,clean_up_tokenization_spaces=False)[0]
-        # need to drop the len(prompt) prefix with these sequences generally 
-        return resp
-    
-    def finetune(self,data, optimizer, c_id):
-        pass
-        # TODO ADD M    E 
+    """
+    This is a class for BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding
+    The base model needs finetuning in almost all cases.  
+
+    Attributes:
+        model_uri (str): Hugging Face Endpoint for LLM
+        tokenizer (AutoTokenizer): Tokenizer from Transformer's library
+        model (LLM): The large language model
+
+    Methods:
+        model_loader: Loads the LLM into memory
+        tokenizer_loader: Loads the tokenizer into memory
+        generate: Generates a response from a given prompt with the loaded LLM and tokenizer
+    """
+
+    model_uri = "bert-base-cased" 
+    def model_loader(self):
+        return AutoModelForMaskedLM.from_pretrained(self.model_uri)
+    def tokenizer_loader(self):
+        return BertTokenizer.from_pretrained(self.model_uri)
     
 class GPT3:
 
