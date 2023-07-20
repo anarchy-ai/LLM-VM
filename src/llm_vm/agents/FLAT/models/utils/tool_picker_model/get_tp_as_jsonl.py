@@ -11,7 +11,7 @@ def __construct_tool_picker_jsonl(data: List[ToolpickerInputModelData]) -> List[
                 "mem": entry["mem"] if "mem" in entry else None,
                 "question": entry["question"],
                 "thought": entry["thought"] if "thought" in entry else None
-            }], 
+            }],
             entry["tools"]
         )
         jsonl_entries.append({

@@ -23,7 +23,7 @@ def question_split(question_to_split, use_fine_tuned_model = True):
     question_data = question_data[:NUMBER_OF_EXAMPLES]
     use_fine_tuned_model = False
     prompt, prompt_stop = splitter_prompt(
-        question_data + 
+        question_data +
         [question_to_split]
     )
 
@@ -31,7 +31,7 @@ def question_split(question_to_split, use_fine_tuned_model = True):
             custom_model, custom_model_key = get_newest_decision_model(DecisionStep.SPLIT)
     else:
         custom_model, custom_model_key = OpenAIModel.DAVINCI_TEXT.value, None
-        
+
     sub_questions_str, price = call_llm({
         "llm": LLMCallType.OPENAI_COMPLETION,
         "model": (custom_model, custom_model_key),
@@ -55,8 +55,8 @@ def pick_tool(tools_list, question, conversation_history, use_fine_tuned_model =
     NUMBER_OF_EXAMPLES = 6
     tool_data = tool_data[:NUMBER_OF_EXAMPLES]
     use_fine_tuned_model = False
-    
-    
+
+
     prompt, stop = toolpicker_prompt(
         tool_data + [{"question": question, "mem": conversation_history}],
         tools_list,

@@ -6,30 +6,30 @@ class OpenAIModel(Enum):
     CURIE_TEXT = "text-curie-001"
     FAST_DAVINCI = "code-cushman-002"
     DAVINCI = "davinci"
-    DAVINCI_TEXT = "text-davinci-003"    
-  
+    DAVINCI_TEXT = "text-davinci-003"
+
 class LLMCallType(Enum):
     OPENAI_COMPLETION = "openai-completion"
     OPENAI_CHAT = "openai-chat"
     # ... other models
-    
+
 class DecisionStep(Enum):
     SPLIT = "split_questions"
     INPUT = "guess_api_input"
     FROM_MEMORY = "use_memory"
     TOOL_PICKER = "tool_picker"
-    
+
 class DefaultTools(Enum):
     I_DONT_KNOW = -1
     ANSWER_FROM_MEMORY = 0
-    
+
     WOLFRAM = 1
     DIRECTIONS = 2
     WEATHER = 3
-    
+
     ## Always set this to the latest ID. This is an integer, not an enum!
     __LAST_ID__: int = 4
-    
+
 class DefaultTrainingTools(Enum):
     TRAIN_SEND_EMAIL = 4
     TRAIN_CREATE_DOCUMENT = 5
@@ -59,7 +59,7 @@ class SingleTool(TypedDict):
     id: int
     args: ToolTypeArgs
     ai_response_prompt: Union[str, None]
-    
+
 ToolList = List[SingleTool]
 # ToolList = NewType("ToolList", List[SingleTool])
 EnumeratedToolList = List[Tuple[int,SingleTool]]
@@ -86,7 +86,7 @@ class QuestionSplitModelJSONData(TypedDict):
     mem: List[List[str]]
     question: str
     answer: List[str]
-    
+
 class QuestionSplitModelData(TypedDict):
     mem: Union[TupleList, None]
     question: str
@@ -103,11 +103,11 @@ class QuestionSplitInputModel(TypedDict):
     model_name: str
     openai_model: OpenAIModel
     data: List[QuestionSplitModelData]
-    
+
 class PromptModelEntry(TypedDict):
     prompt: str
     completion: str
-    
+
 class LLMCallParams(TypedDict):
     llm: LLMCallType
     model: Tuple[str, Union[str, None]]
@@ -115,19 +115,19 @@ class LLMCallParams(TypedDict):
     temperature: float
     max_tokens: int
     stop: str
-    
+
 LLMCallReturnType = Tuple[str, float]
-    
+
 class LLMTrainingResult(TypedDict):
     elapsed_time_s: int
     model_name: str
     model_files: List[str]
-    
+
 class LLMTrainingResultMeta(TypedDict):
     OPENAI_KEY: str
     DATE: str
     TIMESTAMP: int
-    
+
 LLModels = Union[Dict[str, LLMTrainingResult], LLMTrainingResultMeta]
 
 
@@ -143,7 +143,7 @@ class ToolInputModelData(TypedDict):
     question: str
     answer: dict
     params: dict
-    
+
 class ToolInputModel(TypedDict):
     openai_model: OpenAIModel
     data: List[ToolInputModelData]
@@ -163,7 +163,7 @@ class ToolpickerInputModelData(TypedDict):
 class ToolpickerInputModel(TypedDict):
     openai_model: OpenAIModel
     data: List[ToolpickerInputModelData]
-    
+
 class AnswerInMemoryModelData(TypedDict):
     mem: Optional[TupleList]
     facts: Optional[TupleList]
@@ -173,11 +173,11 @@ class AnswerInMemoryModelData(TypedDict):
 class AnswerInMemoryModel(TypedDict):
     openai_model: OpenAIModel
     data: List[AnswerInMemoryModelData]
-    
+
 class DebugCalls(TypedDict):
     response: str
     gpt_suggested_params: Any
     url: str
     raw_api_return: str
-    
+
 DebugCallList = List[DebugCalls]

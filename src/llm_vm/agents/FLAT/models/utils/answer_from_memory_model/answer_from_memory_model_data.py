@@ -28,7 +28,7 @@ answer_from_memory_data: AnswerInMemoryModel = {
         },
         {
             "mem": [
-               ("What is the weather in Portland?", "It is sunny, 22C, with clear skies. Theres 40% chance of rain after 18:00hs")  
+               ("What is the weather in Portland?", "It is sunny, 22C, with clear skies. Theres 40% chance of rain after 18:00hs")
             ],
             "question": "What is the temperature in Portland?",
             "answer": True

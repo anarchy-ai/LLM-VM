@@ -6,9 +6,9 @@ from llm_vm.agents.FLAT.agent_helper.utils import verbose_answer
 def __get_tool_input_model(model: OpenAIModel) -> ToolInputModel:
     current_dir = os.path.dirname(os.path.abspath(__file__))
     file_path = os.path.abspath(os.path.join(current_dir, f'../../raw_data/tool_input_data.json'))
-    
+
     json_data: List[ToolInputModelJSONData] = json.load(open(file_path, "r"))["data"]
-    
+
     def __get_mem_tuple(json_mem: List[List[Union[str, dict]]]) -> TupleList:
         mem: TupleList = []
         for m in json_mem:
@@ -19,7 +19,7 @@ def __get_tool_input_model(model: OpenAIModel) -> ToolInputModel:
                 # when the "mem" has only question/answer
                 mem.append((m[0], m[1]))
         return mem
-    
+
     return {
         "openai_model": model,
         "data": [{
@@ -30,6 +30,6 @@ def __get_tool_input_model(model: OpenAIModel) -> ToolInputModel:
             "params": t["params"]
         } for t in json_data]
     }
-    
+
 
 tool_input_data: ToolInputModel = __get_tool_input_model(OpenAIModel.DAVINCI)

@@ -7,8 +7,8 @@ def delete_model (model_name: str) -> None:
         openai.Model.delete(model_name)
     except Exception as e:
         print("Could not delete model because: " + str(e))
-        
-        
+
+
     try:
         # Delete all files:
         files = openai.File.list()["data"]

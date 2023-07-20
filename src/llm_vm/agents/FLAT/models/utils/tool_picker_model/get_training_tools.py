@@ -6,12 +6,12 @@ def get_randomised_training_tools (
     shuffled_by: int = 0,
     shuffle_by_modulo: int = 1e9
 ) -> ToolList:
-    
+
     def __shuffled(tool_id: int) -> int:
         return int((tool_id + shuffled_by) % shuffle_by_modulo)
-    
+
     shuffled_generic_tools: ToolList = [{"id": __shuffled(t["id"]), "description": t["description"]} for t in generic_tools]
-    
+
     tools: ToolList = shuffled_generic_tools + [
         {
             "id": __shuffled(DefaultTrainingTools.TRAIN_SEND_EMAIL.value),
@@ -50,5 +50,5 @@ def get_randomised_training_tools (
             "description": "Use this tool to order food and get it delivered."
         }
     ]
-    
+
     return tools

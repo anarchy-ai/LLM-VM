@@ -8,4 +8,4 @@ def call_llm(llm_request: LLMCallParams) -> LLMCallReturnType:
         except Exception as e:
             print("OpenAI call failed", e)
             return "OpenAI is down!", 0
-        
+

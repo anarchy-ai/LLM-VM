@@ -25,7 +25,7 @@ def replace_variables_for_values(my_dict: dict, dynamic_keys: dict, ignore_key: 
             formatted_value = value
 
         return formatted_value
-    
+
     replaced_dict = {}
     for key, value in my_dict.items():
         if (key == ignore_key):
