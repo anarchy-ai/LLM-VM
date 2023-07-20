@@ -56,38 +56,24 @@ class Client:
         print("Using model: " + big_model) # announce the primary LLM that is generating results
 
         # These functions allow for proper initialization of the optimizer
-<<<<<<< HEAD
-        def CALL_BIG(prompt, max_len=256, **kwargs):
-
-            return self.teacher.generate(prompt, max_len,**kwargs)
-=======
         # def CALL_BIG(prompt, max_len=256, **kwargs):
-            
+
         #     return self.teacher.generate(prompt, max_len,**kwargs)
->>>>>>> main
 
         def CALL_SMALL(prompt, max_len=256, **kwargs):
 
             return self.student.generate(prompt, max_len,**kwargs)
 
         # load the optimizer into object memory for use by the complete function
-<<<<<<< HEAD
-        self.optimizer = LocalOptimizer(MIN_TRAIN_EXS=2,openai_key=None, call_big=CALL_BIG, call_small= CALL_SMALL,
-=======
-        self.optimizer = LocalOptimizer(MIN_TRAIN_EXS=2,openai_key=None, call_big=self.CALL_BIG, call_small= CALL_SMALL, 
->>>>>>> main
+        self.optimizer = LocalOptimizer(MIN_TRAIN_EXS=2,openai_key=None, call_big=self.CALL_BIG, call_small= CALL_SMALL,
                                         big_model = self.teacher, small_model = self.student)
         self.rebel_agent = agent.Agent("", [], verbose=1)
 
-<<<<<<< HEAD
-
-=======
     # These functions allow for proper initialization of the optimizer
     def CALL_BIG(self, prompt, max_len=256, **kwargs):
-        
+
         return self.teacher.generate(prompt, max_len,**kwargs)
-    
->>>>>>> main
+
     def complete(self, prompt,
                  context,
                  openai_key = "",
@@ -169,4 +155,4 @@ class Client:
 
     def load_finetune(self, model_filename=None):
         self.teacher.load_finetune(model_filename)
-       
+
