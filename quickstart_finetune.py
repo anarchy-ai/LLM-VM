@@ -13,6 +13,7 @@ response = client.complete(prompt = "Answer question Q. ",context="Q: What is th
                            data_synthesis=True,
                            finetune=True,)
 print(response)
+
 # response = client.complete(prompt = "Answer question Q. ",context="Q: What is the economic situation in France",
 #                            openai_key=settings.openai_api_key,
 #                            temperature=0.0,

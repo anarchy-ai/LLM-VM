@@ -56,19 +56,38 @@ class Client:
         print("Using model: " + big_model) # announce the primary LLM that is generating results
 
         # These functions allow for proper initialization of the optimizer
+<<<<<<< HEAD
         def CALL_BIG(prompt, max_len=256, **kwargs):
 
             return self.teacher.generate(prompt, max_len,**kwargs)
+=======
+        # def CALL_BIG(prompt, max_len=256, **kwargs):
+            
+        #     return self.teacher.generate(prompt, max_len,**kwargs)
+>>>>>>> main
 
         def CALL_SMALL(prompt, max_len=256, **kwargs):
 
             return self.student.generate(prompt, max_len,**kwargs)
 
         # load the optimizer into object memory for use by the complete function
+<<<<<<< HEAD
         self.optimizer = LocalOptimizer(MIN_TRAIN_EXS=2,openai_key=None, call_big=CALL_BIG, call_small= CALL_SMALL,
+=======
+        self.optimizer = LocalOptimizer(MIN_TRAIN_EXS=2,openai_key=None, call_big=self.CALL_BIG, call_small= CALL_SMALL, 
+>>>>>>> main
                                         big_model = self.teacher, small_model = self.student)
+        self.rebel_agent = agent.Agent("", [], verbose=1)
 
+<<<<<<< HEAD
 
+=======
+    # These functions allow for proper initialization of the optimizer
+    def CALL_BIG(self, prompt, max_len=256, **kwargs):
+        
+        return self.teacher.generate(prompt, max_len,**kwargs)
+    
+>>>>>>> main
     def complete(self, prompt,
                  context,
                  openai_key = "",
@@ -95,7 +114,6 @@ class Client:
            >>> Small_Local_OPT.generate("How long does it take for an apple to grow?)
            How long does it take for an apple tree to grow?
         """
-        rebel_agent = agent.Agent("", [], verbose=1)
         static_context = context
         dynamic_prompt = prompt
         use_rebel_agent = False
@@ -110,7 +128,26 @@ class Client:
             kwargs.update({"stop":stoptoken})
 
         if tools is not None:
-            use_rebel_agent = True
+            if type(tools) != list:
+                return Exception("Wrong data type for tools. Should be a list")
+            else:
+                final_tools=[]
+                for i in tools:
+                    temp_tool_dict = {}
+                    temp_args_dict = {}
+                    temp_tool_dict.update({"description":i["description"]})
+                    temp_tool_dict.update({"dynamic_params":i["dynamic_params"]})
+                    temp_tool_dict.update({"method":i["method"]})
+                    temp_args_dict.update({"url":i["url"]})
+                    temp_args_dict.update({"params":{}})
+                    for j in i["static_params"].keys():
+                        temp_args_dict["params"].update({j:i["static_params"][j]})
+                    for k in i["dynamic_params"].keys():
+                        temp_args_dict["params"].update({k:"{"+k+"}"})
+                    temp_tool_dict.update({"args":temp_args_dict})
+                    final_tools.append(temp_tool_dict)
+                self.rebel_agent.set_tools(final_tools)
+                use_rebel_agent = True
 
         try:
             if openai_key:
@@ -125,8 +162,11 @@ class Client:
             if not use_rebel_agent:
                 completion = self.optimizer.complete(static_context,dynamic_prompt,data_synthesis=data_synthesis,finetune = finetune, **kwargs)
             else:
-                completion = rebel_agent.run(static_context+dynamic_prompt,[])[0]
+                completion = self.rebel_agent.run(static_context+dynamic_prompt,[])[0]
         except Exception as e:
             return {"status":0, "resp": str(e)}
         return {"completion":completion, "status": 200}
 
+    def load_finetune(self, model_filename=None):
+        self.teacher.load_finetune(model_filename)
+       

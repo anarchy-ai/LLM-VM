@@ -18,6 +18,7 @@ Which tool (number only), if any, would you use to answer the following question
         count+=1
     tools+="tool "+str(count)+": "+str("Use this tool when the question can be answered without using any tool or if the question is a greeting or a casual conversation. Also if we need to convert languages other than english, use this tool.")+"\n"
     prompt=prompt.format(**{"tools":tools,"question":question})
+    print(prompt)
     ans = openai.Completion.create(
         model="text-davinci-002",
         max_tokens=256,

@@ -45,7 +45,8 @@ def set_api_key(key, key_type="OPENAI_API_KEY"):
                 - GOOGLE_KEY
                 - GOOGLE_CX
     """
-    os.environ[key_type]=key
+    if not os.getenv(key_type):
+        os.environ[key_type]=key
 
-    if key_type == "OPENAI_API_KEY":
-        openai.api_key=str(key)
+        if key_type == "OPENAI_API_KEY":
+            openai.api_key=str(key)
