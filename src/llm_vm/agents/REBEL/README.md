@@ -28,7 +28,9 @@ often outputs the answer wrapped in reasoning behind the system’s thoughts. �
 
 📚**Results**📚
 
-* We found that REBEL outperformed ReAct on answering questions that require i) the gathering of many facts to determine an answer ii) very specific search queries that return large amounts of unstructured data. 
+* We found that REBEL outperformed ReAct on answering questions that require
+      * the gathering of many facts to determine an answer
+      * very specific search queries that return large amounts of unstructured data. 
 
 * Below is the table depicting the results of the REBEL system versus ReAct on Compositional Celebrities.
 
