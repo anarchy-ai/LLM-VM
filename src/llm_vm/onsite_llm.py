@@ -25,7 +25,7 @@ import torch
 
 # this is a hack till we add dynaconf or something?
 if os.name == "nt":
-    homepath = os.path.join('C:','Users',os.getlogin())
+    homepath = os.path.join('C:\\','Users',os.getlogin())
 else:
     homepath = os.environ.get("HOME")
     
@@ -137,8 +137,10 @@ class Base_Onsite_LLM(ABC):
                 eval_results = trainer.evaluate()
             optimizer.storage.set_training_in_progress(c_id, False)
 
-        
-            timestamp = datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
+            if os.name == "nt":
+                timestamp = datetime.now().strftime('%Y-%m-%dT%H-%M-%S')
+            else:
+                timestamp = datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
             new_model = os.path.join(model_path_default,"finetuned_models",self.model_name, timestamp + '_' + self.model_name + ".pt" )
             open(new_model,"a")
             torch.save(self.model.state_dict(), new_model) # the model in memory is different now
