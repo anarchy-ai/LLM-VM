@@ -30,7 +30,7 @@ Below we present data on the REBEL agent and its merits.
 
 In this section we first introduce the experimental setup, including the benchmarks used for evaluation, and then present the results. 🤔
 
-## Experimental Setup**📚
+## Experimental Setup📚
 
 * We tested REBEL on 3 datasets: Compositional Celebrities (Ofir Press, 2022), FEVER (Thorne et al., 2018), and
 HotPotQA (Yang et al., 2018). ☑️
