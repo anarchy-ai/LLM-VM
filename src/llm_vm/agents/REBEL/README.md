@@ -21,20 +21,20 @@ In this section we first introduce the experimental setup, including the benchma
 📚**Experimental Setup**📚
 
 * We tested REBEL on 3 datasets: Compositional Celebrities (Ofir Press, 2022), FEVER (Thorne et al., 2018), and
-HotPotQA (Yang et al., 2018).
+HotPotQA (Yang et al., 2018). ☑️
 * On these datasets, correctness was determined by a human experimenter based on the output of each system. ReAct outputs with simply the answer to the question, while REBEL
-often outputs the answer wrapped in reasoning behind the system’s thoughts.
-* Our code, which can be found at in this directory, was implemented in Python using the OpenAI Completion API to access GPT-3 (da-vinci-003).
+often outputs the answer wrapped in reasoning behind the system’s thoughts. 😄
+* Our code, which can be found at in this directory, was implemented in Python using the OpenAI Completion API to access GPT-3 (da-vinci-003).🧠
 
 📚**Results**📚
 
-*We found that REBEL outperformed ReAct on answering questions that require i) the gathering of many facts to determine an answer ii) very specific search queries that return large amounts of unstructured data. 
+* We found that REBEL outperformed ReAct on answering questions that require i) the gathering of many facts to determine an answer ii) very specific search queries that return large amounts of unstructured data. 
 
-Below is the table depicting the results of the REBEL system versus ReAct on Compositional Celebrities.
+* Below is the table depicting the results of the REBEL system versus ReAct on Compositional Celebrities.
 
 <img width="400" alt="image" src="https://github.com/anarchy-ai/LLM-VM/assets/37461794/842ff756-f52b-403d-94a0-595e5ac9bba7">
 
-Below is the table depicting the results of the REBEL systhem versus ReAct on HotPotQA and FEVER.
+* Below is the table depicting the results of the REBEL systhem versus ReAct on HotPotQA and FEVER.
 
 <img width="300" alt="image" src="https://github.com/anarchy-ai/LLM-VM/assets/37461794/de2e1df4-7f4a-4947-8c32-2ce4312df484">
 
