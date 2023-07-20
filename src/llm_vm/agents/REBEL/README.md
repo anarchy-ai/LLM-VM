@@ -1,4 +1,4 @@
-![Anarchy Logo](diagram.png)
+![Anarchy Logo](figure.png)
 # REBEL
 
 🎉🚀 Welcome to the REBEL repository! 
