@@ -25,6 +25,30 @@ import os
 import torch
 
 
+__private_key_value_models_map =  {}
+# []   {
+#         "opt": Small_Local_OPT,
+#         "bloom": Small_Local_Bloom,
+#         "neo": Small_Local_Neo,
+#         "llama": Small_Local_LLama,
+#         "pythia": Small_Local_Pythia,
+#         "gpt": GPT3,
+#         "chat_gpt": Chat_GPT,
+#         "flan" : Small_Local_Flan_T5,
+#         "pythia" : Small_Local_Pythia,
+#         }
+
+def RegisterModelClass(name):
+    def regClass(cls):
+        __private_key_value_models_map[name]=cls 
+    return regClass
+
+model_keys_registered = __private_key_value_models_map.keys()        
+# Dictionary of models to be loaded in ModelConfig
+def load_model_closure(model_name):
+    models = __private_key_value_models_map
+    return models[model_name]
+
 # this is a hack till we add dynaconf or something?
 if os.name == "nt":
     homepath = os.path.join('C:\\','Users',os.getlogin())
@@ -164,7 +188,7 @@ class Base_Onsite_LLM(ABC):
 this factorization isn't necessarily the greatest, nor should it be viewed
 as likely being more general, aside from covering hugging face transformers
 """
-
+@RegisterModelClass("pythia")
 class Small_Local_Pythia(Base_Onsite_LLM):
     """
     This is a class for ElutherAI's Pythia-70m LLM
@@ -189,6 +213,7 @@ class Small_Local_Pythia(Base_Onsite_LLM):
         return AutoTokenizer.from_pretrained(self.model_uri)
 
 
+@RegisterModelClass("opt")
 class Small_Local_OPT(Base_Onsite_LLM):
 
     """
@@ -210,6 +235,7 @@ class Small_Local_OPT(Base_Onsite_LLM):
     def tokenizer_loader(self):
         return AutoTokenizer.from_pretrained(self.model_uri)
 
+@RegisterModelClass("bloom")
 class Small_Local_Bloom(Base_Onsite_LLM):
 
     """
@@ -232,6 +258,7 @@ class Small_Local_Bloom(Base_Onsite_LLM):
     def tokenizer_loader(self):
         return AutoTokenizer.from_pretrained(self.model_uri)
 
+@RegisterModelClass("neo")
 class Small_Local_Neo(Base_Onsite_LLM):
 
     """
@@ -253,6 +280,7 @@ class Small_Local_Neo(Base_Onsite_LLM):
     def tokenizer_loader(self):
         return GPT2Tokenizer.from_pretrained(self.model_uri)
 
+@RegisterModelClass("llama")
 class Small_Local_LLama(Base_Onsite_LLM):
 
     """
@@ -275,6 +303,7 @@ class Small_Local_LLama(Base_Onsite_LLM):
     def tokenizer_loader(self):
         return LlamaTokenizer.from_pretrained(self.model_uri)
 
+@RegisterModelClass("flan")# our yummiest model based on similarity to food
 class Small_Local_Flan_T5(Base_Onsite_LLM):
 
     """
@@ -297,6 +326,7 @@ class Small_Local_Flan_T5(Base_Onsite_LLM):
     def tokenizer_loader(self):
         return AutoTokenizer.from_pretrained(self.model_uri)
 
+@RegisterModelClass("bert")
 class Small_Local_BERT(Base_Onsite_LLM):
 
     """
@@ -319,7 +349,7 @@ class Small_Local_BERT(Base_Onsite_LLM):
         return AutoModelForMaskedLM.from_pretrained(self.model_uri)
     def tokenizer_loader(self):
         return BertTokenizer.from_pretrained(self.model_uri)
-
+@RegisterModelClass("gpt")
 class GPT3:
 
     """
@@ -376,7 +406,7 @@ class GPT3:
         optimizer.storage.set_training_in_progress(c_id, False)
         if old_model is not None:
             openai.Model.delete(old_model)
-
+@RegisterModelClass("chat_gpt")
 class Chat_GPT:
     """
     This is a class for openAI's gpt-3.5-turbo LLM
@@ -434,21 +464,3 @@ class Chat_GPT:
         optimizer.storage.set_training_in_progress(c_id, False)
         if old_model is not None:
             openai.Model.delete(old_model)
-
-
-__private_key_value_models_map =     {
-        "opt": Small_Local_OPT,
-        "bloom": Small_Local_Bloom,
-        "neo": Small_Local_Neo,
-        "llama": Small_Local_LLama,
-        "pythia": Small_Local_Pythia,
-        "gpt": GPT3,
-        "chat_gpt": Chat_GPT,
-        "flan" : Small_Local_Flan_T5,
-        "pythia" : Small_Local_Pythia,
-        }
-model_keys_registered = __private_key_value_models_map.keys()        
-# Dictionary of models to be loaded in ModelConfig
-def load_model_closure(model_name):
-    models = __private_key_value_models_map
-    return models[model_name]
