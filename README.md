@@ -43,7 +43,7 @@ In line with Anarchy's mission, the LLM-VM strives to support open-source models
   
 * **Lower your costs 💸:** *Running models locally can reduce the pay-as-you-go costs of development and testing.*
   
-* **Flexibility 🧘‍♀️:** *AnarchyAI allows you to rapidly switch between models so you can pinpoint the exact right tool for your project.*
+* **Flexibility 🧘‍♀️:** *AnarchyAI allows you to rapidly switch between popular models so you can pinpoint the exact right tool for your project.*
   
 * **Community Vibes 🫂:** *Join our active community of highly motivated developers and engineers working passionately to democratize AGI*
   
@@ -57,9 +57,10 @@ In line with Anarchy's mission, the LLM-VM strives to support open-source models
 
 * **Task Auto-Optimization 🚅:** *The Anarchy LLM-VM will analyze your use cases for repetative tasks where it can activate student-teacher distillation to train a super-efficient small model from a larger more general model without loosing accuracy.  It can furthermore take advantage of data-synthesis techniques to improve results.*
 
-* **HTTP Endpoints 🕸️:** *We provide an HTTP standalone server to handle completion requests.*
 
 * **Library Callable 📚:** *We provide a library that can be used from any python codebase directly.*
+
+* **HTTP Endpoints 🕸️:** *We provide an HTTP standalone server to handle completion requests.*
 
 * **Live Data Augmentation 📊:** (ROADMAP) *You will be able to provide a live updating data-set and the Anarchy LLM-VM will **fine-tune** your models or work with a **vector DB** to provide up-to-date information with citations*
 
@@ -120,7 +121,7 @@ print(response)
 ### Supported Models
 Select from the following models
 ```python
-Supported_Models = ['chat_gpt','gpt','neo','llama','bloom','opt']
+Supported_Models = ['chat_gpt','gpt','neo','llama','bloom','opt','pythia']
 ```
 
 
@@ -153,10 +154,9 @@ For some other choices of memory usage and parameter count in each model family,
 tables in [model_uri_tables](./model_uri_tables.md)
 
 
-#### Files
+#### System Requirements 
 
-- `optimize.py` - Provides the `Optimizer` abstract class and implementations for local optimization (using a `local_ephemeral` store) and hosted optimization (using OpenAI's API).
-- `test_optimize.py` - A test file that shows using either the local or hosted optimizer to generate Haskell code and improve over time.
+Your system will require slightly different specifications depending on which models you attempt to use. Limiting factors on most systems will likely be RAM, but many functions will work at even 16 GB of ram. 
 
 #### Usage
 
@@ -174,4 +174,4 @@ Matthew Mirman, Abhirgya Sodani, Carter Schonwald, Andrew Nelson
 
 ## License
 
-`llm_vm` was created by Matthew Mirman. It is licensed under the terms of the MIT license.
+[MIT License](LICENSE)
