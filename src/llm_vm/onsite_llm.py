@@ -127,6 +127,7 @@ class Base_Onsite_LLM(ABC):
                 per_device_eval_batch_size = 1,
                 num_train_epochs=1,
                 weight_decay=0.01,
+                report_to= "none",
             )
             test_set = FinetuningDataset(tokenized_final_dataset,len(untokenized_final_dataset))
 
@@ -433,3 +434,21 @@ class Chat_GPT:
         optimizer.storage.set_training_in_progress(c_id, False)
         if old_model is not None:
             openai.Model.delete(old_model)
+
+
+__private_key_value_models_map =     {
+        "opt": Small_Local_OPT,
+        "bloom": Small_Local_Bloom,
+        "neo": Small_Local_Neo,
+        "llama": Small_Local_LLama,
+        "pythia": Small_Local_Pythia,
+        "gpt": GPT3,
+        "chat_gpt": Chat_GPT,
+        "flan" : Small_Local_Flan_T5,
+        "pythia" : Small_Local_Pythia,
+        }
+model_keys_registered = __private_key_value_models_map.keys()        
+# Dictionary of models to be loaded in ModelConfig
+def load_model_closure(model_name):
+    models = __private_key_value_models_map
+    return models[model_name]
