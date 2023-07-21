@@ -3,7 +3,7 @@ import os
 import argparse
 from dynaconf import Dynaconf
 from xdg import XDG_CONFIG_HOME
-
+from llm_vm.onsite_llm import model_keys_registered
 
 # Parse CLI arguments
 parser = argparse.ArgumentParser()
@@ -47,14 +47,7 @@ settings = Dynaconf(
 )
 
 # making MODELS_AVAILABLE a set because it will be used for membership testing
-MODELS_AVAILABLE = set([
-    "opt",
-    "bloom",
-    "neo",
-    "llama",
-    "gpt",
-    "chat_gpt",
-])
+MODELS_AVAILABLE = set(model_keys_registered)
 
 if settings.big_model not in MODELS_AVAILABLE:
     print(settings.big_model + " is an invalid Model selection for Big LLM Model")

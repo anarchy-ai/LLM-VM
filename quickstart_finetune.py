@@ -4,7 +4,7 @@ from llm_vm.client import Client
 import os
 from llm_vm.config import settings
 # Instantiate the client specifying which LLM you want to use
-client = Client(big_model='gpt', small_model='opt')
+client = Client(big_model='chat_gpt', small_model='pythia')
 
 # Put in your prompt and go!
 response = client.complete(prompt = "Answer question Q. ",context="Q: What is the currency in myanmmar",

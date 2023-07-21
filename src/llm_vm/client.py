@@ -1,22 +1,11 @@
 import openai
 import llm_vm.onsite_llm as llms
+from llm_vm.onsite_llm import load_model_closure
 from llm_vm.agents.REBEL import agent
 from llm_vm.completion.optimize import LocalOptimizer
 import os
 
 
-# Dictionary of models to be loaded in ModelConfig
-def load_model_closure(model_name):
-    models = {
-        "opt":llms.Small_Local_OPT,
-        "bloom":llms.Small_Local_Bloom,
-        "neo":llms.Small_Local_Neo,
-        "llama":llms.Small_Local_LLama,
-        "pythia":llms.Small_Local_Pythia,
-        "gpt":llms.GPT3,
-        "chat_gpt":llms.Chat_GPT
-        }
-    return models[model_name]
 
 
 class Client:
