@@ -87,13 +87,13 @@ In line with Anarchy's mission, the LLM-VM strives to support open-source models
 
 #### Installation Requirements
 
-Python3.6, Unix
+Python >=3.6 required, Python >= 3.10 recommended, Unix style operating system 
 
 TODO: WRITE WELL
 
 #### System Requirements
 
-Different models have different system requriements. Limiting factors on most systems will likely be RAM, but many functions will work at even 16 GB of ram. 
+Different models have different system requirements. Limiting factors on most systems will likely be RAM, but many functions will work at even 16 GB of ram. 
 
 TODO: PLEASE PUT SOMEHTING GOOD HERE
 
@@ -106,6 +106,10 @@ To install the LLM-VM you simply need to download this repository and install it
 > cd LLM-VM
 > pip3 install .
 ```
+#### Developer Setup
+the best way to test run code while writing a patch is to use 
+`pip3 install --editable .`, which will expose the code as a library you can 
+edit in place.
 
 This will install both the library and test-server.  
 
