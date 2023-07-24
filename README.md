@@ -1,29 +1,38 @@
 ![Anarchy Logo](anarchy_logo.svg)
-Need help? Want to help out? Come join our discord server! Our engineers are 
-standing by to help out!  https://discord.gg/YmNvCAk6W6
 
+<p align="center">
+  <a href="https://anarchy.ai/" target="_blank"><img src="https://img.shields.io/badge/View%20Documentation-Docs-yellow"></a>
+  <a href="https://discord.gg/YmNvCAk6W6" target="_blank"><img src="https://img.shields.io/badge/Join%20our%20community-Discord-blue"></a>
+  <a href="https://github.com/anarchy-ai/LLM-VM">
+      <img src="https://img.shields.io/github/stars/anarchy-ai/LLM-VM" />
+  </a>
+</p>
+<h1 align='center'> 🤖 Anarchy LLM-VM 🤖 </h1>
+<p align='center'><em>An Open-Source AGI Server for Open-Source LLMs</em></p>
 
-# 🤖 Anarchy LLM-VM 🤖
-*Acclerating development by simplifying AGIs*
+This is [Anarchy's](https://anarchy.ai) effort to build 🏗️ an open generalized artificial intelligence 🤖 through the LLM-VM: a way to give your LLMs superpowers 🦸 and superspeed 🚄.
 
-This is [Anarchy's](https://anarchy.ai) effort for building 🏗️ open generalized artificial intelligence 🤖 through the LLM-VM: a way to give your LLMs superpowers 🦸 and superspeed 🚄. 
-
-You can find instructions to try it live here: [anarchy.ai](https://anarchy.ai)
+You can find detailed instructions to try it live here: [anarchy.ai](https://anarchy.ai)
 
 > This project is in BETA. Expect continuous improvement and development.
 
 
 # Table of Contents
 
-* [Table of Contents](#Table)
-* [About](#-About-)
+* [Table of Contents](#table)
+* [About](#-about-)
     * [What](#-what-is-the-anarchy-llm-vm)
     * [Why](#-why-use-the-anarchy-llm-vm)
     * [Features and Roadmap](#-features-and-roadmap)
 * [Quick Start and Installation](#-quickstart-)
-
-
-
+   * [Requirements](#-requirements)
+   * [Installation](#-installation)
+   * [Generating Completions](#-generating-completions)
+   * [Running LLMs Locally](#-running-llms-locally)
+   * [Supported Models](#-supported-models)
+   * [Picking Different Models](#-picking-different-models)
+   * [Tool Usage](#-tool-usage)
+* [Contributing](#-contributing-)
 
 ## 📚 About 📚
 
@@ -74,6 +83,20 @@ In line with Anarchy's mission, the LLM-VM strives to support open-source models
 
 ## 🚀 Quickstart 🚀
 
+### 🥹 Requirements
+
+#### Installation Requirements
+
+Python3.6, Unix
+
+TODO: WRITE WELL
+
+#### System Requirements
+
+Different models have different system requriements. Limiting factors on most systems will likely be RAM, but many functions will work at even 16 GB of ram. 
+
+TODO: PLEASE PUT SOMEHTING GOOD HERE
+
 ### 👨‍💻 Installation
 
 To install the LLM-VM you simply need to download this repository and install it with pip like so:
@@ -86,7 +109,7 @@ To install the LLM-VM you simply need to download this repository and install it
 
 This will install both the library and test-server.  
 
-### Generating Completions
+### ✅ Generating Completions
 Our LLM-VM gets you working directly with popular LLMs locally in just 3 lines. Once you've installed (as above), just load your model and start generating!
 
 
@@ -103,7 +126,7 @@ print(response)
 # Anarchy is a political ideology that advocates for the absence of government...
 ```
 
-### Locally Run an LLM
+### 🏃‍♀️ Running LLMs Locally
 ```python
 # import our client
 from llm_vm.client import Client
@@ -118,7 +141,7 @@ print(response)
 ```
 
 
-### Supported Models
+### 😎 Supported Models
 Select from the following models
 ```python
 Supported_Models = ['chat_gpt','gpt','neo','llama','bloom','opt','pythia']
@@ -127,7 +150,7 @@ Supported_Models = ['chat_gpt','gpt','neo','llama','bloom','opt','pythia']
 
 
 
-### Picking a Different Model
+### ☯️ Picking Different Models
 LLM-VM default model sizes for local models is intended to make experimentation 
 with LLMs accessible to everyone, but if you have the memory required, larger parameter models 
 will perform far better!
@@ -154,11 +177,7 @@ For some other choices of memory usage and parameter count in each model family,
 tables in [model_uri_tables](./model_uri_tables.md)
 
 
-#### System Requirements 
-
-Your system will require slightly different specifications depending on which models you attempt to use. Limiting factors on most systems will likely be RAM, but many functions will work at even 16 GB of ram. 
-
-#### Usage
+### 🛠️ Tool Usage
 
 There are two agents: FLAT and REBEL. 
 
@@ -168,10 +187,55 @@ titled `agent.py`.
 Alternatively, to run a simple interface and choose an agent to run from the CLI, run the `src/llm_vm/agents/agent_interface.py` file 
 and follow the command prompt instructions. 
 
-## Acknowledgements 
-Matthew Mirman, Abhirgya Sodani, Carter Schonwald, Andrew Nelson
 
+## 🩷 Contributing 🩷
 
+We welcome contributors!  The best way to get started is to join our active [discord community](https://discord.gg/YmNvCAk6W6).  Otherwise here are some ways to contribute and get paid:
+
+### Jobs
+
+- We're always looking for serious hackers.  Prove that you can build and creatively solve hard problems and reach out! 
+- The easiest way to secure a job/internship with us is to submit a pull request that closes a ticket.
+- The second easiest is to submit good tickets.
+- Otherwise, to apply directly: https://forms.gle/bUWDKW3cwZ8n6qsU8
+
+### Bounty
+
+Some tickets we'll pay you for closing! Look at the ticket labels to see how much the bounty is.  Note we can't guarantee that if you close a ticket we can pay you (only if you are from a non-US sanctioned country), and it is up to you to reach out and provide bank details. 
+
+## 🙏 Acknowledgements 🙏
+
+- **Matthew Mirman** - CEO
+  - GitHub: [@mmirman](https://github.com/mmirman)
+  - LinkedIn: [@matthewmirman](https://www.linkedin.com/in/matthewmirman/)
+  - Twitter: [@mmirman](https://twitter.com/mmirman)
+  - Website: [mirman.com](https://www.mirman.com)
+
+- **Abhigya Sodani** - Research Intern
+  - GitHub: [@abhigya-sodani](https://github.com/abhigya-sodani)
+  - LinkedIn: [@abhigya-sodani](https://www.linkedin.com/in/abhigya-sodani-405918160/)
+ 
+
+- **Carter Schonwald** - Community Engineering Leader 
+  - GitHub: [@cartazio](https://github.com/cartazio)
+  - LinkedIn: [@carter-schonwald](https://www.linkedin.com/in/carter-schonwald-aa178132/)
+ 
+- **Andrew Nelson** - Basilisk Trainer
+  - GitHub: [@ajn2004](https://github.com/ajn2004)
+  - LinkedIn: [@ajnelsnyc](https://www.linkedin.com/in/ajnelsnyc/)
+ 
+- **Kyle Wild** - Undoomer
+  - GitHub: [@dorkitude](https://github.com/dorkitude)
+  - LinkedIn: [@kylewild](https://www.linkedin.com/in/kylewild/)
+
+- **Victor Odede** - Fearless Contributor
+  - GitHub: [@VictorOdede](https://github.com/VictorOdede)
+  - LinkedIn: [@victor-odede](https://www.linkedin.com/in/victor-odede-aaa907114/)
+
+- **Aarushi Banerjee** - Fearless Contributor
+  - GitHub: [@AB3000](https://github.com/AB3000)
+  - LinkedIn: [@ab99](https://www.linkedin.com/in/ab99/)
+    
 ## License
 
 [MIT License](LICENSE)
