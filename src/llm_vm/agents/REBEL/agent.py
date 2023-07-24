@@ -31,7 +31,7 @@ import random
 # UNCOMMENT THESE IMPORTS SO THAT SUBQUESTION PORTION CAN WORK (NLP CURRENTLY NOT RECOGNIZED)
 import spacy
 
-nlp = spacy.load("en_core_web_md")
+nlp = None #spacy.load("en_core_web_md")
 
 from math import sqrt, pow, exp
 
@@ -451,7 +451,8 @@ class Agent:
             a tuple containing the gpt response and a list with the conversation history
         """
 
-
+        if nlp is None:
+            nlp=spacy.load("en_core_web_md")
         mem = "".join(
             [
                 self.makeInteraction(p, a, "P", "AI", INTERACTION="Human-AI")

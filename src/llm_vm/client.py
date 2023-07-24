@@ -3,9 +3,21 @@ import llm_vm.onsite_llm as llms
 from llm_vm.onsite_llm import load_model_closure
 from llm_vm.agents.REBEL import agent
 from llm_vm.completion.optimize import LocalOptimizer
+import llm_vm.config as conf
 import os
 
 
+if conf.settings.big_model is None:
+    default_big_model = "chat_gpt"
+else:
+    default_big_model= conf.settings.big_model
+
+if conf.settings.small_model is not  None:
+    default_small_model= "pythia"
+else:    
+    default_small_model = conf.settings.small_model
+
+    
 
 
 class Client:
@@ -20,7 +32,7 @@ class Client:
         complete: The Anarchy completion endpoint giving access to a specified LLM
     """
 
-    def __init__(self, big_model = 'chat_gpt', small_model ='gpt',big_model_config={},small_model_config={}):
+    def __init__(self, big_model = default_big_model, small_model =default_small_model,big_model_config={},small_model_config={}):
         """
         This __init__ function allows the user to specify which LLM they want to use upon instantiation.
 
@@ -56,7 +68,7 @@ class Client:
         # load the optimizer into object memory for use by the complete function
         self.optimizer = LocalOptimizer(MIN_TRAIN_EXS=2,openai_key=None, call_big=self.CALL_BIG, call_small= CALL_SMALL,
                                         big_model = self.teacher, small_model = self.student)
-        self.rebel_agent = agent.Agent("", [], verbose=1)
+        self.rebel_agent = None # only initialized on first use 
 
     # These functions allow for proper initialization of the optimizer
     def CALL_BIG(self, prompt, max_len=256, **kwargs):
@@ -65,7 +77,7 @@ class Client:
 
     def complete(self, prompt,
                  context,
-                 openai_key = "",
+                 openai_key = None,
                  finetune=False,
                  data_synthesis = False,
                  temperature=0,
@@ -78,7 +90,7 @@ class Client:
             prompt (str): Prompt to send to LLM for generation
             context (str): Context to send to the LLM for generation
             finetune (bool): Boolean value that begins fine tuning when set to True
-            data_synthesis (bool): Boolean value to determine whether data should be synethesized for fine-tuning or not
+            data_synthesis (bool): Boolean value to determine whether data should be synthesized for fine-tuning or not
             temperature (float): An analog
 
 
@@ -96,7 +108,7 @@ class Client:
 
         kwargs.update({"temperature":temperature})
 
-        if openai_key:
+        if openai_key is not None:
             self.openai_key = openai_key
 
         if stoptoken is not None:
@@ -121,17 +133,21 @@ class Client:
                         temp_args_dict["params"].update({k:"{"+k+"}"})
                     temp_tool_dict.update({"args":temp_args_dict})
                     final_tools.append(temp_tool_dict)
+                if self.rebel_agent is None:
+                    self.rebel_agent = agent.Agent("", [], verbose=1) # initialize only if tools registered
                 self.rebel_agent.set_tools(final_tools)
                 use_rebel_agent = True
 
         try:
-            if openai_key:
+            if openai_key is not None:
                 openai.api_key = self.openai_key
         except:
             return  {"status":0, "resp":"Issue with OpenAI key"}
 
         self.optimizer.openai_key = openai.api_key
-        agent.set_api_key(openai.api_key,"OPENAI_API_KEY")
+        # self.agent.set_api_key(openai.api_key,"OPENAI_API_KEY") # 
+        if os.getenv("OPENAI_API_KEY") is None and use_rebel_agent==True :
+            print("warning: you need OPENAI_API_KEY environment variable for ")
 
         try:
             if not use_rebel_agent:

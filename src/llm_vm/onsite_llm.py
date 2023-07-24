@@ -406,6 +406,7 @@ class GPT3:
         optimizer.storage.set_training_in_progress(c_id, False)
         if old_model is not None:
             openai.Model.delete(old_model)
+
 @RegisterModelClass("chat_gpt")
 class Chat_GPT:
     """
@@ -439,28 +440,30 @@ class Chat_GPT:
         return ans['choices'][0]['message']['content']
 
     def finetune(self, dataset, optimizer, c_id):
-        old_model = optimizer.storage.get_model(c_id)
-        training_file = create_jsonl_file(dataset)
-        upload_response = openai.File.create(file=training_file, purpose="fine-tune")
-        training_file.close()
-        fine_tuning_job = openai.FineTune.create(training_file= upload_response.id)
+        print("fine tuning isn't supported by OpenAI on this model")
+        exit()
+        # old_model = optimizer.storage.get_model(c_id)
+        # training_file = create_jsonl_file(dataset)
+        # upload_response = openai.File.create(file=training_file, purpose="fine-tune")
+        # training_file.close()
+        # fine_tuning_job = openai.FineTune.create(training_file= upload_response.id)
 
-        print(f"Fine-tuning job created: {fine_tuning_job}", flush=True)
-        global job_id # global state isn't great, but thats interrupt handlers
-        job_id = fine_tuning_job["id"]
-        while True:
-            fine_tuning_status = openai.FineTune.retrieve(id=job_id)
-            status = fine_tuning_status["status"]
-            print(f"Fine-tuning job status: {status}")
-            if status in ["succeeded", "completed", "failed"]:
-                break
-            time.sleep(30)
-        job_id = None #
-        new_model_id = fine_tuning_status.fine_tuned_model
+        # print(f"Fine-tuning job created: {fine_tuning_job}", flush=True)
+        # global job_id # global state isn't great, but thats interrupt handlers
+        # job_id = fine_tuning_job["id"]
+        # while True:
+        #     fine_tuning_status = openai.FineTune.retrieve(id=job_id)
+        #     status = fine_tuning_status["status"]
+        #     print(f"Fine-tuning job status: {status}")
+        #     if status in ["succeeded", "completed", "failed"]:
+        #         break
+        #     time.sleep(30)
+        # job_id = None #
+        # new_model_id = fine_tuning_status.fine_tuned_model
 
-        print("New_model_id: ", new_model_id, flush=True)
+        # print("New_model_id: ", new_model_id, flush=True)
 
-        optimizer.storage.set_model(c_id, new_model_id)
-        optimizer.storage.set_training_in_progress(c_id, False)
-        if old_model is not None:
-            openai.Model.delete(old_model)
+        # optimizer.storage.set_model(c_id, new_model_id)
+        # optimizer.storage.set_training_in_progress(c_id, False)
+        # if old_model is not None:
+        #     openai.Model.delete(old_model)

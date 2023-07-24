@@ -1,5 +1,6 @@
 # Default settings for your application
 BIG_MODEL = "chat_gpt"
 PORT = 3002
-SMALL_MODEL = "bloom"
+SMALL_MODEL = "pythia"
 HOST = "127.0.0.1"
+# OPEN_API_KEY = $YourKeyHere
