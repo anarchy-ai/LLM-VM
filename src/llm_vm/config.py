@@ -8,9 +8,10 @@ from llm_vm.onsite_llm import model_keys_registered
 # Parse CLI arguments
 parser = argparse.ArgumentParser()
 parser.add_argument('-b', '--big_model', type=str, help='Big LLM Model.')
-parser.add_argument('-p', '--port', type=int, help='Port Number.')
-parser.add_argument('-s', '--small_model', type=str, help='Small LLM Model.')
-parser.add_argument('-H', '--host', type=str, help='Host Address.')
+parser.add_argument('-p', '--port', type=int,      help='Port Number.')
+parser.add_argument('-s', '--small_model',type=str,help='Small LLM Model.')
+parser.add_argument('-H', '--host', type=str,      help='Host Address.')
+parser.add_argument('-K', '--openai_key',type=str,help='OpenAI api key')
 args = parser.parse_args()
 
 # Set the CLI argument values to environment variables if they are present
@@ -22,6 +23,8 @@ if args.small_model is not None:
     os.environ['LLM_VM_SMALL_MODEL'] = args.small_model
 if args.host is not None:
     os.environ['LLM_VM_HOST'] = args.host
+if args.open_ai_key is not None:
+    os.environ['LLM_VM_OPENAI_API_KEY']     
 
 
 source_directory = os.path.dirname(os.path.abspath(__file__))
@@ -55,6 +58,19 @@ if settings.big_model not in MODELS_AVAILABLE:
 
 if settings.small_model not in MODELS_AVAILABLE:
     print(settings.small_model + " is an invalid Model selection for Small LLM Model")
+    exit()
+
+# do we want to do this early test and exit?
+# if settings.small_model is "chat_gpt":
+#     print("openai currently doesn't support fine tuning chat_gpt, aka gpt3.5-turbo, exiting")    
+#     exit()
+
+def isOpenAIModel(str):
+    str =="gpt" or str =="chat_gpt"
+
+if settings.openai_api_key is None and (isOpenAIModel(settings.small_model) or isOpenAIModel(settings.big_model):
+    print("Error: you must have an OpenAI API key set via config files, ./settings.default.toml or via environment variable ")
+    print("LLM_VM_OPEN_AI_API,if you wish to use their models. Exiting")
     exit()
 
 # check args.host is a valid IP address

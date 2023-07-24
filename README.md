@@ -113,8 +113,14 @@ edit in place.
 
 This will install both the library and test-server.  
 
+#### One Last Step, almost there!
+If you're using one of the OpenAI models, you will need to set the `LLM_VM_OPENAI_API_KEY` environment
+variable with your api key. 
+
+
 ### ✅ Generating Completions
 Our LLM-VM gets you working directly with popular LLMs locally in just 3 lines. Once you've installed (as above), just load your model and start generating!
+
 
 
 ```python
