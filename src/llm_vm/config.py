@@ -23,8 +23,8 @@ if args.small_model is not None:
     os.environ['LLM_VM_SMALL_MODEL'] = args.small_model
 if args.host is not None:
     os.environ['LLM_VM_HOST'] = args.host
-if args.open_ai_key is not None:
-    os.environ['LLM_VM_OPENAI_API_KEY']     
+if "openai_api_key" in args:
+    os.environ['LLM_VM_OPENAI_API_KEY'] = args.openai_api_key
 
 
 source_directory = os.path.dirname(os.path.abspath(__file__))
@@ -68,7 +68,7 @@ if settings.small_model not in MODELS_AVAILABLE:
 def isOpenAIModel(str):
     str =="gpt" or str =="chat_gpt"
 
-if settings.openai_api_key is None and (isOpenAIModel(settings.small_model) or isOpenAIModel(settings.big_model):
+if settings.openai_api_key is None and (isOpenAIModel(settings.small_model) or isOpenAIModel(settings.big_model)):
     print("Error: you must have an OpenAI API key set via config files, ./settings.default.toml or via environment variable ")
     print("LLM_VM_OPEN_AI_API,if you wish to use their models. Exiting")
     exit()
