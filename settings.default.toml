@@ -3,4 +3,4 @@ BIG_MODEL = "chat_gpt"
 PORT = 3002
 SMALL_MODEL = "pythia"
 HOST = "127.0.0.1"
-# OPEN_API_KEY = $YourKeyHere
+OPENAI_API_KEY = "$YOUR API KEY HERE"
