@@ -186,7 +186,7 @@ class Agent:
             self.bot_str = bot_str
         else:
             self.bot_str = "<GLOBAL>" + bot_str + "<GLOBAL>"
-
+        self.nlp=spacy.load("en_core_web_md")
         # set all the API resource keys to make calls
         set_api_key(openai_key, "OPENAI_API_KEY")
 
@@ -451,8 +451,6 @@ class Agent:
             a tuple containing the gpt response and a list with the conversation history
         """
 
-        if nlp is None:
-            nlp=spacy.load("en_core_web_md")
         mem = "".join(
             [
                 self.makeInteraction(p, a, "P", "AI", INTERACTION="Human-AI")
@@ -475,7 +473,7 @@ class Agent:
 
             else:
                 for i in subq[1]:
-                    if cos_similarity(nlp(question).vector, nlp(i).vector) < 0.98:
+                    if cos_similarity(self.nlp(question).vector, self.nlp(i).vector) < 0.98:
                         subq_final.append(i)
                     else:
                         split_allowed = False
