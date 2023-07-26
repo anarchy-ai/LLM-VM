@@ -451,8 +451,6 @@ class Agent:
             a tuple containing the gpt response and a list with the conversation history
         """
 
-        if self.nlp is None:
-            self.nlp=spacy.load("en_core_web_md")
         mem = "".join(
             [
                 self.makeInteraction(p, a, "P", "AI", INTERACTION="Human-AI")
