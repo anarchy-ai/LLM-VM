@@ -18,17 +18,19 @@ Which tool (number only), if any, would you use to answer the following question
         count+=1
     tools+="tool "+str(count)+": "+str("Use this tool when the question can be answered without using any tool or if the question is a greeting or a casual conversation. Also if we need to convert languages other than english, use this tool.")+"\n"
     prompt=prompt.format(**{"tools":tools,"question":question})
-    print(prompt)
+    prompt += "\n\nYOU JUST ANSWER WITH A NUMBER."
     ans = openai.Completion.create(
-        model="text-davinci-002",
+        model="text-davinci-003",
         max_tokens=256,
         stop=None,
         prompt=prompt,
         temperature=0.4
     )
-
-    return (calcCost(prompt),str(int(re.sub("[^0-9]", "",ans['choices'][0]['text'].strip()))+starting_tool_num))
-
+    
+    try:
+        return (calcCost(prompt),str(int(re.sub("[^0-9]", "",ans['choices'][0]['text'].strip()))+starting_tool_num))
+    except:
+        return  (calcCost(prompt),1+starting_tool_num)
 
 def calcCost(p):
             return (len(p) / 2700.0) * 0.02
