@@ -87,7 +87,7 @@ In this section we first introduce the experimental setup, including the benchma
 ## Experimental Setup
 
 * We tested REBEL on 3 datasets: Compositional Celebrities (Ofir Press, 2022), FEVER (Thorne et al., 2018), and
-HotPotQA (Yang et al., 2018). ☑
+HotPotQA (Yang et al., 2018). 
 * On these datasets, correctness was determined by a human experimenter based on the output of each system. ReAct outputs with simply the answer to the question, while REBEL
 often outputs the answer wrapped in reasoning behind the system’s thoughts. 
 * Our code, which can be found at in this directory, was implemented in Python using the OpenAI Completion API to access GPT-3 (da-vinci-003).
