@@ -184,6 +184,109 @@ class Base_Onsite_LLM(ABC):
     def finetune_immediately(self):
         finetune()()
 
+
+class TokenStreamerDisguisedAsStoppingCriterion:
+    def __init__(self, token_streamer):
+        self.token_streamer = token_streamer
+
+    def __call__(self, input_ids, scores, **kwargs):
+        self.token_streamer(input_ids, scores, **kwargs)
+        return False
+
+
+class TokenStreamer:
+    def __call__(self, input_ids, scores, **kwargs):
+        raise NotImplementedError
+
+
+class TransformersLLM:
+    def __init__(self, model_identifier, **kwargs):
+        self.model_identifier = model_identifier
+        self.model_args = kwargs
+
+        from transformers import AutoModelForCausalLM
+        print(f"Creating {self.model_identifier} model instance using AutoModelForCausalLM transformers module", flush=True)
+        self.model = AutoModelForCausalLM.from_pretrained(self.model_identifier, **self.model_args)
+        
+        print(f"{self.model_identifier} model is ready for use on {self.model.device}", flush=True)
+
+        self.max_batch_size = kwargs.get("batch_size", 8)
+
+    @property
+    def eos_token_id(self):
+        return self.model.config.eos_token_id
+
+    def score(self, input_ids, attention_mask, **model_kwargs):
+        input_ids = torch.tensor(input_ids)
+        attention_mask = torch.tensor(attention_mask)
+        
+        # prepare model inputs
+        model_inputs = self.model.prepare_inputs_for_generation(input_ids, **model_kwargs, eos_token_id=self.eos_token_id)
+        model_inputs["attention_mask"] = attention_mask
+
+        token_scores = []
+        
+        outputs = self.model(
+            **model_inputs,
+            return_dict=True,
+            output_attentions=False,
+            output_hidden_states=False,
+        )
+
+        next_token_logits = outputs.logits[:, -len(input_ids), :]
+        next_token_logits = torch.log_softmax(next_token_logits, dim=-1)
+        token_scores = next_token_logits.gather(-1, input_ids)
+
+        return token_scores
+    
+    def generate(self, input_ids, attention_mask, temperature, max_new_tokens, bias_tensor, streamer):
+        input_ids = torch.tensor(input_ids)
+        attention_mask = torch.tensor(attention_mask)
+        
+        kwargs = {
+            "input_ids": input_ids.to(self.model.device),
+            "do_sample": temperature > 0.0,
+            "attention_mask": attention_mask.to(self.model.device),
+            "temperature": temperature,
+            "max_new_tokens": max_new_tokens,
+            "logits_processor": self.logits_processors(bias_tensor),
+            "output_scores": True,
+            "return_dict_in_generate": True
+        }
+
+        result = self.model.generate(**kwargs, stopping_criteria=[TokenStreamerDisguisedAsStoppingCriterion(streamer)], 
+                                     eos_token_id=self.eos_token_id, pad_token_id=self.eos_token_id)
+
+        return (result.sequences, result.scores)
+    
+    def make_bias_tensor(self, logit_biases, vocab_size):
+        bias_tensors = [torch.zeros(vocab_size) for _ in logit_biases]
+        for i, bias in enumerate(logit_biases):
+            if len(bias) > 0:
+                indices = torch.tensor(list(bias.keys()), dtype=torch.int64)
+                values = torch.tensor(list(bias.values()), dtype=torch.float32)
+                bias_tensors[i][indices] = values
+        return torch.stack(bias_tensors)
+    
+    def logits_processors(self, logit_biases):
+        bias_tensors = None
+        make_bias_tensor = self.make_bias_tensor
+        
+        if len(logit_biases) == 0:
+            return []
+
+        class BatchLogitsProcessor:
+            def __call__(self, input_ids, scores):
+                nonlocal bias_tensors
+
+                if bias_tensors is None:
+                    bias_tensors = torch.tensor(make_bias_tensor(logit_biases, scores.shape[-1])).to(scores.device)
+
+                return scores + bias_tensors
+
+        return [BatchLogitsProcessor()]
+    
+
 """
 this factorization isn't necessarily the greatest, nor should it be viewed
 as likely being more general, aside from covering hugging face transformers
