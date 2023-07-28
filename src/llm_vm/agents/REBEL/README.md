@@ -1,10 +1,11 @@
-![Anarchy Logo](figure.png)
+![Anarchy Logo](diagram.png)
 *Figure 1: The Rebel Pipeline for each subquestion*
 # REBEL
 
 Welcome to the REBEL repository! 
 
 ## Table of Contents
+- [Installation](#installation)
 - [Reproducibility](#reproducibility)
 - [Abstract](#abstract)
 - [Methods](#methods)
@@ -13,20 +14,61 @@ Welcome to the REBEL repository!
 - [Results](#results)
 - [Authors](#authors)
 
-## Reproducibility
-First run
+## Installation
+To install REBEL first run
+
+```
+git clone https://github.com/anarchy-ai/LLM-VM.git
+pip install .
+```
+
+From the root LLM-VM directory, we need to go to the REBEL directory.
+
+```
+cd .\src\llm_vm\agents\REBEL
+```
+
+and then run
+
 ```
 pip install -r requirements.txt
 ```
 
+## Reproducibility
+After installation is complete there are a few ways that you can run REBEL. The first is through the quickstart_REBEL.py in the root LLM_VM directory. 
 To run the REBEL agent run 
 ```
 python quickstart_REBEL.py
 ```
-in the root LLM-VM directory. In the quickstart_REBEL.py file it is shown how one can use the LLM-VM client function to declare tools and use the REBEL agent. 
+In the quickstart_REBEL.py file it is shown how one can use the LLM-VM client function to declare tools and use the REBEL agent. You can add more tools to the file and change the query REBEL is run on. 
 
-The quickstart_REBEL.py file allows you to run REBEL with any tool that you want to, but to run tests on the compositional celebrities dataset, run 
+Secondly, you can run REBEL by importing client from llm_vm in the following way:
 
+```
+from llm_vm.client import Client
+import os
+
+# Instantiate the client specifying which LLM you want to use
+client = Client(big_model='chat_gpt', small_model='gpt') #REBEL will use chat_gpt no matter what big model is specified here, this specification exists for non-REBEL completion calls. 
+
+#Calling client.complete with a tool list specified leads to the REBEL agent being used.
+response = client.complete(
+	 prompt = 'Is it warmer in Paris or Timbuktu and what are the temperatures in either city?',
+         context='',
+         openai_key=os.getenv("OPENAI_API_KEY"), #for REBEL we need an OpenAI key
+         tools=[{'description': 'Find the weather at a location and returns it in celcius.',  #this tool list contains only one dictionary, therefore only one tool
+                 'dynamic_params': {
+		 		   "latitude": 'latitude of as a float',
+		 		   "longitude": 'the longitude as a float'
+				   },
+                 'method': 'GET',
+                 'url': "https://api.open-meteo.com/v1/forecast",
+                 'static_params': {'current_weather': 'true'}}]) #No tools by default, so you have to add your own
+print(response)
+```
+This is identical to how the code in quickstart_REBEL accesses REBEL, but this can be done by any file written in the LLM_VM root directory. Any calls to client.complete that contains a list of tools passed to the parameter "tools" will result in the usage of the REBEL repository. 
+
+Lastly to run tests on the Compositional Celebrities database run
 ```
 python test_agent.py
 ```
@@ -60,12 +102,6 @@ Below we present data on the REBEL agent and its merits.
 * We introduce a method, Recursion based extensible LLM (REBEL), which handles open-world, deep reasoning tasks. REBEL allows LLMs to reason via recursive problem decomposition and utilization of external tools. 
 
 ## Methods
-<p align="center" width="100%">
-    <img width="60%" src="dia.png">
-</p>
-
-*Figure 2: REBEL recursive reasoning and data flow*
-
 
 * We split each question recursively into subquestions in order to solve
 compositional tasks.
@@ -117,7 +153,3 @@ Meet the awesome minds behind REBEL:
   - LinkedIn: [Matthew Mirman](https://www.linkedin.com/in/matthewmirman/)
 
 These talented individuals have brought their expertise and passion to make REBEL a reality. Connect with them and get to know more about their contributions.
-
-Feel free to reach out to us if you have any questions or feedback. Happy coding! 🎉🚀
-
-
