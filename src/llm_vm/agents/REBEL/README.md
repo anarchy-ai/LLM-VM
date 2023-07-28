@@ -1,8 +1,9 @@
-![Anarchy Logo](diagram.png)
-*Figure 1: The Rebel Pipeline for each subquestion*
 # REBEL
 
 Welcome to the REBEL repository! 
+
+![Anarchy Logo](diagram.png)
+*Figure 1: The Rebel Pipeline for each subquestion*
 
 ## Table of Contents
 - [Installation](#installation)
