@@ -58,22 +58,20 @@ Secondly, you can run REBEL by importing client from llm_vm in the following way
 from llm_vm.client import Client
 import os
 
-# Instantiate the client specifying which LLM you want to use
-client = Client(big_model='chat_gpt', small_model='gpt') #REBEL will use chat_gpt no matter what big model is specified here, this specification exists for non-REBEL completion calls. 
+client = Client(big_model='chat_gpt', small_model='gpt')
 
-#Calling client.complete with a tool list specified leads to the REBEL agent being used.
 response = client.complete(
 	 prompt = 'Is it warmer in Paris or Timbuktu and what are the temperatures in either city?',
          context='',
          openai_key=os.getenv("OPENAI_API_KEY"), #for REBEL we need an OpenAI key
-         tools=[{'description': 'Find the weather at a location and returns it in celcius.',  #this tool list contains only one dictionary, therefore only one tool
+         tools=[{'description': 'Find the weather at a location and returns it in celcius.',  
                  'dynamic_params': {
 		 		   "latitude": 'latitude of as a float',
 		 		   "longitude": 'the longitude as a float'
 				   },
                  'method': 'GET',
                  'url': "https://api.open-meteo.com/v1/forecast",
-                 'static_params': {'current_weather': 'true'}}]) #No tools by default, so you have to add your own
+                 'static_params': {'current_weather': 'true'}}]) 
 print(response)
 ```
 This is identical to how the code in quickstart_REBEL accesses REBEL, but this can be done by any file written in the LLM_VM root directory. Any calls to client.complete that contains a list of tools passed to the parameter "tools" will result in the usage of the REBEL repository. 
