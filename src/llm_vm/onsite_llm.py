@@ -199,13 +199,13 @@ class TokenStreamer:
         raise NotImplementedError
 
 
-class TransformersLLM:
-    def __init__(self, model_identifier, **kwargs):
-        self.model_identifier = model_identifier
+class HFTransformers:
+    def __init__(self, model_uri, **kwargs):
+        self.model_identifier = model_uri
         self.model_args = kwargs
 
         from transformers import AutoModelForCausalLM
-        print(f"Creating {self.model_identifier} model instance using AutoModelForCausalLM transformers module", flush=True)
+        print(f"Creating {self.model_identifier} instance using AutoModelForCausalLM transformers module", flush=True)
         self.model = AutoModelForCausalLM.from_pretrained(self.model_identifier, **self.model_args)
         
         print(f"{self.model_identifier} model is ready for use on {self.model.device}", flush=True)
@@ -222,6 +222,7 @@ class TransformersLLM:
         
         # prepare model inputs
         model_inputs = self.model.prepare_inputs_for_generation(input_ids, **model_kwargs, eos_token_id=self.eos_token_id)
+        print(model_input)
         model_inputs["attention_mask"] = attention_mask
 
         token_scores = []
@@ -570,3 +571,21 @@ class Chat_GPT:
         # optimizer.storage.set_training_in_progress(c_id, False)
         # if old_model is not None:
         #     openai.Model.delete(old_model)
+
+
+
+if __name__ == "__main__":
+    model = HFTransformers("facebook/opt-350m")
+    tokenizer = AutoTokenizer.from_pretrained("facebook/opt-350m")
+
+    input_text = "The person performing the heart surgery is a"
+    input_ids = tokenizer(input_text, return_tensors="pt")
+    print(input_ids)
+    model_input = input_ids["input_ids"]
+    print(model_input)
+    class DebugStreamer:
+        def __call__(self, tokens, scores):
+            print(tokenizer.decode(tokens[-1]))
+            return False
+    output = model.generate(model_input, torch.ones_like(model_input), 1.0, 50, [], DebugStreamer())
+    # print("Response: ", output)
