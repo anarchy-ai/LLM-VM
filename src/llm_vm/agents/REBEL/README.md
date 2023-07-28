@@ -8,7 +8,7 @@ Welcome to the REBEL repository!
 - [Installation](#installation)
 - [Requirements](#requirements)
 - [Usage](#usage)
-- [Abstract](#abstract)
+- [Background](#background)
 - [Methods](#methods)
 - [Evaluation](#evaluation)
 - [Experimental](#experimental-setup)
@@ -117,7 +117,7 @@ in the REBEL directory. After running test_agent.py you will see a menu like thi
 Enter the number of the category you want to test, and then press enter to start the experiment. 
 Below we present data on the REBEL agent and its merits. 
 
-## Abstract
+## Background
 
 * While large language models (LLMs) have demonstrated impressive performance in question answering tasks, their performance is limited when the questions require knowledge that is not included in the model’s training data and can only be acquired through direct observation or interaction with the real world. 
 * Existing methods decompose reasoning tasks through the use of modules invoked sequentially, limiting their ability to answer deep reasoning tasks. 
