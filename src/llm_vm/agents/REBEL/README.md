@@ -6,13 +6,19 @@ Welcome to the REBEL repository!
 
 ## Table of Contents
 - [Installation](#installation)
-- [Reproducibility](#reproducibility)
+- [Requirements](#requirements)
+- [Usage](#usage)
 - [Abstract](#abstract)
 - [Methods](#methods)
 - [Evaluation](#evaluation)
 - [Experimental](#experimental-setup)
 - [Results](#results)
 - [Authors](#authors)
+
+## Requirements
+To run REBEL you need to have a Python version that is greater than 3.8. 
+
+All other requirements that can be installed using the Installation section. 
 
 ## Installation
 To install REBEL first run
@@ -34,13 +40,17 @@ and then run
 pip install -r requirements.txt
 ```
 
-## Reproducibility
-After installation is complete there are a few ways that you can run REBEL. The first is through the quickstart_REBEL.py in the root LLM_VM directory. 
+## Usage
+After installation is complete there are a few ways that you can run REBEL. 
+
+
+The first is through the quickstart_REBEL.py in the root LLM_VM directory. 
 To run the REBEL agent run 
 ```
 python quickstart_REBEL.py
 ```
 In the quickstart_REBEL.py file it is shown how one can use the LLM-VM client function to declare tools and use the REBEL agent. You can add more tools to the file and change the query REBEL is run on. 
+
 
 Secondly, you can run REBEL by importing client from llm_vm in the following way:
 
@@ -67,6 +77,18 @@ response = client.complete(
 print(response)
 ```
 This is identical to how the code in quickstart_REBEL accesses REBEL, but this can be done by any file written in the LLM_VM root directory. Any calls to client.complete that contains a list of tools passed to the parameter "tools" will result in the usage of the REBEL repository. 
+
+To define a tool create a dictionary with the following fields:
+
+|Field| Type | Description|
+|-|-|-|
+|```'description'```| string | A description of what the tool does|
+|```'dynamic_params'```| dictionary | A dictionary containing key value pairs (paramter name : description) of the API endpoint's mutable parameters that need to be set by REBEL in order to answer a query|
+|```'method'```| string | ```GET``` or ```POST```, whichever is the type of the API endpoint|
+|```'url'```| string | URL of the API endpoint that the given tool specifies|
+|```'static_params'```| dictionary | Any parameters that are constant between all API calls. An API key/token is an example of this|
+
+
 
 Lastly to run tests on the Compositional Celebrities database run
 ```
@@ -116,6 +138,7 @@ determine an answer, and which number tool is required.
 the answering of all subsequent subquestions.
 * For each subquestion, REBEL uses a pipeline of Question Splitting, Memory
 Checking, Tool Picking, and Tool Input Generation to determine an answer.
+
 ## Evaluation
 
 In this section we first introduce the experimental setup, including the benchmarks used for evaluation, and then present the results. 
@@ -126,7 +149,7 @@ In this section we first introduce the experimental setup, including the benchma
 HotPotQA (Yang et al., 2018). 
 * On these datasets, correctness was determined by a human experimenter based on the output of each system. ReAct outputs with simply the answer to the question, while REBEL
 often outputs the answer wrapped in reasoning behind the system’s thoughts. 
-* Our code, which can be found at in this directory, was implemented in Python using the OpenAI Completion API to access GPT-3 (da-vinci-003).
+* Our code, which can be found at in this directory, was implemented in Python using the OpenAI Completion API to access GPT-3 (text-davinci-003).
 
 ## Results
 
@@ -134,12 +157,28 @@ often outputs the answer wrapped in reasoning behind the system’s thoughts.
 
 * Below is the table depicting the results of the REBEL system versus ReAct on Compositional Celebrities.
 
-<img width="400" alt="image" src="https://github.com/anarchy-ai/LLM-VM/assets/37461794/842ff756-f52b-403d-94a0-595e5ac9bba7">
+| Category    | ReAct | REBEL | 
+|-------------|-------------------|------------------|
+|Birthplace_Rounded_Lat | 28 | **59** |
+|Birthplace_Currency| 85 | **94** |
+|Birthplace_Currency_Symbol| 35 | **47** |
+|Birthplace_NobelLiterature| 33 | **82** |
+|Birthdat_USPresident| 53 | **90** |
 
 * Below is the table depicting the results of the REBEL systhem versus ReAct on HotPotQA and FEVER.
 
-<img width="300" alt="image" src="https://github.com/anarchy-ai/LLM-VM/assets/37461794/de2e1df4-7f4a-4947-8c32-2ce4312df484">
+| Dataset    | ReAct | REBEL | 
+|-------------|-------------------|------------------|
+|FEVER | 72 | **78** |
+|HotPotQA| **63** | 50 |
 
+## Publications
+
+*  [LLM Guided Inductive Inference for Solving Compositional Problems](https://drive.google.com/file/d/1Lmc7jXahND43vPRSdjiGadCLHw2U_y1i/view).
+
+    Abhigya Sodani, Lauren Moos, Matthew Mirman
+
+    ICML TEACH23.
 ## Authors 
 
 Meet the awesome minds behind REBEL:
