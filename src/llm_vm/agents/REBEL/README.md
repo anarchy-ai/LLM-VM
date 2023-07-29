@@ -149,6 +149,7 @@ HotPotQA (Yang et al., 2018).
     Abhigya Sodani, Lauren Moos, Matthew Mirman
 
     ICML TEACH23.
+   
 ## Authors 
 
 Meet the awesome minds behind REBEL:
@@ -157,7 +158,7 @@ Meet the awesome minds behind REBEL:
   - GitHub: [abhigya-sodani](https://github.com/abhigya-sodani)
   - LinkedIn: [Abhigya Sodani](https://www.linkedin.com/in/abhigya-sodani-405918160/)
 
-- **Dr. Matthew Mirman** - CEO of Anarchy, PhD ETH Zurich
+- **Matthew Mirman** - CEO of Anarchy, PhD ETH Zurich
   - GitHub: [Matthew Mirman](https://github.com/mmirman)
   - LinkedIn: [Matthew Mirman](https://www.linkedin.com/in/matthewmirman/)
 
@@ -173,8 +174,3 @@ These talented individuals have brought their expertise and passion to make REBE
   url={https://drive.google.com/file/d/1Lmc7jXahND43vPRSdjiGadCLHw2U_y1i/view},
 }
 ```
-## References
-* Sewon Min Ludwig Schmidt Noah A. Smith Mike Lewis Ofir Press, Muru Zhang. Measuring and narrowing the compositionality gap in language models. arXiv:2210.03350v1, 2022.
-* Dian Yu Nan Du Izhak Shafran Karthik Narasimhan Yuan Cao Shunyu Yao, Jeffrey Zhao. React: Synergizing reasoning and acting in language models. ICLR, 2023.
-* James Thorne, Andreas Vlachos, Christos Christodoulopoulos, and Arpit Mittal. Fever: a large-scale dataset for fact extraction and verification. arXiv preprint arXiv:1803.05355, 2018.
-* Zhilin Yang, Peng Qi, Saizheng Zhang, Yoshua Bengio, William W Cohen, Ruslan Salakhutdinov, and Christopher D Manning. Hotpotqa: A dataset for diverse, explainable multi-hop question answering. arXiv preprint arXiv:1809.09600, 2018.
