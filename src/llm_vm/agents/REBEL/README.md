@@ -3,7 +3,6 @@
 This is the code for the "LLM Guided Inductive Inference for Solving Compositional Problems" paper presented at ICML TEACH23
 
 ![Anarchy Logo](diagram.png)
-*Figure 1: The Rebel Pipeline for each subquestion*
 
 ## Table of Contents
 - [Installation](#installation)
