@@ -1,6 +1,6 @@
 # REBEL
 
-Welcome to the REBEL repository! 
+This is the code for the "LLM Guided Inductive Inference for Solving Compositional Problems" paper presented at ICML TEACH23
 
 ![Anarchy Logo](diagram.png)
 *Figure 1: The Rebel Pipeline for each subquestion*
@@ -10,11 +10,10 @@ Welcome to the REBEL repository!
 - [Requirements](#requirements)
 - [Usage](#usage)
 - [Background](#background)
-- [Methods](#methods)
 - [Evaluation](#evaluation)
-- [Experimental](#experimental-setup)
-- [Results](#results)
 - [Authors](#authors)
+- [Citation](#citation)
+- [References](#references)
 
 ## Requirements
 To run REBEL you need to have a Python version that is greater than 3.8. 
@@ -122,39 +121,12 @@ Below we present data on the REBEL agent and its merits.
 * Existing methods decompose reasoning tasks through the use of modules invoked sequentially, limiting their ability to answer deep reasoning tasks. 
 * We introduce a method, Recursion based extensible LLM (REBEL), which handles open-world, deep reasoning tasks. REBEL allows LLMs to reason via recursive problem decomposition and utilization of external tools. 
 
-## Methods
-
-* We split each question recursively into subquestions in order to solve
-compositional tasks.
-* We stop recursive splitting when a generated subquestion has a embedded
-cosine similarity of 98 percent with the question it was generated for.
-* We allow the use of any external tool that can be defined by a GET/POST
-request to an API endpoint.
-* The REBEL system contains a numbered list of the tools we have available and
-their descriptions. For each subquestion, we determine if a tool is required to
-determine an answer, and which number tool is required.
-* We append all answers to subquestions to a "facts" list, and use this to inform
-the answering of all subsequent subquestions.
-* For each subquestion, REBEL uses a pipeline of Question Splitting, Memory
-Checking, Tool Picking, and Tool Input Generation to determine an answer.
-
 ## Evaluation
-
-In this section we first introduce the experimental setup, including the benchmarks used for evaluation, and then present the results. 
-
-## Experimental Setup
 
 * We tested REBEL on 3 datasets: Compositional Celebrities (Ofir Press, 2022), FEVER (Thorne et al., 2018), and
 HotPotQA (Yang et al., 2018). 
-* On these datasets, correctness was determined by a human experimenter based on the output of each system. ReAct outputs with simply the answer to the question, while REBEL
-often outputs the answer wrapped in reasoning behind the system’s thoughts. 
-* Our code, which can be found at in this directory, was implemented in Python using the OpenAI Completion API to access GPT-3 (text-davinci-003).
 
-## Results
-
-* We found that REBEL outperformed ReAct on answering questions that require i) the gathering of many facts to determine an answer ii) very specific search queries that return large amounts of unstructured data. 
-
-* Below is the table depicting the results of the REBEL system versus ReAct on Compositional Celebrities.
+* Below is the table depicting the accuracy of the REBEL system versus ReAct on Compositional Celebrities.
 
 | Category    | ReAct | REBEL | 
 |-------------|-------------------|------------------|
@@ -164,7 +136,7 @@ often outputs the answer wrapped in reasoning behind the system’s thoughts.
 |Birthplace_NobelLiterature| 33 | **82** |
 |Birthdat_USPresident| 53 | **90** |
 
-* Below is the table depicting the results of the REBEL systhem versus ReAct on HotPotQA and FEVER.
+* Below is the table depicting the accuracy of the REBEL systhem versus ReAct on HotPotQA and FEVER.
 
 | Dataset    | ReAct | REBEL | 
 |-------------|-------------------|------------------|
@@ -191,3 +163,19 @@ Meet the awesome minds behind REBEL:
   - LinkedIn: [Matthew Mirman](https://www.linkedin.com/in/matthewmirman/)
 
 These talented individuals have brought their expertise and passion to make REBEL a reality. Connect with them and get to know more about their contributions.
+
+## Citation
+```
+@inproceedings{
+  title={LLM Guided Inductive Inference for Solving Compositional Problems},
+  author={Sodani, Moos, and Mirman},
+  booktitle={International Conference on Machine Learning (ICML) TEACH Workshop},
+  year={2023},
+  url={https://drive.google.com/file/d/1Lmc7jXahND43vPRSdjiGadCLHw2U_y1i/view},
+}
+```
+## References
+* Sewon Min Ludwig Schmidt Noah A. Smith Mike Lewis Ofir Press, Muru Zhang. Measuring and narrowing the compositionality gap in language models. arXiv:2210.03350v1, 2022.
+* Dian Yu Nan Du Izhak Shafran Karthik Narasimhan Yuan Cao Shunyu Yao, Jeffrey Zhao. React: Synergizing reasoning and acting in language models. ICLR, 2023.
+* James Thorne, Andreas Vlachos, Christos Christodoulopoulos, and Arpit Mittal. Fever: a large-scale dataset for fact extraction and verification. arXiv preprint arXiv:1803.05355, 2018.
+* Zhilin Yang, Peng Qi, Saizheng Zhang, Yoshua Bengio, William W Cohen, Ruslan Salakhutdinov, and Christopher D Manning. Hotpotqa: A dataset for diverse, explainable multi-hop question answering. arXiv preprint arXiv:1809.09600, 2018.
