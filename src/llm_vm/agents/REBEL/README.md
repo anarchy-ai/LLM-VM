@@ -13,6 +13,7 @@ This is the code for the "LLM Guided Inductive Inference for Solving Composition
 - [Authors](#authors)
 - [Citation](#citation)
 - [References](#references)
+- [Contact](#contact)
 
 ## Requirements
 To run REBEL you need to have a Python version that is greater than 3.8. 
@@ -125,7 +126,7 @@ Below we present data on the REBEL agent and its merits.
 * We tested REBEL on 3 datasets: Compositional Celebrities (Ofir Press, 2022), FEVER (Thorne et al., 2018), and
 HotPotQA (Yang et al., 2018). 
 
-* Below is the table depicting the accuracy of the REBEL system versus ReAct on Compositional Celebrities.
+* Below is the table depicting the accuracy percentage of the REBEL system versus ReAct on Compositional Celebrities.
 
 | Category    | ReAct | REBEL | 
 |-------------|-------------------|------------------|
@@ -135,7 +136,7 @@ HotPotQA (Yang et al., 2018).
 |Birthplace_NobelLiterature| 33 | **82** |
 |Birthdat_USPresident| 53 | **90** |
 
-* Below is the table depicting the accuracy of the REBEL systhem versus ReAct on HotPotQA and FEVER.
+* Below is the table depicting the accuracy percentage of the REBEL systhem versus ReAct on HotPotQA and FEVER.
 
 | Dataset    | ReAct | REBEL | 
 |-------------|-------------------|------------------|
@@ -168,9 +169,13 @@ These talented individuals have brought their expertise and passion to make REBE
 ```
 @inproceedings{
   title={LLM Guided Inductive Inference for Solving Compositional Problems},
-  author={Sodani, Moos, and Mirman},
+  author={Abhigya Sodani, Lauren Moos, and Matthew Mirman},
   booktitle={International Conference on Machine Learning (ICML) TEACH Workshop},
   year={2023},
   url={https://drive.google.com/file/d/1Lmc7jXahND43vPRSdjiGadCLHw2U_y1i/view},
 }
 ```
+
+## Contact
+
+Contact abhigya@anarchy.ai for any questions or concerns about REBEL. 
