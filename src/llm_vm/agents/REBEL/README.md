@@ -130,18 +130,18 @@ HotPotQA (Yang et al., 2018).
 
 | Category    | ReAct | REBEL | 
 |-------------|-------------------|------------------|
-|Birthplace_Rounded_Lat | 28 | **59** |
-|Birthplace_Currency| 85 | **94** |
-|Birthplace_Currency_Symbol| 35 | **47** |
-|Birthplace_NobelLiterature| 33 | **82** |
-|Birthdat_USPresident| 53 | **90** |
+|Birthplace_Rounded_Lat | 28% | **59%** |
+|Birthplace_Currency| 85% | **94%** |
+|Birthplace_Currency_Symbol| 35% | **47%** |
+|Birthplace_NobelLiterature| 33% | **82%** |
+|Birthdat_USPresident| 53% | **90%** |
 
 * Below is the table depicting the accuracy percentage of the REBEL systhem versus ReAct on HotPotQA and FEVER.
 
 | Dataset    | ReAct | REBEL | 
 |-------------|-------------------|------------------|
-|FEVER | 72 | **78** |
-|HotPotQA| **63** | 50 |
+|FEVER | 72% | **78%** |
+|HotPotQA| **63%** | 50% |
 
 ## Publications
 
