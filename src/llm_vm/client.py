@@ -13,7 +13,7 @@ else:
     default_big_model= conf.settings.big_model
 
 if conf.settings.small_model is not  None:
-    default_small_model= "pythia"
+    default_small_model= "opt"
 else:    
     default_small_model = conf.settings.small_model
 
@@ -61,7 +61,7 @@ class Client:
 
         #     return self.teacher.generate(prompt, max_len,**kwargs)
 
-        def CALL_SMALL(prompt, max_len=256, **kwargs):
+        def CALL_SMALL(prompt, max_len=40, **kwargs):
 
             return self.student.generate(prompt, max_len,**kwargs)
 
@@ -82,7 +82,8 @@ class Client:
                  data_synthesis = False,
                  temperature=0,
                  stoptoken = None,
-                 tools = None):
+                 tools = None,
+                 regex = None):
         """
         This function is Anarchy's completion entry point
 
@@ -107,6 +108,9 @@ class Client:
         kwargs = {}
 
         kwargs.update({"temperature":temperature})
+
+        if regex is not None:
+            kwargs.update({"regex" : regex})
 
         if openai_key is not None:
             self.openai_key = openai_key

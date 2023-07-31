@@ -24,6 +24,8 @@ import json
 import os
 import torch
 
+from llm_vm.conditioner.regex_conditioner import RegexConditioner , NoMaskProcessor
+
 
 __private_key_value_models_map =  {}
 # []   {
@@ -108,7 +110,7 @@ class Base_Onsite_LLM(ABC):
         self.model.load_state_dict(torch.load(os.path.join(model_path_default,"finetuned_models", self.model_name, model_filename)))
 
 
-    def generate(self,prompt,max_length=100,**kwargs): # both tokenizer and model take kwargs :(
+    def generate(self,prompt,max_length=40,**kwargs): # both tokenizer and model take kwargs :(
         """
         This function uses the class's llm and tokenizer to generate a response given a user's prompt
 
@@ -124,12 +126,53 @@ class Base_Onsite_LLM(ABC):
            >>> Small_Local_OPT.generate("How long does it take for an apple to grow?)
            I think it takes about a week for the apple to grow.
         """
-        inputs=self.tokenizer(prompt,return_tensors="pt")
-        generate_ids=self.model.generate(inputs.input_ids,max_length=max_length)
-        resp= self.tokenizer.batch_decode(generate_ids,skip_special_tokens=True,clean_up_tokenization_spaces=False)[0]
-        # need to drop the len(prompt) prefix with these sequences generally
-        # because they include the prompt.
-        return resp[len(prompt):]
+        max_length = 20
+        if kwargs.get("regex"):
+            output_conditioner = RegexConditioner(
+                text = kwargs.get("regex") , 
+                tokenizer =  self.tokenizer
+            )
+        else:
+            output_conditioner = None 
+
+        
+        generated_tokens = 0
+        partial_completion = ""
+        prompt_plus_completion = prompt
+
+        while generated_tokens < max_length:
+            token_ids = self.tokenizer.encode(prompt_plus_completion, return_tensors="pt")
+            prompt_length = token_ids.shape[1]
+
+            if output_conditioner:
+                custom_mask_processor = output_conditioner.filter_and_mask_tokens(partial_completion=partial_completion)
+            else:
+                custom_mask_processor = NoMaskProcessor()
+
+
+            output_ids = self.model.generate(
+                input_ids = token_ids, 
+                max_new_tokens = 1,
+                pad_token_id=self.tokenizer.eos_token_id,
+                logits_processor=[custom_mask_processor],
+            )
+
+            new_token_ids = output_ids[0, prompt_length:]
+            output_text = self.tokenizer.decode(new_token_ids, skip_special_tokens=True)
+            partial_completion += output_text
+            print(output_text , generated_tokens)
+            prompt_plus_completion = prompt_plus_completion + output_text
+
+            generated_tokens += 1
+
+        return partial_completion
+
+        # inputs=self.tokenizer(prompt,return_tensors="pt")
+        # generate_ids=self.model.generate(inputs.input_ids,max_length=max_length)
+        # resp= self.tokenizer.batch_decode(generate_ids,skip_special_tokens=True,clean_up_tokenization_spaces=False)[0]
+        # # need to drop the len(prompt) prefix with these sequences generally
+        # # because they include the prompt.
+        # return resp[len(prompt):]
 
     def finetune(self,data, optimizer, c_id):
         def asynctune():

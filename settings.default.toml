@@ -1,6 +1,6 @@
 # Default settings for your application
 BIG_MODEL = "chat_gpt"
 PORT = 3002
-SMALL_MODEL = "pythia"
+SMALL_MODEL = "opt"
 HOST = "127.0.0.1"
 OPENAI_API_KEY = "$YOUR API KEY HERE"
