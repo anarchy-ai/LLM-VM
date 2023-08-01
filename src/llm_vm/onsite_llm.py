@@ -5,6 +5,7 @@ import math
 from transformers import (
     AutoModelForMaskedLM,
     AutoModelForSeq2SeqLM,
+    AutoModelForCausalLM,
     AutoTokenizer,
     BertTokenizer,
     OPTForCausalLM,
@@ -16,13 +17,18 @@ from transformers import (
     GPT2Tokenizer,
     DataCollatorForLanguageModeling,
     TrainingArguments,
-    Trainer)
+    Trainer,
+    LogitsProcessor,
+    LogitsProcessorList,
+    )
 import time
 from datetime import datetime
 import tempfile
 import json
 import os
 import torch
+import re
+
 
 
 __private_key_value_models_map =  {}
@@ -185,64 +191,171 @@ class Base_Onsite_LLM(ABC):
         finetune()()
 
 
-class TokenStreamerDisguisedAsStoppingCriterion:
+class TokenStreamerAsStoppingCriterion:
     def __init__(self, token_streamer):
         self.token_streamer = token_streamer
 
     def __call__(self, input_ids, scores, **kwargs):
-        self.token_streamer(input_ids, scores, **kwargs)
-        return False
+        if self.token_streamer is None:
+            return False
+        else:
+            self.token_streamer(input_ids, scores, **kwargs)
+            return False
 
 
-class TokenStreamer:
-    def __call__(self, input_ids, scores, **kwargs):
-        raise NotImplementedError
+class RegexBiasLogitsProcessor(LogitsProcessor):
+   
+
+        def __init__(self, sequence_bias):
+            self.sequence_bias = sequence_bias
+            self._validate_arguments()
+
+            # Bias variables that will be populated on the first call (for retrocompatibility purposes, the vocabulary size
+            # is infered in the first usage, which inhibits initializing here)
+            self.sequences_length_greater_than_1 = []
+            self.length_1_bias = None
+            self.length_greather_than_1_bias = None
+            self.prepared_bias_variables = False
+
+        def __call__(self, input_ids: torch.LongTensor, scores: torch.FloatTensor) -> torch.FloatTensor:
+            # 1 - Prepares the bias tensors. This is only needed the first time the logit processor is called.
+            if not self.prepared_bias_variables:
+                self._prepare_bias_variables(scores)
+
+            # 2 - prepares an empty bias to add
+            bias = torch.zeros_like(scores)
+
+            # 3 - include the bias from length = 1
+            bias += self.length_1_bias
+
+            # 4 - include the bias from length > 1, after determining which biased sequences may be completed.
+            # `matching_mask` is a (batch_size, vocab_size) boolean mask that is True for all tokens whose corresponding
+            # bias should be applied. The bias is applied on the last token of the sequence, if (and only if) the sequence
+            # may become complete this iteration.
+            matching_mask = torch.zeros_like(scores, dtype=torch.bool)
+            for sequence_ids in self.sequences_length_greater_than_1:
+                if len(sequence_ids) > input_ids.shape[1]:  # the sequence is longer than the context, ignore
+                    continue
+                prefix_length = len(sequence_ids) - 1
+                last_token = sequence_ids[-1]
+                matching_rows = torch.eq(
+                    input_ids[:, -prefix_length:],
+                    torch.tensor(sequence_ids[:-1], dtype=input_ids.dtype, device=input_ids.device),
+                ).prod(dim=1)
+                matching_mask[:, last_token] |= matching_rows.bool()
+            bias += torch.where(
+                matching_mask,
+                self.length_greather_than_1_bias,
+                torch.tensor(0.0, device=self.length_greather_than_1_bias.device),
+            )
+
+            # 5 - apply the bias to the scores
+            scores = scores + bias
+            return scores
+
+        def _prepare_bias_variables(self, scores: torch.FloatTensor):
+            vocabulary_size = scores.shape[-1]
+            sequence_bias = self.sequence_bias
+            tokens_with_bias = []
+
+            # Check biased tokens out of bounds
+            invalid_biases = []
+            for sequence_ids in sequence_bias:
+                for token_id in sequence_ids:
+                    if token_id >= vocabulary_size:
+                        invalid_biases.append(token_id)
+            if len(invalid_biases) > 0:
+                raise ValueError(
+                    f"The model vocabulary size is {vocabulary_size}, but the following tokens were being biased: "
+                    f"{invalid_biases}"
+                )
+
+            # Precompute the bias tensors to be applied. Sequences of length 1 are kept separately, as they can be applied
+            # with simpler logic.
+            self.length_1_bias = torch.zeros((vocabulary_size,), dtype=torch.float).to(scores.device)
+            self.length_greather_than_1_bias = torch.zeros((vocabulary_size,), dtype=torch.float).to(scores.device)
+            for sequence_ids, bias in sequence_bias.items():
+                if len(sequence_ids) == 1:
+                    self.length_1_bias[sequence_ids[-1]] = bias
+                else:
+                    self.sequences_length_greater_than_1.append(sequence_ids)
+                    if self.length_greather_than_1_bias[sequence_ids[-1]] != 0.0:
+                        raise ValueError(
+                            "Setting a bias on sequences that share a common token termination is not yet supported. "
+                            "Please open an issue if you see this error message (after checking that it doesn't already "
+                            "exist)."
+                        )
+                    self.length_greather_than_1_bias[sequence_ids[-1]] = bias
+                tokens_with_bias.append(sequence_ids[-1])
+
+            self.prepared_bias_variables = True
+
+        def _validate_arguments(self):
+            sequence_bias = self.sequence_bias
+            if not isinstance(sequence_bias, dict) or len(sequence_bias) == 0:
+                raise ValueError(f"`sequence_bias` has to be a non-empty dictionary, but is {sequence_bias}.")
+            if any(not isinstance(sequence_ids, tuple) for sequence_ids in sequence_bias.keys()):
+                raise ValueError(f"`sequence_bias` has to be a dict with tuples as keys, but is {sequence_bias}.")
+            if any(
+                any((not isinstance(token_id, (int, torch.int)) or token_id < 0) for token_id in sequence_ids)
+                or len(sequence_ids) == 0
+                for sequence_ids in sequence_bias.keys()
+            ):
+                raise ValueError(
+                    f"Each key in `sequence_bias` has to be a non-empty tuple of positive integers, but is "
+                    f"{sequence_bias}."
+                )
+            if any(not isinstance(bias, float) for bias in sequence_bias.values()):
+                raise ValueError(f"`sequence_bias` has to be a dict with floats as values, but is {sequence_bias}.")
 
 
-class HFTransformers:
+class HFTransformersWithRegex:
     def __init__(self, model_uri, **kwargs):
         self.model_identifier = model_uri
         self.model_args = kwargs
 
-        from transformers import AutoModelForCausalLM
         print(f"Creating {self.model_identifier} instance using AutoModelForCausalLM transformers module", flush=True)
         self.model = AutoModelForCausalLM.from_pretrained(self.model_identifier, **self.model_args)
-        
         print(f"{self.model_identifier} model is ready for use on {self.model.device}", flush=True)
-
+        self.tokenizer = AutoTokenizer.from_pretrained(self.model_identifier, add_prefix_space=True)
+        self.vocab_size = self.tokenizer.vocab_size
+        self.vocab = self.tokenizer.vocab
         self.max_batch_size = kwargs.get("batch_size", 8)
 
     @property
     def eos_token_id(self):
         return self.model.config.eos_token_id
 
-    def score(self, input_ids, attention_mask, **model_kwargs):
-        input_ids = torch.tensor(input_ids)
-        attention_mask = torch.tensor(attention_mask)
-        
-        # prepare model inputs
-        model_inputs = self.model.prepare_inputs_for_generation(input_ids, **model_kwargs, eos_token_id=self.eos_token_id)
-        print(model_input)
-        model_inputs["attention_mask"] = attention_mask
+    def _make_mask_from_regex(self, regex):
+        vocab_map = {v: k for k, v in self.vocab.items()}
+        space_repr = self.tokenizer.tokenize(" ")[0]
+        nl_repr = self.tokenizer.tokenize("\n")[0]
+        regex = regex.replace(" ", space_repr)
+        regex = regex.replace("\n", nl_repr)
+        regex = regex.replace(" ", self.tokenizer.tokenize(" ")[0])
 
-        token_scores = []
-        
-        outputs = self.model(
-            **model_inputs,
-            return_dict=True,
-            output_attentions=False,
-            output_hidden_states=False,
-        )
+        matching_tokens = []
+        pattern = re.compile(regex, re.UNICODE)
+        for id, subtoken in vocab_map.items():
+            if pattern.match(subtoken) is not None:
+                matching_tokens.append(subtoken)
 
-        next_token_logits = outputs.logits[:, -len(input_ids), :]
-        next_token_logits = torch.log_softmax(next_token_logits, dim=-1)
-        token_scores = next_token_logits.gather(-1, input_ids)
+        return matching_tokens
 
-        return token_scores
     
-    def generate(self, input_ids, attention_mask, temperature, max_new_tokens, bias_tensor, streamer):
-        input_ids = torch.tensor(input_ids)
-        attention_mask = torch.tensor(attention_mask)
+    def generate(self, input_ids, attention_mask, temperature, max_new_tokens, streamer, regex, r_bias):
+        assert torch.is_tensor(input_ids), "Input ids must be a torch tensor"
+        assert torch.is_tensor(attention_mask), "Attention mask must be a torch tensor"    
+
+        legal_tokens = self._make_mask_from_regex(regex)
+
+        seq_bias = {}
+        for t in legal_tokens:
+            t_tuple = tuple(self.tokenizer.encode(t, add_special_tokens=False))
+            seq_bias[t_tuple] = r_bias
+
+        logits_processor = LogitsProcessorList()
+        logits_processor.append(RegexBiasLogitsProcessor(seq_bias))
         
         kwargs = {
             "input_ids": input_ids.to(self.model.device),
@@ -250,43 +363,16 @@ class HFTransformers:
             "attention_mask": attention_mask.to(self.model.device),
             "temperature": temperature,
             "max_new_tokens": max_new_tokens,
-            "logits_processor": self.logits_processors(bias_tensor),
+            "logits_processor": logits_processor,
             "output_scores": True,
             "return_dict_in_generate": True
         }
 
-        result = self.model.generate(**kwargs, stopping_criteria=[TokenStreamerDisguisedAsStoppingCriterion(streamer)], 
+        result = self.model.generate(**kwargs, stopping_criteria=[TokenStreamerAsStoppingCriterion(streamer)], 
                                      eos_token_id=self.eos_token_id, pad_token_id=self.eos_token_id)
 
         return (result.sequences, result.scores)
-    
-    def make_bias_tensor(self, logit_biases, vocab_size):
-        bias_tensors = [torch.zeros(vocab_size) for _ in logit_biases]
-        for i, bias in enumerate(logit_biases):
-            if len(bias) > 0:
-                indices = torch.tensor(list(bias.keys()), dtype=torch.int64)
-                values = torch.tensor(list(bias.values()), dtype=torch.float32)
-                bias_tensors[i][indices] = values
-        return torch.stack(bias_tensors)
-    
-    def logits_processors(self, logit_biases):
-        bias_tensors = None
-        make_bias_tensor = self.make_bias_tensor
-        
-        if len(logit_biases) == 0:
-            return []
 
-        class BatchLogitsProcessor:
-            def __call__(self, input_ids, scores):
-                nonlocal bias_tensors
-
-                if bias_tensors is None:
-                    bias_tensors = torch.tensor(make_bias_tensor(logit_biases, scores.shape[-1])).to(scores.device)
-
-                return scores + bias_tensors
-
-        return [BatchLogitsProcessor()]
-    
 
 """
 this factorization isn't necessarily the greatest, nor should it be viewed
@@ -571,21 +657,3 @@ class Chat_GPT:
         # optimizer.storage.set_training_in_progress(c_id, False)
         # if old_model is not None:
         #     openai.Model.delete(old_model)
-
-
-
-if __name__ == "__main__":
-    model = HFTransformers("facebook/opt-350m")
-    tokenizer = AutoTokenizer.from_pretrained("facebook/opt-350m")
-
-    input_text = "The person performing the heart surgery is a"
-    input_ids = tokenizer(input_text, return_tensors="pt")
-    print(input_ids)
-    model_input = input_ids["input_ids"]
-    print(model_input)
-    class DebugStreamer:
-        def __call__(self, tokens, scores):
-            print(tokenizer.decode(tokens[-1]))
-            return False
-    output = model.generate(model_input, torch.ones_like(model_input), 1.0, 50, [], DebugStreamer())
-    # print("Response: ", output)
