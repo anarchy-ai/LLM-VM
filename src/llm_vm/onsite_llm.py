@@ -197,7 +197,7 @@ class TokenStreamerAsStoppingCriterion:
 
     def __call__(self, input_ids, scores, **kwargs):
         if self.token_streamer is None:
-            return False
+            return None
         else:
             self.token_streamer(input_ids, scores, **kwargs)
             return False
