@@ -3,19 +3,21 @@ import llm_vm.onsite_llm as llms
 from llm_vm.onsite_llm import load_model_closure
 from llm_vm.agents.REBEL import agent
 from llm_vm.completion.optimize import LocalOptimizer
-import llm_vm.config as conf
+#import llm_vm.config as conf
 import os
 
 
-if conf.settings.big_model is None:
-    default_big_model = "chat_gpt"
-else:
-    default_big_model= conf.settings.big_model
+#if conf.settings.big_model is None:
+default_big_model = "chat_gpt"
+#else:
+#    pass
+    #default_big_model= conf.settings.big_model
 
-if conf.settings.small_model is not  None:
-    default_small_model= "pythia"
-else:    
-    default_small_model = conf.settings.small_model
+#if conf.settings.small_model is not  None:
+default_small_model= "pythia"
+#else:
+#    pass
+    #default_small_model = conf.settings.small_model
 
     
 
