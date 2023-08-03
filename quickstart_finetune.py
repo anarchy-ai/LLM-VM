@@ -7,7 +7,7 @@ import os
 client = Client(big_model='chat_gpt', small_model='llama')
 
 # Put in your prompt and go!
-response = client.complete(prompt = "Break Q into the subquestions need to answer it. Seperate each subquestions with a comma. \n\n  Q: Who is older John Green or Adam Sandler? ",context="Create Subquestions: \n\n",                          
+response = client.complete(prompt = "Q: Who is older John Green or Adam Sandler? ", context="Break Q into the subquestions need to answer it. Seperate each subquestions with a comma. \n\n ",                          
                            openai_key="",
                            temperature=0.0,
                            data_synthesis=True,
