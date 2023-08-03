@@ -133,7 +133,7 @@ class Base_Onsite_LLM(ABC):
 
     def finetune(self,data, optimizer, c_id):
         def asynctune():
-            old_model = model_path_default+"finetuned_models\pythia-70m-deduped\2023-08-03T01:05:05_pythia-70m-deduped.pt"
+            old_model = optimizer.storage.get_model(c_id)
             if old_model is not None:
                 self.model.load_state_dict(torch.load(old_model))
             untokenized_final_dataset = []
