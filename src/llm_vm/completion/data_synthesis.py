@@ -26,79 +26,22 @@ class DataSynthesis:
         - List: A list of tuples containing the QA pairs to be used for fine-tuning.
         """
         model = SentenceTransformer("all-MiniLM-L6-v2")
-        final_prompt = None
-        if type(prompt) is str:
-            final_prompt = '{"prompt": "' +prompt+'"  , "response": "' +response+'" }'+example_delim
-        elif type(prompt) is list:
-            json_str = ""
-            for idx,p in enumerate(prompt):
-               example_str = '{"prompt": "' + p +'"  , "response": "' + str(response[idx]) +'" }'+example_delim+'\n'
-               json_str += example_str
-            final_prompt = json_str
-        final_prompt = "Generate 50 more jsons like the ones below. Use "+example_delim+" as a delimeter between JSONs.\n" + final_prompt
-        print(final_prompt)
-        data = None
-        openai.api_key=openai_key
-        response=openai.Completion.create(prompt=final_prompt,model="text-davinci-003",max_tokens=1000,temperature=1).choices[0].text
         datapoints = []
-        print("REPLY"+response,file=sys.stderr)
-        split_response = response.split(sep=example_delim)
-        print(f"Generated {len(split_response)}/{self.examples_to_generate} examples.", file=sys.stderr )
-        if semantic_sim:
-            num_responses = len(split_response)
-            batch_responses = []
-            for idx in range(0, len(split_response), 10):
-                batch_str = None
-                if len(split_response) - idx >= 10:
-                    batch_str = "".join(split_response[idx : idx + 10])
-                else:
-                    batch_str = "".join(split_response[idx : len(split_response)])
-                batch_responses.append(batch_str)
-            embeddings = model.encode(batch_responses, convert_to_tensor=True)
-            cosine_scores = util.cos_sim(embeddings, embeddings)
-            duplicate_idx = []
-            for row_idx, row in enumerate(cosine_scores):
-                for i, score in enumerate(row):
-                    if score >= self.variance and score < 0.99:
-                        duplicate_idx.append((row_idx, i))
-
-            deleted_idx = []
-            for duplicate in duplicate_idx:
-                example_idx, match_idx = duplicate
-                if example_idx in deleted_idx or match_idx in deleted_idx:
-                    continue
-                else:
-                    split_idx = (example_idx + 1) * 10
-                    if split_idx < len(split_response):
-                        del split_response[split_idx - 10 : split_idx]
-                    else:
-                        del split_response[split_idx - 10 : len(split_response)]
-                    deleted_idx.append(example_idx)
-
-            print(
-                f"Found {len(split_response)} valid examples. Removed {num_responses - len(split_response)} duplicate examples.",
-                file=sys.stderr,
-            )
-        datum_failure = 0
-        bad_key_failure =0
-        resp_filter = {}
-
-        for d in split_response:
-            print(d)
-
+        for i in range(0,self.examples_to_generate):
+            final_prompt = None
+            if type(prompt) is str:
+                final_prompt = '{"prompt": "' +prompt+'"  , "response": "' +response+'" }'
+            final_prompt = "Generate 1 json similar to the one below. \n" + final_prompt
+            print(final_prompt)
+            data = None
+            openai.api_key=openai_key
+            response=openai.Completion.create(prompt=final_prompt,model="text-davinci-003",max_tokens=1000,temperature=1).choices[0].text
+        
             try:
-                the_data = json.loads(d.replace("\n",""))
+                the_data = json.loads(response.replace("\n",""))
                 the_tuple = (the_data["prompt"],the_data["response"])
-                if the_tuple in resp_filter:
-                    continue   # dont save a response if its already happened
-                resp_filter[the_tuple]=True  # for now we're treating the (Q,A) pair as a single value
                 datapoints.append(the_tuple)
-            except json.decoder.JSONDecodeError as err:
-                print(F'data_synthesis response parsing failed with: { err } \nExpected a valid JSON Object but received {type(d)} of length {len(d)}',file=sys.stderr)
-                datum_failure+=1
-            except LookupError as err : # i have no evidence that this will happen
-                print(F'data_synthesis key lookup failed with: { err }',file=sys.stderr)
-                bad_key_failure +=1
-        print(F'Out of { len(split_response)} response objects, {datum_failure} were not valid json \n\
-            and {bad_key_failure} were missing a key',file=sys.stderr)
+            except:
+                pass
+    
         return datapoints
