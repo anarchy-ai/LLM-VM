@@ -26,6 +26,7 @@ dependencies = [
     "sentence-transformers>=2.2.2",
     "requests>=2.26.0",
     "spacy>=3.5.3",
+    "litellm>=0.1.226"
     "en_core_web_md @ https://github.com/explosion/spacy-models/releases/download/en_core_web_md-3.6.0/en_core_web_md-3.6.0-py3-none-any.whl",
 ]
 

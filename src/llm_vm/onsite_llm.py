@@ -23,7 +23,7 @@ import tempfile
 import json
 import os
 import torch
-
+from litellm import completion
 
 __private_key_value_models_map =  {}
 # []   {
@@ -467,3 +467,110 @@ class Chat_GPT:
         # optimizer.storage.set_training_in_progress(c_id, False)
         # if old_model is not None:
         #     openai.Model.delete(old_model)
+@RegisterModelClass("claude")
+class Claude:
+    """
+    This is a class for openAI's gpt-3.5-turbo LLM
+
+    Methods:
+        generate: Generates a response from a given prompt through OpenAI's endpoint
+    """
+
+    def generate(self,prompt, max_length=100,**kwargs): # both tokenizer and model take kwargs :(
+        """
+        This function uses openAI's API to generate a response from the prompt
+
+        Parameters:
+            prompt (str): Prompt to send to LLM
+            max_length (int): Optional parameter limiting response length
+
+
+        Returns:
+            str: LLM Generated Response
+
+        Example:
+            >>> Small_Local_OPT.generate("How long does it take for an apple to grow?)
+            It typically takes about 100-200 days...
+        """
+        cur_prompt = [{'role': "system", 'content' : prompt}]
+        ans = completion(
+            messages=cur_prompt,
+            model="claude-instant-1", # could also do claude-2
+            **kwargs)
+        return ans['choices'][0]['message']['content']
+
+    def finetune(self, dataset, optimizer, c_id):
+        print("fine tuning isn't supported by OpenAI on this model")
+        exit()
+
+@RegisterModelClass("llama2-replicate")
+class Llama2Replicate:
+    """
+    This is a class for openAI's gpt-3.5-turbo LLM
+
+    Methods:
+        generate: Generates a response from a given prompt through OpenAI's endpoint
+    """
+
+    def generate(self,prompt, max_length=100,**kwargs): # both tokenizer and model take kwargs :(
+        """
+        This function uses openAI's API to generate a response from the prompt
+
+        Parameters:
+            prompt (str): Prompt to send to LLM
+            max_length (int): Optional parameter limiting response length
+
+
+        Returns:
+            str: LLM Generated Response
+
+        Example:
+            >>> Small_Local_OPT.generate("How long does it take for an apple to grow?)
+            It typically takes about 100-200 days...
+        """
+        cur_prompt = [{'role': "system", 'content' : prompt}]
+        ans = completion(
+            messages=cur_prompt,
+            model="replicate/llama-2-70b-chat:2c1608e18606fad2812020dc541930f2d0495ce32eee50074220b87300bc16e1", # works for any replicate model
+            **kwargs)
+        return ans['choices'][0]['message']['content']
+
+    def finetune(self, dataset, optimizer, c_id):
+        print("fine tuning isn't supported by OpenAI on this model")
+        exit()
+
+@RegisterModelClass("cohere")
+class Cohere:
+    """
+    This is a class for openAI's gpt-3.5-turbo LLM
+
+    Methods:
+        generate: Generates a response from a given prompt through OpenAI's endpoint
+    """
+
+    def generate(self,prompt, max_length=100,**kwargs): # both tokenizer and model take kwargs :(
+        """
+        This function uses openAI's API to generate a response from the prompt
+
+        Parameters:
+            prompt (str): Prompt to send to LLM
+            max_length (int): Optional parameter limiting response length
+
+
+        Returns:
+            str: LLM Generated Response
+
+        Example:
+            >>> Small_Local_OPT.generate("How long does it take for an apple to grow?)
+            It typically takes about 100-200 days...
+        """
+        cur_prompt = [{'role': "system", 'content' : prompt}]
+        ans = completion(
+            messages=cur_prompt,
+            model="command-nightly",
+            **kwargs)
+        return ans['choices'][0]['message']['content']
+
+    def finetune(self, dataset, optimizer, c_id):
+        print("fine tuning isn't supported by OpenAI on this model")
+        exit()
