@@ -27,13 +27,11 @@ class DataSynthesis:
         """
         model = SentenceTransformer("all-MiniLM-L6-v2")
         datapoints = []
+        final_prompt = None
+        if type(prompt) is str:
+            final_prompt = '{"prompt": "' +prompt+'"  , "response": "' +response+'" }'
+        final_prompt = "Generate 1 json similar to the one below. \n" + final_prompt
         while len(datapoints) < self.examples_to_generate:
-            final_prompt = None
-            if type(prompt) is str:
-                final_prompt = '{"prompt": "' +prompt+'"  , "response": "' +response+'" }'
-            final_prompt = "Generate 1 json similar to the one below. \n" + final_prompt
-            print(final_prompt)
-            data = None
             openai.api_key=openai_key
             cur_prompt = [{'role': "system", 'content' : final_prompt}]
             response=openai.ChatCompletion.create(messages=cur_prompt,model="gpt-4",max_tokens=1000,temperature=1)['choices'][0]['message']['content']
