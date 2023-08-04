@@ -435,7 +435,7 @@ class Chat_GPT:
         cur_prompt = [{'role': "system", 'content' : prompt}]
         ans = openai.ChatCompletion.create(
             messages=cur_prompt,
-            model="gpt-3.5-turbo-0301",
+            model="gpt-4",
             **kwargs)
         return ans['choices'][0]['message']['content']
 
