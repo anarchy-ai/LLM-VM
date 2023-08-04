@@ -35,7 +35,8 @@ class DataSynthesis:
             print(final_prompt)
             data = None
             openai.api_key=openai_key
-            response=openai.Completion.create(prompt=final_prompt,model="gpt-4",max_tokens=1000,temperature=1).choices[0].text
+            cur_prompt = [{'role': "system", 'content' : final_prompt}]
+            response=openai.ChatCompletion.create(prompt=cur_prompt,model="gpt-4",max_tokens=1000,temperature=1).choices[0].text
         
             try:
                 the_data = json.loads(response.replace("\n",""))
