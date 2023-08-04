@@ -27,7 +27,7 @@ class DataSynthesis:
         """
         model = SentenceTransformer("all-MiniLM-L6-v2")
         datapoints = []
-        for i in range(0,self.examples_to_generate):
+        while len(datapoints) < self.examples_to_generate:
             final_prompt = None
             if type(prompt) is str:
                 final_prompt = '{"prompt": "' +prompt+'"  , "response": "' +response+'" }'
