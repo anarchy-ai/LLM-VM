@@ -7,8 +7,189 @@ import os
 client = Client(big_model='chat_gpt', small_model='bloom')
 
 # Put in your prompt and go!
-response = client.complete(prompt = "Q: Locate and delete all emails that were sent to my manager last year.", context='Split the "Q" into its subtasks and return that as a list separated by commas. Return an empty string if no subtasks are necessary. \n\n Q: Find all the files in my system that were sent to HR before July 2nd. \n\n Find all files in system., Using previous answer search for files that were sent to HR., Using previous answer search for all files that were sent before July 2nd.<ENDOFLIST>',
-                           openai_key="",
+response = client.complete(prompt = '''Prompt: "I want to know all the apartments in a 10-mile radius that cost less than 4000 a month."
+                           
+Subprompts:
+Find all the apartments in your city.
+Using the previous, find all that are 10 miles away.
+Using the previous, find all that cost less than 4000 a month.
+                           
+Approved APIs:
+                           
+PropertyAPI: Fetches apartments based on city.
+Endpoint: https://propertyapi.com/city
+GeoAPI: Returns properties within a certain radius.
+Endpoint: https://geoapi.com/radius
+PriceFilterAPI: Filters properties based on price.
+Endpoint: https://pricefilterapi.com/filter
+JSON Schemas:
+PropertyAPI:
+Return:
+{
+    "type": "array",
+    "items": {
+        "type": "object",
+        "properties": {
+            "id": {"type": "number"},
+            "address": {"type": "string"},
+            "price": {"type": "number"},
+            "coordinates": {
+                "type": "object",
+                "properties": {
+                    "latitude": {"type": "number"},
+                    "longitude": {"type": "number"}
+                },
+                "required": ["latitude", "longitude"]
+            }
+        },
+        "required": ["id", "address", "price", "coordinates"]
+    }
+}
+GeoAPI:
+Return:
+{
+    "type": "array",
+    "items": {
+        "type": "number"
+    }
+}
+PriceFilterAPI:
+Return:
+{
+    "type": "array",
+    "items": {
+        "type": "object",
+        "properties": {
+            "id": {"type": "number"}
+        },
+        "required": ["id"]
+    }
+}
+
+Generate DryMerge code to answer the prompt. Use the subprompts:                                                  
+                           ''', context='''
+Prompt: "I want to know all the apartments in a 5-mile radius that cost less than 300 a month."
+                           
+Subprompts:
+Find all the apartments in your city.
+Using the previous, find all that are 5 miles away.
+Using the previous, find all that cost less than 300 a month.
+                           
+Approved APIs:
+                           
+PropertyAPI: Fetches apartments based on city.
+Endpoint: https://propertyapi.com/city
+GeoAPI: Returns properties within a certain radius.
+Endpoint: https://geoapi.com/radius
+PriceFilterAPI: Filters properties based on price.
+Endpoint: https://pricefilterapi.com/filter
+JSON Schemas:
+PropertyAPI:
+Return:
+{
+    "type": "array",
+    "items": {
+        "type": "object",
+        "properties": {
+            "id": {"type": "number"},
+            "address": {"type": "string"},
+            "price": {"type": "number"},
+            "coordinates": {
+                "type": "object",
+                "properties": {
+                    "latitude": {"type": "number"},
+                    "longitude": {"type": "number"}
+                },
+                "required": ["latitude", "longitude"]
+            }
+        },
+        "required": ["id", "address", "price", "coordinates"]
+    }
+}
+GeoAPI:
+Return:
+{
+    "type": "array",
+    "items": {
+        "type": "number"
+    }
+}
+PriceFilterAPI:
+Return:
+{
+    "type": "array",
+    "items": {
+        "type": "object",
+        "properties": {
+            "id": {"type": "number"}
+        },
+        "required": ["id"]
+    }
+}
+                           
+Generate Dry Merge code to answer prompt. Use the subprompts:
+                           
+[
+    {
+        "identity": {
+            "namespace": "apartment_search",
+            "name": "all_city_apartments"
+        },
+        "request_schema": {
+            "core": {
+                "url": "https://propertyapi.com/city",
+                "method": "GET"
+            },
+            "query": {
+                "city": {"dry_string": "{{context.city}}"}
+            }
+        }
+    },
+    {
+        "identity": {
+            "namespace": "apartment_search",
+            "name": "within_radius"
+        },
+        "request_schema": {
+            "core": {
+                "url": "https://geoapi.com/radius",
+                "method": "POST"
+            },
+            "body": {
+                "apartment_ids": {"dry_value": "{{dependencies.all_city_apartments}}"},
+                "radius": 5
+            }
+        },
+        "dependency_schema": {
+            "all_city_apartments": {
+                "identity": "apartment_search/all_city_apartments"
+            }
+        }
+    },
+    {
+        "identity": {
+            "namespace": "apartment_search",
+            "name": "price_filter"
+        },
+        "request_schema": {
+            "core": {
+                "url": "https://pricefilterapi.com/filter",
+                "method": "POST"
+            },
+            "body": {
+                "apartment_ids": {"dry_value": "{{dependencies.within_radius}}"},
+                "max_price": 300
+            }
+        },
+        "dependency_schema": {
+            "within_radius": {
+                "identity": "apartment_search/within_radius"
+            }
+        }
+    }
+    ]
+                           ''',
+                           openai_key = "",
                            temperature=0.0,
                            data_synthesis=True,
                            finetune=True,)
