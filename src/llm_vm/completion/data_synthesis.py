@@ -2,6 +2,9 @@ import json
 import sys
 from sentence_transformers import SentenceTransformer, util
 import openai
+import time
+import os
+import pickle
 
 
 class DataSynthesis:
@@ -25,6 +28,9 @@ class DataSynthesis:
         ----------
         - List: A list of tuples containing the QA pairs to be used for fine-tuning.
         """
+        if os.path.isfile("data_gen.pkl"):
+            new_file = open("data_gen.pkl","rb")
+            return list(pickle.load(new_file))
         model = SentenceTransformer("all-MiniLM-L6-v2")
         datapoints = []
         final_prompt = None
@@ -34,11 +40,13 @@ class DataSynthesis:
         while len(datapoints) < self.examples_to_generate:
             openai.api_key=openai_key
             cur_prompt = [{'role': "system", 'content' : final_prompt}]
+            time.sleep(15)
             response=openai.ChatCompletion.create(messages=cur_prompt,model="gpt-4",max_tokens=1000,temperature=1)['choices'][0]['message']['content']
         
             try:
                 the_data = json.loads(response.replace("\n",""))
                 the_tuple = (the_data["prompt"],the_data["response"])
+                print(the_tuple)
                 datapoints.append(the_tuple)
             except:
                 pass

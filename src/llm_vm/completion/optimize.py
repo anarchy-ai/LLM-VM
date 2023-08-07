@@ -14,6 +14,7 @@ import pickle
 #we need to package-ify so this works
 import llm_vm.completion.data_synthesis as data_synthesis
 import inspect
+import pickle
 
 
 job_id = None # we want to be able to cancel a fine_tune if you kill the program
@@ -179,7 +180,7 @@ class LocalOptimizer(Optimizer):
         self.big_model = big_model
         self.small_model = small_model
         self.openai_key = openai_key
-        self.data_synthesizer = data_synthesis.DataSynthesis(0.87, 50)
+        self.data_synthesizer = data_synthesis.DataSynthesis(0.87, 200)
 
     def complete(self, stable_context, dynamic_prompt, data_synthesis = False, finetune = False, **kwargs):
         openai.api_key = self.openai_key
@@ -252,11 +253,15 @@ class LocalOptimizer(Optimizer):
                     self.storage.add_example(c_id, new_datapoint)
 
                     if run_data_synthesis:
+                        
                         if len(self.storage.get_data(c_id)) < min_examples_for_synthesis:
                             print("Data synthesis is not available right now, need more examples in storage.")
                         else:
-                            for j in self.data_synthesizer.data_synthesis(self,dynamic_prompt,best_completion,openai_key=self.openai_key, **kwargs):
+                            new_data =  self.data_synthesizer.data_synthesis(self,dynamic_prompt,best_completion,openai_key=self.openai_key, **kwargs)
+                            for j in new_data:
                                 self.storage.add_example(c_id, j)
+                            file = open("data_gen.pkl","wb")
+                            pickle.dump(new_data,file)
                     training_exs = self.storage.get_data(c_id)
                     print(training_exs)
                     print("Considering Fine-tuning", flush=True)
