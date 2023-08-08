@@ -180,7 +180,7 @@ class LocalOptimizer(Optimizer):
         self.big_model = big_model
         self.small_model = small_model
         self.openai_key = openai_key
-        self.data_synthesizer = data_synthesis.DataSynthesis(0.87, 200)
+        self.data_synthesizer = data_synthesis.DataSynthesis(0.87, 50)
 
     def complete(self, stable_context, dynamic_prompt, data_synthesis = False, finetune = False, **kwargs):
         openai.api_key = self.openai_key

@@ -4,7 +4,7 @@ from llm_vm.client import Client
 import os
 #from llm_vm.config import settings
 # Instantiate the client specifying which LLM you want to use
-client = Client(big_model='chat_gpt', small_model='bloom')
+client = Client(big_model='chat_gpt', small_model='llama')
 
 # Put in your prompt and go!
 response = client.complete(prompt = '''Prompt: "I want to know all the apartments in a 10-mile radius that cost less than 4000 a month."
