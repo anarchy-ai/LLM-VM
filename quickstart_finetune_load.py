@@ -1,3 +1,4 @@
+#! /usr/bin/env python3
 # import our client
 from llm_vm.client import Client
 import os

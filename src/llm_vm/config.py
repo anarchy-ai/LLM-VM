@@ -4,6 +4,7 @@ import argparse
 from dynaconf import Dynaconf
 from xdg import XDG_CONFIG_HOME
 from llm_vm.onsite_llm import model_keys_registered
+from llm_vm.data_path import project_root
 
 # Parse CLI arguments
 parser = argparse.ArgumentParser()
@@ -27,7 +28,7 @@ if "openai_api_key" in args:
     os.environ['LLM_VM_OPENAI_API_KEY'] = args.openai_api_key
 
 
-project_root = os.path.abspath(os.getcwd())
+# project_root = os.path.abspath(os.getcwd())
 
 print("Project Root: " + project_root)
 
