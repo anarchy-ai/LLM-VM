@@ -882,9 +882,55 @@ class SequenceLogitsProcessor(LogitsProcessor):
                 raise ValueError(f"`sequence_bias` has to be a dict with floats as values, but is {sequence_bias}.")
 
 
+class TransformersWithConstraints:
+    def __init__(self, model_uri, **kwargs):
+        self.model_identifier = model_uri
+        self.model_args = kwargs
+
+        print(f"Creating {self.model_identifier} instance using AutoModelForCausalLM transformers module", flush=True)
+        self.model = AutoModelForCausalLM.from_pretrained(self.model_identifier, **self.model_args)
+        print(f"{self.model_identifier} model is ready for use on {self.model.device}", flush=True)
+        self.tokenizer = AutoTokenizer.from_pretrained(self.model_identifier, add_prefix_space=True)
+        self.vocab_size = self.tokenizer.vocab_size
+        self.vocab = self.tokenizer.vocab
+
+    @property
+    def eos_token_id(self):
+        return self.model.config.eos_token_id
+
+    
+    def generate(self, input_ids, attention_mask, temperature, max_new_tokens, regex, r_bias):
+        assert torch.is_tensor(input_ids), "Input ids must be a torch tensor"
+        assert torch.is_tensor(attention_mask), "Attention mask must be a torch tensor"    
+        
+        r_constraints = RegexTokenConstraint(self.model_identifier) 
+        valid_tokens = r_constraints(regex)
+
+        seq_bias = {}
+        for t in valid_tokens:
+            t_tuple = tuple(self.tokenizer.encode(t, add_special_tokens=False))
+            seq_bias[t_tuple] = r_bias
+
+        logits_processor = LogitsProcessorList()
+        logits_processor.append(SequenceLogitsProcessor(seq_bias))
+        
+        kwargs = {
+            "input_ids": input_ids.to(self.model.device),
+            "do_sample": temperature > 0.0,
+            "attention_mask": attention_mask.to(self.model.device),
+            "temperature": temperature,
+            "max_new_tokens": max_new_tokens,
+            "logits_processor": logits_processor,
+            "output_scores": True,
+            "return_dict_in_generate": True
+        }
+
+        result = self.model.generate(**kwargs, eos_token_id=self.eos_token_id, pad_token_id=self.eos_token_id)
+
+        return (result.sequences, result.scores)
 
 if __name__ == "__main__":
-    interface = TokenConstraint("cfg", "facebook/opt-350m")
+    interface = RegexTokenConstraint("facebook/opt-350m")
     re_str = "a|b"
     res = interface.construct_crude_filter_set(re_str)
     print(res)
