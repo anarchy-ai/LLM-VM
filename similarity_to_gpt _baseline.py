@@ -20,19 +20,15 @@ def cos_similarity(x, y):
 new_file = open("data_gen_eval.pkl","rb")
 examples = list(pickle.load(new_file))
 client = Client(big_model='llama')
-# specify the file name of the finetuned model to load
-model_name = '2023-08-08T22:22:06_open_llama_3b_v2.pt'
-client.load_finetune(model_name)
+
 
 client1 = Client(big_model='pythia')
-# specify the file name of the finetuned model to load
-model_name = '2023-08-08T22:44:34_pythia-70m-deduped.pt'
-client1.load_finetune(model_name)
+
 sims = []
 for i in examples:
-    response_llama = client.complete(prompt = i[0], context = '')["completion"].split("<ENDOFLIST>")[0]
+    response_llama = client.complete(prompt = i[0], context = 'Split the "Q" into its subtasks and return that as a list separated by commas. Return an empty string if no subtasks are necessary. \n\n Q: Find all the files in my system that were sent to HR before July 2nd. \n\n Find all files in system., Using previous answer search for files that were sent to HR., Using previous answer search for all files that were sent before July 2nd.\n\n')["completion"].split("<ENDOFLIST>")[0]
     print(response_llama)
-    response_pythia = client1.complete(prompt = i[0], context = '')["completion"].split("<ENDOFLIST>")[0]
+    response_pythia = client1.complete(prompt = i[0], context = 'Split the "Q" into its subtasks and return that as a list separated by commas. Return an empty string if no subtasks are necessary. \n\n Q: Find all the files in my system that were sent to HR before July 2nd. \n\n Find all files in system., Using previous answer search for files that were sent to HR., Using previous answer search for all files that were sent before July 2nd.\n\n')["completion"].split("<ENDOFLIST>")[0]
     print(response_pythia)
     response_chat_gpt = i[1].split("<ENDOFLIST>")[0]
     print(response_chat_gpt)
