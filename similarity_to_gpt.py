@@ -21,14 +21,15 @@ new_file = open("data_gen_eval.pkl","rb")
 examples = list(pickle.load(new_file))
 client = Client(big_model='llama')
 # specify the file name of the finetuned model to load
-model_name = '2023-08-08T22:22:06_open_llama_3b_v2.pt'
+#model_name = '2023-08-08T22:22:06_open_llama_3b_v2.pt'
+#client.load_finetune(model_name)
+
 client1 = Client(big_model='pythia')
 # specify the file name of the finetuned model to load
-model_name = '2023-08-08T22:44:34_pythia-70m-deduped.pt'
-client1.load_finetune(model_name)
+#model_name = '2023-08-08T22:44:34_pythia-70m-deduped.pt'
+#client1.load_finetune(model_name)
 sims = []
 for i in examples:
-    client.load_finetune(model_name)
     response_llama = client.complete(prompt = i[0], context = '')["completion"].split("<ENDOFLIST>")[0]
     print(response_llama)
     response_pythia = client1.complete(prompt = i[0], context = '')["completion"].split("<ENDOFLIST>")[0]
