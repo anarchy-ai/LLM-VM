@@ -481,29 +481,9 @@ class TokenConstraint(ABC):
         self.model_uri = model_uri
         self.tokenizer = AutoTokenizer.from_pretrained(self.model_uri, add_prefix_space=True)
 
-
+    @abstractmethod
     def construct_crude_filter_set(self, expression):
-        vocab = self.tokenizer.vocab
-        vocab_map = {v: k for k, v in vocab.items()}
-        space_repr = self.tokenizer.tokenize(" ")[0]
-        nl_repr = self.tokenizer.tokenize("\n")[0]
-        expression = expression.replace(" ", space_repr)
-        expression = expression.replace("\n", nl_repr)
-        expression = expression.replace(" ", self.tokenizer.tokenize(" ")[0])
-        valid_ids = []
-  
-        if self.constraint_type == 'regex':
-            pattern = re.compile(expression, re.UNICODE)
-            for id, subtoken in vocab_map.items():
-                if pattern.match(subtoken) is not None:
-                    valid_ids.append(id)
-        elif self.constraint_type == 'cfg':
-            dfa = self._regex_to_dfa(expression)
-            for id, subtoken in vocab_map.items():
-                if dfa.match(subtoken) == True:
-                    valid_ids.append(id)
-        
-        return valid_ids
+       pass
 
     def _regex_to_dfa(self, r_string):
         non_symbols = ['+', '*', '.', '(', ')', '?', '|']
@@ -773,10 +753,53 @@ class TokenConstraint(ABC):
                     dfa['final_states'].append(states)
         
         return dfa
+    
+class RegexTokenConstraint(TokenConstraint):
+    def construct_crude_filter_set(self, expression):
+        vocab = self.tokenizer.vocab
+        vocab_map = {v: k for k, v in vocab.items()}
+        space_repr = self.tokenizer.tokenize(" ")[0]
+        nl_repr = self.tokenizer.tokenize("\n")[0]
+        expression = expression.replace(" ", space_repr)
+        expression = expression.replace("\n", nl_repr)
+        expression = expression.replace(" ", self.tokenizer.tokenize(" ")[0])
+        valid_ids = []
+  
+        pattern = re.compile(expression, re.UNICODE)
+        for id, subtoken in vocab_map.items():
+            if pattern.match(subtoken) is not None:
+                valid_ids.append(id)
+
+
+class PythonTokenConstraint(TokenConstraint):
+        def parse_grammar(self, parser):
+            pass
+
+        def construct_crude_filter_set(self, expression):
+            vocab = self.tokenizer.vocab
+            vocab_map = {v: k for k, v in vocab.items()}
+            space_repr = self.tokenizer.tokenize(" ")[0]
+            nl_repr = self.tokenizer.tokenize("\n")[0]
+            expression = expression.replace(" ", space_repr)
+            expression = expression.replace("\n", nl_repr)
+            expression = expression.replace(" ", self.tokenizer.tokenize(" ")[0])
+            valid_ids = []
+    
+            if self.constraint_type == 'regex':
+                pattern = re.compile(expression, re.UNICODE)
+                for id, subtoken in vocab_map.items():
+                    if pattern.match(subtoken) is not None:
+                        valid_ids.append(id)
+            elif self.constraint_type == 'cfg':
+                dfa = self._regex_to_dfa(expression)
+                for id, subtoken in vocab_map.items():
+                    if dfa.match(subtoken) == True:
+                        valid_ids.append(id)
+        
 
 if __name__ == "__main__":
     interface = TokenConstraint("cfg", "facebook/opt-350m")
-    re_str = "a*"
+    re_str = "a|b"
     res = interface.construct_crude_filter_set(re_str)
     print(res)
 
