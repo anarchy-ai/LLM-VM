@@ -9,7 +9,7 @@ client = Client(big_model='chat_gpt', small_model='pythia')
 # Put in your prompt and go!
 response = client.complete(prompt = "Q: Locate and delete all emails that were sent to my manager last year.", 
                            context='Split the "Q" into its subtasks and return that as a list separated by commas. Return an empty string if no subtasks are necessary. \n\n Q: Find all the files in my system that were sent to HR before July 2nd. \n\n Find all files in system., Using previous answer search for files that were sent to HR., Using previous answer search for all files that were sent before July 2nd.<ENDOFLIST>',
-                           openai_key="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",
+                           openai_key="",
                            temperature=0.0,
                            data_synthesis=True,
                            finetune=True,)
