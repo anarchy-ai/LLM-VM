@@ -506,8 +506,8 @@ class TokenConstraint(ABC):
         return valid_ids
 
     def _regex_to_dfa(self, r_string):
-        non_symbols = ['+', '*', '.', '(', ')']
-        nfa = {}
+        non_symbols = ['+', '*', '.', '(', ')', '?', '|']
+        nfa = {} 
         dfa = {}
         nfa_states = []
         dfa_states = []
@@ -538,10 +538,19 @@ class TokenConstraint(ABC):
                     z.right = stack.pop()
                     z.left = stack.pop()
                     stack.append(z)
+                elif c == "|":
+                    z = ExpressionTree(charType.UNION)
+                    z.right = stack.pop()
+                    z.left = stack.pop()
+                    stack.append(z)
                 elif c == ".":
                     z = ExpressionTree(charType.CONCAT)
                     z.right = stack.pop()
                     z.left = stack.pop()
+                    stack.append(z)
+                elif c == "?":
+                    z = ExpressionTree(charType.KLEENE)
+                    z.left = stack.pop() 
                     stack.append(z)
                 elif c == "*":
                     z = ExpressionTree(charType.KLEENE)
@@ -555,7 +564,7 @@ class TokenConstraint(ABC):
 
 
         def compPrecedence(a, b):
-            p = ["+", ".", "*"]
+            p = ["|", "." , "?", "+", "*"]
             return p.index(a) > p.index(b)
 
 
@@ -763,7 +772,6 @@ class TokenConstraint(ABC):
                 if state in nfa['final_states'] and states not in dfa['final_states']:
                     dfa['final_states'].append(states)
         
-       
         return dfa
 
 if __name__ == "__main__":
