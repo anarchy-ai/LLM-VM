@@ -19,18 +19,18 @@ def cos_similarity(x, y):
 
 new_file = open("data_gen_eval.pkl","rb")
 examples = list(pickle.load(new_file))
+client = Client(big_model='llama')
+# specify the file name of the finetuned model to load
+model_name = '2023-08-08T22:22:06_open_llama_3b_v2.pt'
+client1 = Client(big_model='pythia')
+# specify the file name of the finetuned model to load
+model_name = '2023-08-08T22:44:34_pythia-70m-deduped.pt'
+client1.load_finetune(model_name)
 sims = []
-for i in examples[0:30]:
-    client = Client(big_model='llama')
-    # specify the file name of the finetuned model to load
-    model_name = '2023-08-08T22:22:06_open_llama_3b_v2.pt'
+for i in examples:
     client.load_finetune(model_name)
     response_llama = client.complete(prompt = i[0], context = '')["completion"].split("<ENDOFLIST>")[0]
     print(response_llama)
-    client1 = Client(big_model='pythia')
-    # specify the file name of the finetuned model to load
-    model_name = '2023-08-08T22:44:34_pythia-70m-deduped.pt'
-    client1.load_finetune(model_name)
     response_pythia = client1.complete(prompt = i[0], context = '')["completion"].split("<ENDOFLIST>")[0]
     print(response_pythia)
     response_chat_gpt = i[1].split("<ENDOFLIST>")[0]
