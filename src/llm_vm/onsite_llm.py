@@ -476,8 +476,7 @@ class Chat_GPT:
 
 
 class TokenConstraint(ABC):
-    def __init__(self, constraint_type, model_uri):
-        self.constraint_type = constraint_type
+    def __init__(self, model_uri):
         self.model_uri = model_uri
         self.tokenizer = AutoTokenizer.from_pretrained(self.model_uri, add_prefix_space=True)
 
@@ -763,12 +762,13 @@ class RegexTokenConstraint(TokenConstraint):
         expression = expression.replace(" ", space_repr)
         expression = expression.replace("\n", nl_repr)
         expression = expression.replace(" ", self.tokenizer.tokenize(" ")[0])
-        valid_ids = []
+        valid_tokens = []
   
         pattern = re.compile(expression, re.UNICODE)
         for id, subtoken in vocab_map.items():
             if pattern.match(subtoken) is not None:
-                valid_ids.append(id)
+                valid_tokens.append(subtoken)
+        return valid_tokens
 
 
 class PythonTokenConstraint(TokenConstraint):
@@ -783,19 +783,105 @@ class PythonTokenConstraint(TokenConstraint):
             expression = expression.replace(" ", space_repr)
             expression = expression.replace("\n", nl_repr)
             expression = expression.replace(" ", self.tokenizer.tokenize(" ")[0])
-            valid_ids = []
-    
-            if self.constraint_type == 'regex':
-                pattern = re.compile(expression, re.UNICODE)
-                for id, subtoken in vocab_map.items():
-                    if pattern.match(subtoken) is not None:
-                        valid_ids.append(id)
-            elif self.constraint_type == 'cfg':
-                dfa = self._regex_to_dfa(expression)
-                for id, subtoken in vocab_map.items():
-                    if dfa.match(subtoken) == True:
-                        valid_ids.append(id)
-        
+            valid_tokens = []    
+            dfa = self._regex_to_dfa(expression)
+            for id, subtoken in vocab_map.items():
+                if dfa.match(subtoken) == True:
+                    valid_tokens.append(subtoken)
+            return valid_tokens
+
+class SequenceLogitsProcessor(LogitsProcessor):
+   
+        def __init__(self, sequence_bias):
+            self.sequence_bias = sequence_bias
+            self._validate_arguments()
+            self.sequences_length_greater_than_1 = []
+            self.length_1_bias = None
+            self.length_greather_than_1_bias = None
+            self.prepared_bias_variables = False
+
+        def __call__(self, input_ids, scores):
+            if not self.prepared_bias_variables:
+                self._prepare_bias_variables(scores)
+
+            bias = torch.zeros_like(scores)
+
+            bias += self.length_1_bias
+
+            matching_mask = torch.zeros_like(scores, dtype=torch.bool)
+            for sequence_ids in self.sequences_length_greater_than_1:
+                if len(sequence_ids) > input_ids.shape[1]: 
+                    continue
+                prefix_length = len(sequence_ids) - 1
+                last_token = sequence_ids[-1]
+                matching_rows = torch.eq(
+                    input_ids[:, -prefix_length:],
+                    torch.tensor(sequence_ids[:-1], dtype=input_ids.dtype, device=input_ids.device),
+                ).prod(dim=1)
+                matching_mask[:, last_token] |= matching_rows.bool()
+            bias += torch.where(
+                matching_mask,
+                self.length_greather_than_1_bias,
+                torch.tensor(0.0, device=self.length_greather_than_1_bias.device),
+            )
+
+            scores = scores + bias
+            return scores
+
+        def _prepare_bias_variables(self, scores):
+            vocabulary_size = scores.shape[-1]
+            sequence_bias = self.sequence_bias
+            tokens_with_bias = []
+
+            # Check biased tokens out of bounds
+            invalid_biases = []
+            for sequence_ids in sequence_bias:
+                for token_id in sequence_ids:
+                    if token_id >= vocabulary_size:
+                        invalid_biases.append(token_id)
+            if len(invalid_biases) > 0:
+                raise ValueError(
+                    f"The model vocabulary size is {vocabulary_size}, but the following tokens were being biased: "
+                    f"{invalid_biases}"
+                )
+
+            self.length_1_bias = torch.zeros((vocabulary_size,), dtype=torch.float).to(scores.device)
+            self.length_greather_than_1_bias = torch.zeros((vocabulary_size,), dtype=torch.float).to(scores.device)
+            for sequence_ids, bias in sequence_bias.items():
+                if len(sequence_ids) == 1:
+                    self.length_1_bias[sequence_ids[-1]] = bias
+                else:
+                    self.sequences_length_greater_than_1.append(sequence_ids)
+                    if self.length_greather_than_1_bias[sequence_ids[-1]] != 0.0:
+                        raise ValueError(
+                            "Setting a bias on sequences that share a common token termination is not yet supported. "
+                            "Please open an issue if you see this error message (after checking that it doesn't already "
+                            "exist)."
+                        )
+                    self.length_greather_than_1_bias[sequence_ids[-1]] = bias
+                tokens_with_bias.append(sequence_ids[-1])
+
+            self.prepared_bias_variables = True
+
+        def _validate_arguments(self):
+            sequence_bias = self.sequence_bias
+            if not isinstance(sequence_bias, dict) or len(sequence_bias) == 0:
+                raise ValueError(f"`sequence_bias` has to be a non-empty dictionary, but is {sequence_bias}.")
+            if any(not isinstance(sequence_ids, tuple) for sequence_ids in sequence_bias.keys()):
+                raise ValueError(f"`sequence_bias` has to be a dict with tuples as keys, but is {sequence_bias}.")
+            if any(
+                any((not isinstance(token_id, (int, torch.int)) or token_id < 0) for token_id in sequence_ids)
+                or len(sequence_ids) == 0
+                for sequence_ids in sequence_bias.keys()
+            ):
+                raise ValueError(
+                    f"Each key in `sequence_bias` has to be a non-empty tuple of positive integers, but is "
+                    f"{sequence_bias}."
+                )
+            if any(not isinstance(bias, float) for bias in sequence_bias.values()):
+                raise ValueError(f"`sequence_bias` has to be a dict with floats as values, but is {sequence_bias}.")
+
+
 
 if __name__ == "__main__":
     interface = TokenConstraint("cfg", "facebook/opt-350m")
