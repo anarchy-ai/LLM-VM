@@ -17,24 +17,24 @@ def cos_similarity(x, y):
     denominator = squared_sum(x) * squared_sum(y)
     return round(numerator / float(denominator), 3)
 
-new_file = open("data_gen.pkl","rb")
+new_file = open("data_gen_eval.pkl","rb")
 examples = list(pickle.load(new_file))
 sims = []
-for i in examples:
+for i in examples[0:30]:
     client = Client(big_model='llama')
     # specify the file name of the finetuned model to load
-    model_name = '2023-08-04T08:24:41_open_llama_3b_v2.pt'
+    model_name = '2023-08-08T22:22:06_open_llama_3b_v2.pt'
     client.load_finetune(model_name)
     response_llama = client.complete(prompt = i[0], context = '')["completion"].split("<ENDOFLIST>")[0]
-
-    client = Client(big_model='pythia')
+    print(response_llama)
+    client1 = Client(big_model='pythia')
     # specify the file name of the finetuned model to load
-    model_name = '2023-08-04T08:24:41_open_llama_3b_v2.pt'
-    client.load_finetune(model_name)
-    response_pythia = client.complete(prompt = i[0], context = '')["completion"].split("<ENDOFLIST>")[0]
-
-    client = Client(big_model='chat_gpt')
-    response_chat_gpt = client.complete(prompt = i[0], context = '')["completion"]
-
-    final_sims = [cos_similarity(nlp(response_llama).vector, nlp(response_chat_gpt).vector),cos_similarity(nlp(response_llama).vector, nlp(response_chat_gpt).vector)]
+    model_name = '2023-08-08T22:44:34_pythia-70m-deduped.pt'
+    client1.load_finetune(model_name)
+    response_pythia = client1.complete(prompt = i[0], context = '')["completion"].split("<ENDOFLIST>")[0]
+    print(response_pythia)
+    response_chat_gpt = i[1].split("<ENDOFLIST>")[0]
+    print(response_chat_gpt)
+    final_sims = [cos_similarity(nlp(response_llama).vector, nlp(response_chat_gpt).vector),cos_similarity(nlp(response_pythia).vector, nlp(response_chat_gpt).vector)]
     sims.append(final_sims)
+print(sims)
