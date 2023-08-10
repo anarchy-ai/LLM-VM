@@ -108,7 +108,7 @@ class Base_Onsite_LLM(ABC):
         self.model.load_state_dict(torch.load(os.path.join(model_path_default,"finetuned_models", self.model_name, model_filename)))
 
 
-    def generate(self,prompt,max_length=100,**kwargs): # both tokenizer and model take kwargs :(
+    def generate(self,prompt,max_length=500,**kwargs): # both tokenizer and model take kwargs :(
         """
         This function uses the class's llm and tokenizer to generate a response given a user's prompt
 
@@ -125,7 +125,7 @@ class Base_Onsite_LLM(ABC):
            I think it takes about a week for the apple to grow.
         """
         inputs=self.tokenizer(prompt,return_tensors="pt")
-        generate_ids=self.model.generate(inputs.input_ids,max_length=max_length)
+        generate_ids=self.model.generate(inputs.input_ids,max_length=max_length, max_new_tokens = 500)
         resp= self.tokenizer.batch_decode(generate_ids,skip_special_tokens=True,clean_up_tokenization_spaces=False)[0]
         # need to drop the len(prompt) prefix with these sequences generally
         # because they include the prompt.
@@ -149,7 +149,7 @@ class Base_Onsite_LLM(ABC):
                 learning_rate=2e-5,
                 per_device_train_batch_size = 5,
                 per_device_eval_batch_size = 5,
-                num_train_epochs=5,
+                num_train_epochs=2,
                 weight_decay=0.01,
                 report_to= "none",
             )

@@ -260,7 +260,7 @@ class LocalOptimizer(Optimizer):
                             new_data =  self.data_synthesizer.data_synthesis(self,dynamic_prompt,best_completion,openai_key=self.openai_key, **kwargs)
                             for j in new_data:
                                 self.storage.add_example(c_id, j)
-                            file = open("data_gen.pkl","wb")
+                            file = open("data_gen1.pkl","wb")
                             pickle.dump(new_data,file)
                     training_exs = self.storage.get_data(c_id)
                     print(training_exs)

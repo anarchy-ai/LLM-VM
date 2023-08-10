@@ -7,8 +7,7 @@ import os
 client = Client(big_model='chat_gpt', small_model='llama')
 
 # Put in your prompt and go!
-response = client.complete(prompt = '''Prompt: "I want to know all the apartments in a 10-mile radius that cost less than 4000 a month."
-                           
+response = client.complete(prompt = '''                           
 Subprompts:
 Find all the apartments in your city.
 Using the previous, find all that are 10 miles away.
@@ -68,8 +67,7 @@ Return:
 
 Generate DryMerge code to answer the prompt. Use the subprompts:                                                  
                            ''', context='''
-Prompt: "I want to know all the apartments in a 5-mile radius that cost less than 300 a month."
-                           
+
 Subprompts:
 Find all the apartments in your city.
 Using the previous, find all that are 5 miles away.
@@ -187,7 +185,7 @@ Generate Dry Merge code to answer prompt. Use the subprompts:
             }
         }
     }
-    ]
+    ]<ENDOFCODE>
                            ''',
                            openai_key = "",
                            temperature=0.0,
