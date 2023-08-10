@@ -29,7 +29,7 @@ dependencies = [
     "en_core_web_md @ https://github.com/explosion/spacy-models/releases/download/en_core_web_md-3.6.0/en_core_web_md-3.6.0-py3-none-any.whl",
 ]
 
-
+# todo: https://setuptools.pypa.io/en/latest/userguide/datafiles.html 
 
 [project.scripts] # these names are just placeholders
 #llm_vm_test_optimize = "tests.test_optimize:run_test_stub"
@@ -44,10 +44,16 @@ llm_vm_run_agent_flat = "llm_vm.agents.FLAT.agent:flat_main"
 [build-system]
 requires = ["setuptools>=61", "wheel"]
 build-backend = "setuptools.build_meta"
+[tool.setuptools]
+include-package-data = true
 
+[tool.setuptools.packages.find]
+where = ["src"] # this is the default i think
 
+[tool.setuptools.package-data]
+llm_vm = ["*.toml"] # note how the left hand side, the key, needs to be the package name/namespace
 
-# lets maybe try pytest
+# lets maybe try pytest # question all of this 
 [tool.pytest.ini_options]
 minversion = "6.0"
 addopts = "-ra -q"

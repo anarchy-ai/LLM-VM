@@ -4,6 +4,7 @@ import argparse
 from dynaconf import Dynaconf
 from xdg import XDG_CONFIG_HOME
 from llm_vm.onsite_llm import model_keys_registered
+from llm_vm.data_path import project_root
 
 # Parse CLI arguments
 parser = argparse.ArgumentParser()
@@ -27,11 +28,8 @@ if "openai_api_key" in args:
     os.environ['LLM_VM_OPENAI_API_KEY'] = args.openai_api_key
 
 
-source_directory = os.path.dirname(os.path.abspath(__file__))
-project_root = os.path.abspath(os.path.join(source_directory, os.pardir, os.pardir))
+# project_root = os.path.abspath(os.getcwd())
 
-
-print("Source Directory: " + source_directory)
 print("Project Root: " + project_root)
 
 
@@ -62,7 +60,7 @@ if settings.small_model not in MODELS_AVAILABLE:
 
 # do we want to do this early test and exit?
 # if settings.small_model is "chat_gpt":
-#     print("openai currently doesn't support fine tuning chat_gpt, aka gpt3.5-turbo, exiting")    
+#     print("openai currently doesn't support fine tuning chat_gpt, aka gpt3.5-turbo, exiting")
 #     exit()
 
 def isOpenAIModel(str):

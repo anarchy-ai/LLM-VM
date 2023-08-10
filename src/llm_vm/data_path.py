@@ -1,0 +1,12 @@
+import os
+
+
+
+from pathlib import Path
+
+
+path = Path(__file__)
+project_root= str(path.parent.absolute())
+
+if __name__ == 'main':
+    print(parent_root)

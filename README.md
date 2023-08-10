@@ -87,15 +87,16 @@ In line with Anarchy's mission, the LLM-VM strives to support open-source models
 
 #### Installation Requirements
 
-Python >=3.6 required, Python >= 3.10 recommended, Unix style operating system 
+Python >=3.10 Supported. Older versions of python are on a best effort basis. 
 
-TODO: WRITE WELL
+
 
 #### System Requirements
 
 Different models have different system requirements. Limiting factors on most systems will likely be RAM, but many functions will work at even 16 GB of ram. 
 
-TODO: PLEASE PUT SOMEHTING GOOD HERE
+That said, always lookup information about models you're using, they all have different sizes and requirements 
+in memory and compute resources. 
 
 ### 👨‍💻 Installation
 
