@@ -706,7 +706,6 @@ class TokenConstraint(ABC):
         # construct DFA
         def get_power_set(nfa_st):
             print("Constructing DFA...", flush=True)
-
             powerset = list(chain.from_iterable(combinations(nfa_st, r) for r in range(len(nfa_st)+1)))
             return powerset
         
@@ -790,7 +789,7 @@ class PythonTokenConstraint(TokenConstraint):
                     valid_tokens.append(subtoken)
             return valid_tokens
 
-class SequenceLogitsProcessor(LogitsProcessor):
+class ConstraintLogitsProcessor(LogitsProcessor):
    
         def __init__(self, sequence_bias):
             self.sequence_bias = sequence_bias
@@ -882,11 +881,10 @@ class SequenceLogitsProcessor(LogitsProcessor):
                 raise ValueError(f"`sequence_bias` has to be a dict with floats as values, but is {sequence_bias}.")
 
 
-class TransformersWithConstraints:
+class HF_LLM(ABC):
     def __init__(self, model_uri, **kwargs):
         self.model_identifier = model_uri
         self.model_args = kwargs
-
         print(f"Creating {self.model_identifier} instance using AutoModelForCausalLM transformers module", flush=True)
         self.model = AutoModelForCausalLM.from_pretrained(self.model_identifier, **self.model_args)
         print(f"{self.model_identifier} model is ready for use on {self.model.device}", flush=True)
@@ -897,36 +895,45 @@ class TransformersWithConstraints:
     @property
     def eos_token_id(self):
         return self.model.config.eos_token_id
-
     
-    def generate(self, input_ids, attention_mask, temperature, max_new_tokens, regex, r_bias):
-        assert torch.is_tensor(input_ids), "Input ids must be a torch tensor"
-        assert torch.is_tensor(attention_mask), "Attention mask must be a torch tensor"    
+    @abstractmethod
+    def generate(self, regex=None, **kwargs):
+       pass
+
+
+class HFTransformers(HF_LLM):
+    
+    def generate(self, regex=None, **kwargs):
+        if regex is not None:
+            raise TypeError('Expected regex to be of type None')
+        result = self.model.generate(**kwargs, eos_token_id=self.eos_token_id, pad_token_id=self.eos_token_id)
+        return (result.sequences, result.scores)
+    
+
+class HFTransformersWithConstraints(HF_LLM):
+    
+    def generate(self, regex=None, **kwargs):
+        if type(regex) is not str:
+            raise TypeError('Expected regex to be of type Str')
+        assert torch.is_tensor(kwargs["input_ids"]), "Input ids must be a torch tensor"
+        assert torch.is_tensor(kwargs["attention_mask"]), "Attention mask must be a torch tensor"    
         
         r_constraints = RegexTokenConstraint(self.model_identifier) 
         valid_tokens = r_constraints(regex)
-
         seq_bias = {}
         for t in valid_tokens:
             t_tuple = tuple(self.tokenizer.encode(t, add_special_tokens=False))
-            seq_bias[t_tuple] = r_bias
+            seq_bias[t_tuple] = 10.0
 
         logits_processor = LogitsProcessorList()
-        logits_processor.append(SequenceLogitsProcessor(seq_bias))
+        logits_processor.append(ConstraintLogitsProcessor(seq_bias))
         
-        kwargs = {
-            "input_ids": input_ids.to(self.model.device),
-            "do_sample": temperature > 0.0,
-            "attention_mask": attention_mask.to(self.model.device),
-            "temperature": temperature,
-            "max_new_tokens": max_new_tokens,
-            "logits_processor": logits_processor,
-            "output_scores": True,
-            "return_dict_in_generate": True
-        }
+        kwargs["logits_processor"] = logits_processor
+        kwargs["do_sample"] =  kwargs["temperature"] > 0
+        kwargs["output_scores"] = True
+        kwargs["return_dict_in_generate"] = True
 
         result = self.model.generate(**kwargs, eos_token_id=self.eos_token_id, pad_token_id=self.eos_token_id)
-
         return (result.sequences, result.scores)
 
 if __name__ == "__main__":
