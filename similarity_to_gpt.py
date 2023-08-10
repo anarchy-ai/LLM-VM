@@ -17,7 +17,7 @@ def cos_similarity(x, y):
     denominator = squared_sum(x) * squared_sum(y)
     return round(numerator / float(denominator), 3)
 
-new_file = open("data_gen_eval.pkl","rb")
+new_file = open("data_gen_e.pkl","rb")
 examples = list(pickle.load(new_file))
 client = Client(big_model='llama')
 # specify the file name of the finetuned model to load
@@ -31,9 +31,9 @@ client1.load_finetune(model_name)
 sims = []
 for i in examples:
     response_llama = client.complete(prompt = i[0], context = '')["completion"].split("<ENDOFLIST>")[0]
-    print(response_llama)
+    print("llama:",response_llama)
     response_pythia = client1.complete(prompt = i[0], context = '')["completion"].split("<ENDOFLIST>")[0]
-    print(response_pythia)
+    print("pythia:",response_pythia)
     response_chat_gpt = i[1].split("<ENDOFLIST>")[0]
     print(response_chat_gpt)
     final_sims = [cos_similarity(nlp(response_llama).vector, nlp(response_chat_gpt).vector),cos_similarity(nlp(response_pythia).vector, nlp(response_chat_gpt).vector)]
