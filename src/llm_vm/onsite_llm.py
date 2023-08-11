@@ -882,13 +882,14 @@ class ConstraintLogitsProcessor(LogitsProcessor):
 
 
 class HF_LLM(ABC):
-    def __init__(self, model_uri, **kwargs):
+    def __init__(self, model_uri, tokenizer, **kwargs):
         self.model_identifier = model_uri
         self.model_args = kwargs
+        self.tokenizer = tokenizer
+
         print(f"Creating {self.model_identifier} instance using AutoModelForCausalLM transformers module", flush=True)
         self.model = AutoModelForCausalLM.from_pretrained(self.model_identifier, **self.model_args)
         print(f"{self.model_identifier} model is ready for use on {self.model.device}", flush=True)
-        self.tokenizer = AutoTokenizer.from_pretrained(self.model_identifier, add_prefix_space=True)
         self.vocab_size = self.tokenizer.vocab_size
         self.vocab = self.tokenizer.vocab
 
@@ -916,7 +917,6 @@ class HFTransformersWithConstraints(HF_LLM):
         if type(regex) is not str:
             raise TypeError('Expected regex to be of type Str')
         assert torch.is_tensor(kwargs["input_ids"]), "Input ids must be a torch tensor"
-        assert torch.is_tensor(kwargs["attention_mask"]), "Attention mask must be a torch tensor"    
         
         r_constraints = RegexTokenConstraint(self.model_identifier) 
         valid_tokens = r_constraints(regex)
@@ -937,8 +937,15 @@ class HFTransformersWithConstraints(HF_LLM):
         return (result.sequences, result.scores)
 
 if __name__ == "__main__":
-    interface = RegexTokenConstraint("facebook/opt-350m")
-    re_str = "a|b"
-    res = interface.construct_crude_filter_set(re_str)
-    print(res)
-
+    # interface = RegexTokenConstraint("facebook/opt-350m")
+    # re_str = "a|b"
+    # res = interface.construct_crude_filter_set(re_str)
+    # print(res)
+    tokenizer = AutoTokenizer.from_pretrained("facebook/opt-350m", add_prefix_space=True)
+    input_text = "The one performing the heart surgery is a"
+    token_ids = tokenizer(input_text, return_tensors="pt")
+    kwargs = {
+        'input_ids': token_ids['input_ids'],
+        'attention_mask': token_ids['attention_mask'],
+    }
+    model = HFTransformersWithConstraints("facebook/opt-350m", tokenizer)
