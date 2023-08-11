@@ -481,7 +481,7 @@ class TokenConstraint(ABC):
         self.tokenizer = AutoTokenizer.from_pretrained(self.model_uri, add_prefix_space=True)
 
     @abstractmethod
-    def construct_crude_filter_set(self, expression):
+    def construct_filter_set(self, expression):
        pass
 
     def _regex_to_dfa(self, r_string):
@@ -753,7 +753,7 @@ class TokenConstraint(ABC):
         return dfa
     
 class RegexTokenConstraint(TokenConstraint):
-    def construct_crude_filter_set(self, expression):
+    def construct_filter_set(self, expression):
         vocab = self.tokenizer.vocab
         vocab_map = {v: k for k, v in vocab.items()}
         space_repr = self.tokenizer.tokenize(" ")[0]
@@ -774,7 +774,7 @@ class PythonTokenConstraint(TokenConstraint):
         def parse_grammar(self, parser):
             pass
 
-        def construct_crude_filter_set(self, expression):
+        def construct_filter_set(self, expression):
             vocab = self.tokenizer.vocab
             vocab_map = {v: k for k, v in vocab.items()}
             space_repr = self.tokenizer.tokenize(" ")[0]
@@ -796,7 +796,7 @@ class ConstraintLogitsProcessor(LogitsProcessor):
             self._validate_arguments()
             self.sequences_length_greater_than_1 = []
             self.length_1_bias = None
-            self.length_greather_than_1_bias = None
+            self.length_greater_than_1_bias = None
             self.prepared_bias_variables = False
 
         def __call__(self, input_ids, scores):
@@ -821,7 +821,7 @@ class ConstraintLogitsProcessor(LogitsProcessor):
             bias += torch.where(
                 matching_mask,
                 self.length_greather_than_1_bias,
-                torch.tensor(0.0, device=self.length_greather_than_1_bias.device),
+                torch.tensor(0.0, device=self.length_greater_than_1_bias.device),
             )
 
             scores = scores + bias
@@ -831,33 +831,18 @@ class ConstraintLogitsProcessor(LogitsProcessor):
             vocabulary_size = scores.shape[-1]
             sequence_bias = self.sequence_bias
             tokens_with_bias = []
-
-            # Check biased tokens out of bounds
-            invalid_biases = []
-            for sequence_ids in sequence_bias:
-                for token_id in sequence_ids:
-                    if token_id >= vocabulary_size:
-                        invalid_biases.append(token_id)
-            if len(invalid_biases) > 0:
-                raise ValueError(
-                    f"The model vocabulary size is {vocabulary_size}, but the following tokens were being biased: "
-                    f"{invalid_biases}"
-                )
-
-            self.length_1_bias = torch.zeros((vocabulary_size,), dtype=torch.float).to(scores.device)
-            self.length_greather_than_1_bias = torch.zeros((vocabulary_size,), dtype=torch.float).to(scores.device)
+            self.length_1_bias = torch.zeros((vocabulary_size,), dtype=torch.float)
+            self.length_greater_than_1_bias = torch.zeros((vocabulary_size,), dtype=torch.float)
             for sequence_ids, bias in sequence_bias.items():
                 if len(sequence_ids) == 1:
                     self.length_1_bias[sequence_ids[-1]] = bias
                 else:
                     self.sequences_length_greater_than_1.append(sequence_ids)
-                    if self.length_greather_than_1_bias[sequence_ids[-1]] != 0.0:
+                    if self.length_greater_than_1_bias[sequence_ids[-1]] != 0.0:
                         raise ValueError(
-                            "Setting a bias on sequences that share a common token termination is not yet supported. "
-                            "Please open an issue if you see this error message (after checking that it doesn't already "
-                            "exist)."
+                            "Setting a bias on sequences that share a common token termination is not supported."
                         )
-                    self.length_greather_than_1_bias[sequence_ids[-1]] = bias
+                    self.length_greater_than_1_bias[sequence_ids[-1]] = bias
                 tokens_with_bias.append(sequence_ids[-1])
 
             self.prepared_bias_variables = True
@@ -865,20 +850,7 @@ class ConstraintLogitsProcessor(LogitsProcessor):
         def _validate_arguments(self):
             sequence_bias = self.sequence_bias
             if not isinstance(sequence_bias, dict) or len(sequence_bias) == 0:
-                raise ValueError(f"`sequence_bias` has to be a non-empty dictionary, but is {sequence_bias}.")
-            if any(not isinstance(sequence_ids, tuple) for sequence_ids in sequence_bias.keys()):
-                raise ValueError(f"`sequence_bias` has to be a dict with tuples as keys, but is {sequence_bias}.")
-            if any(
-                any((not isinstance(token_id, (int, torch.int)) or token_id < 0) for token_id in sequence_ids)
-                or len(sequence_ids) == 0
-                for sequence_ids in sequence_bias.keys()
-            ):
-                raise ValueError(
-                    f"Each key in `sequence_bias` has to be a non-empty tuple of positive integers, but is "
-                    f"{sequence_bias}."
-                )
-            if any(not isinstance(bias, float) for bias in sequence_bias.values()):
-                raise ValueError(f"`sequence_bias` has to be a dict with floats as values, but is {sequence_bias}.")
+                raise ValueError(f"sequence_bias has to be a non-empty dictionary, but is {sequence_bias}.")
 
 
 class HF_LLM(ABC):
@@ -898,35 +870,38 @@ class HF_LLM(ABC):
         return self.model.config.eos_token_id
     
     @abstractmethod
-    def generate(self, regex=None, **kwargs):
+    def generate(self, constraint_type=None, **kwargs):
        pass
 
 
 class HFTransformers(HF_LLM):
     
-    def generate(self, regex=None, **kwargs):
-        if regex is not None:
-            raise TypeError('Expected regex to be of type None')
+    def generate(self, constraint_type=None, **kwargs):
+        if constraint_type is not None:
+            raise TypeError('Expected constraint_type to be None')
         result = self.model.generate(**kwargs, eos_token_id=self.eos_token_id, pad_token_id=self.eos_token_id)
         return (result.sequences, result.scores)
     
 
 class HFTransformersWithConstraints(HF_LLM):
     
-    def generate(self, regex=None, **kwargs):
-        if type(regex) is not str:
-            raise TypeError('Expected regex to be of type Str')
+    def generate(self, constraint_type=None, **kwargs):
+        if type(constraint_type) is not str:
+            raise TypeError('Expected constraint_type to be a string')
         assert torch.is_tensor(kwargs["input_ids"]), "Input ids must be a torch tensor"
         
-        r_constraints = RegexTokenConstraint(self.model_identifier) 
-        valid_tokens = r_constraints(regex)
-        seq_bias = {}
-        for t in valid_tokens:
-            t_tuple = tuple(self.tokenizer.encode(t, add_special_tokens=False))
-            seq_bias[t_tuple] = 10.0
-
-        logits_processor = LogitsProcessorList()
-        logits_processor.append(ConstraintLogitsProcessor(seq_bias))
+        if constraint_type == "regex":
+            r_constraints = RegexTokenConstraint(self.model_identifier) 
+            valid_tokens = r_constraints.construct_filter_set(kwargs['regex'])
+            del kwargs['regex']
+            seq_bias = {}
+            for t in valid_tokens:
+                t_tuple = tuple(self.tokenizer.encode(t, add_special_tokens=False))
+                seq_bias[t_tuple] = 10.0
+            logits_processor = LogitsProcessorList()
+            logits_processor.append(ConstraintLogitsProcessor(seq_bias))
+        else:
+            raise Exception(f"{constraint_type} not supported")
         
         kwargs["logits_processor"] = logits_processor
         kwargs["do_sample"] =  kwargs["temperature"] > 0
@@ -937,15 +912,20 @@ class HFTransformersWithConstraints(HF_LLM):
         return (result.sequences, result.scores)
 
 if __name__ == "__main__":
-    # interface = RegexTokenConstraint("facebook/opt-350m")
-    # re_str = "a|b"
+    
+    re_str = "doctor|specialist"
     # res = interface.construct_crude_filter_set(re_str)
     # print(res)
     tokenizer = AutoTokenizer.from_pretrained("facebook/opt-350m", add_prefix_space=True)
     input_text = "The one performing the heart surgery is a"
     token_ids = tokenizer(input_text, return_tensors="pt")
     kwargs = {
+        'regex': re_str,
         'input_ids': token_ids['input_ids'],
         'attention_mask': token_ids['attention_mask'],
+        'temperature': 1.0,
+        'max_new_tokens': 10
     }
+    print("Input: ", token_ids['input_ids'] )
     model = HFTransformersWithConstraints("facebook/opt-350m", tokenizer)
+    model.generate(constraint_type="regex", **kwargs)
