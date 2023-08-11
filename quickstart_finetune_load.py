@@ -6,7 +6,7 @@ import os
 client = Client(big_model='llama')
 
 # specify the file name of the finetuned model to load
-model_name =  '2023-08-10T19:46:30_open_llama_3b_v2.pt'
+model_name='2023-08-10T19:46:30_open_llama_3b_v2.pt'
 client.load_finetune(model_name)
 
 # Put in your prompt and go!
