@@ -8,7 +8,7 @@ client = Client(big_model='chat_gpt', small_model='pythia')
 
 # Put in your prompt and go!
 response = client.complete(prompt = "Q: Which city in texas his furthest from Beijing?", 
-                           context='Split the "Q" into its subtasks and return that as a list separated by commas. Return an empty string if no subtasks are necessary. \n\n Q: Which city has the highest temperature Beijing, Cabo, or Portland? \n\n Find the temperature of Beijing., Find the temperature of Cabo., Find the temperature of Portland., Using previos compare the three temperatures and return the highest.<ENDOFLIST>',
+                           context='Split the "Q" into its subtasks and return that as a list separated by commas. Return an empty string if no subtasks are necessary. \n\n Q: Which city has the highest temperature Beijing, Cabo, or Portland? \n\n <STARTOFLIST>Find the temperature of Beijing.<FIRSTDISTINCTQ>Find the temperature of Cabo.<SECONDDISTINCTQ>Find the temperature of Portland.<THIRDDISTINCTQ>Using previos compare the three temperatures and return the highest.<FOURTHDISTINCTQ><ENDOFLIST>\n\n',
                            openai_key="",
                            temperature=0.0,
                            data_synthesis=True,
