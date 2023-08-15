@@ -29,6 +29,9 @@ import os
 import torch
 import re
 from itertools import chain, combinations
+from lark import Lark
+from lark.indenter import PythonIndenter
+
 
 __private_key_value_models_map =  {}
 # []   {
@@ -762,7 +765,6 @@ class RegexTokenConstraint(TokenConstraint):
         expression = expression.replace("\n", nl_repr)
         expression = expression.replace(" ", self.tokenizer.tokenize(" ")[0])
         valid_tokens = []
-  
         pattern = re.compile(expression, re.UNICODE)
         for id, subtoken in vocab_map.items():
             if pattern.match(subtoken) is not None:
@@ -771,8 +773,14 @@ class RegexTokenConstraint(TokenConstraint):
 
 
 class PythonTokenConstraint(TokenConstraint):
-        def parse_grammar(self, parser):
-            pass
+        def parse_grammar(self):
+            python_parser = Lark.open_from_package('lark', 'python.lark', ['grammars'], parser='lalr', lexer='contextual', postlex=PythonIndenter(), start='file_input')
+            terminals = python_parser.terminals
+            t_map = {}
+            for t in terminals:
+                t_map[t.name] = t.pattern
+            return t_map
+                    
 
         def construct_filter_set(self, expression):
             vocab = self.tokenizer.vocab
@@ -783,11 +791,12 @@ class PythonTokenConstraint(TokenConstraint):
             expression = expression.replace("\n", nl_repr)
             expression = expression.replace(" ", self.tokenizer.tokenize(" ")[0])
             valid_tokens = []    
-            dfa = self._regex_to_dfa(expression)
+            pattern = re.compile(expression, re.UNICODE)
             for id, subtoken in vocab_map.items():
-                if dfa.match(subtoken) == True:
+                if pattern.match(subtoken) is not None:
                     valid_tokens.append(subtoken)
             return valid_tokens
+
 
 class ConstraintLogitsProcessor(LogitsProcessor):
    
@@ -820,7 +829,7 @@ class ConstraintLogitsProcessor(LogitsProcessor):
                 matching_mask[:, last_token] |= matching_rows.bool()
             bias += torch.where(
                 matching_mask,
-                self.length_greather_than_1_bias,
+                self.length_greater_than_1_bias,
                 torch.tensor(0.0, device=self.length_greater_than_1_bias.device),
             )
 
@@ -900,6 +909,16 @@ class HFTransformersWithConstraints(HF_LLM):
                 seq_bias[t_tuple] = 10.0
             logits_processor = LogitsProcessorList()
             logits_processor.append(ConstraintLogitsProcessor(seq_bias))
+        elif constraint_type == "grammar":
+            if kwargs['language'] == 'python':
+                python_constraint = PythonTokenConstraint(self.model_identifier)
+                terminals_map = python_constraint.parse_grammar()
+                valid_tokens = []
+                for k, v in terminals_map.items():
+                    matching_tokens = python_constraint.construct_filter_set(v)
+                    valid_tokens += matching_tokens
+                valid_tokens = set(valid_tokens)
+                del kwargs['language']
         else:
             raise Exception(f"{constraint_type} not supported")
         
@@ -912,20 +931,40 @@ class HFTransformersWithConstraints(HF_LLM):
         return (result.sequences, result.scores)
 
 if __name__ == "__main__":
+
+    python_parser = Lark.open_from_package('lark', 'python.lark', ['grammars'], parser='lalr', lexer='contextual', postlex=PythonIndenter(), start='file_input')
+    terminals = python_parser.terminals
+    t_map = {}
+    for t in terminals:
+        t_map[t.name] = t.pattern
+
+    print(t_map)
+    interactive_tree = python_parser.parse_interactive("name=1\n")
+    interactive_tree.exhaust_lexer()
+    print(interactive_tree.accepts())
+    # def handle_errors(e):
+    #     print(e)
+       
+    #     return True
+    parse_tree = python_parser.parse("name=1\nres=3 + name\n")
+
+
     
-    re_str = "doctor|specialist"
-    # res = interface.construct_crude_filter_set(re_str)
-    # print(res)
-    tokenizer = AutoTokenizer.from_pretrained("facebook/opt-350m", add_prefix_space=True)
-    input_text = "The one performing the heart surgery is a"
-    token_ids = tokenizer(input_text, return_tensors="pt")
-    kwargs = {
-        'regex': re_str,
-        'input_ids': token_ids['input_ids'],
-        'attention_mask': token_ids['attention_mask'],
-        'temperature': 1.0,
-        'max_new_tokens': 10
-    }
-    print("Input: ", token_ids['input_ids'] )
-    model = HFTransformersWithConstraints("facebook/opt-350m", tokenizer)
-    model.generate(constraint_type="regex", **kwargs)
+    # re_str = "doctor|specialist"
+    # # res = interface.construct_crude_filter_set(re_str)
+    # # print(res)
+    # tokenizer = AutoTokenizer.from_pretrained("facebook/opt-350m", add_prefix_space=True)
+    # input_text = "The one performing the heart surgery is a"
+    # token_ids = tokenizer(input_text, return_tensors="pt")
+    # kwargs = {
+    #     'regex': re_str,
+    #     'input_ids': token_ids['input_ids'],
+    #     'attention_mask': token_ids['attention_mask'],
+    #     'temperature': 1.0,
+    #     'max_new_tokens': 10
+    # }
+    # print("Input: ", token_ids['input_ids'] )
+    # model = HFTransformersWithConstraints("facebook/opt-350m", tokenizer)
+    # res = model.generate(constraint_type="regex", **kwargs)
+    # res_text = tokenizer.batch_decode(res[0], skip_special_tokens=True)
+    # print("Response: ", res_text)
