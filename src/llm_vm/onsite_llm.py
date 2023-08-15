@@ -482,6 +482,7 @@ class TokenConstraint(ABC):
     def __init__(self, model_uri):
         self.model_uri = model_uri
         self.tokenizer = AutoTokenizer.from_pretrained(self.model_uri, add_prefix_space=True)
+        self.parser = None
 
     @abstractmethod
     def construct_filter_set(self, expression):
@@ -766,21 +767,13 @@ class RegexTokenConstraint(TokenConstraint):
         expression = expression.replace(" ", self.tokenizer.tokenize(" ")[0])
         valid_tokens = []
         pattern = re.compile(expression, re.UNICODE)
-        for id, subtoken in vocab_map.items():
+        for subtoken in vocab_map.values():
             if pattern.match(subtoken) is not None:
                 valid_tokens.append(subtoken)
         return valid_tokens
 
 
-class PythonTokenConstraint(TokenConstraint):
-        def parse_grammar(self):
-            python_parser = Lark.open_from_package('lark', 'python.lark', ['grammars'], parser='lalr', lexer='contextual', postlex=PythonIndenter(), start='file_input')
-            terminals = python_parser.terminals
-            t_map = {}
-            for t in terminals:
-                t_map[t.name] = t.pattern
-            return t_map
-                    
+class PythonTokenConstraint(TokenConstraint):                    
 
         def construct_filter_set(self, expression):
             vocab = self.tokenizer.vocab
@@ -792,13 +785,40 @@ class PythonTokenConstraint(TokenConstraint):
             expression = expression.replace(" ", self.tokenizer.tokenize(" ")[0])
             valid_tokens = []    
             pattern = re.compile(expression, re.UNICODE)
-            for id, subtoken in vocab_map.items():
+            for subtoken in vocab_map.values():
                 if pattern.match(subtoken) is not None:
                     valid_tokens.append(subtoken)
             return valid_tokens
+        
+        def parse_grammar(self):
+            self.parser = Lark.open_from_package('lark', 'python.lark', ['grammars'], parser='lalr', regex=True, lexer='contextual', postlex=PythonIndenter(), start='file_input')
+            terminals = self.parser.terminals
+            t_map = {}
+            for t in terminals:
+                t_map[t.name] = t.pattern
+            return t_map
 
+        def prefix_state(self, prefix_str):
+            valid_next = []
+            try:      
+                self.parser.parse(prefix_str)
+            except:
+                interactive_tree = self.parser.parse_interactive(prefix_str)
+                interactive_tree.exhaust_lexer()
+                valid_next = list(interactive_tree.accepts())
+            return valid_next
 
-class ConstraintLogitsProcessor(LogitsProcessor):
+        def construct_final_filter_set(self, prefix_str, token_map):
+            next_lex = self.prefix_state(prefix_str)
+            final_tokens = []
+            for lex in next_lex:
+                for k, v in token_map.items():
+                    if lex == k:
+                        final_tokens += v
+            return set(final_tokens)
+            
+
+class RegexLogitsProcessor(LogitsProcessor):
    
         def __init__(self, sequence_bias):
             self.sequence_bias = sequence_bias
@@ -908,15 +928,18 @@ class HFTransformersWithConstraints(HF_LLM):
                 t_tuple = tuple(self.tokenizer.encode(t, add_special_tokens=False))
                 seq_bias[t_tuple] = 10.0
             logits_processor = LogitsProcessorList()
-            logits_processor.append(ConstraintLogitsProcessor(seq_bias))
+            logits_processor.append(RegexLogitsProcessor(seq_bias))
         elif constraint_type == "grammar":
             if kwargs['language'] == 'python':
                 python_constraint = PythonTokenConstraint(self.model_identifier)
                 terminals_map = python_constraint.parse_grammar()
                 valid_tokens = []
+                tokens_map = {}
                 for k, v in terminals_map.items():
                     matching_tokens = python_constraint.construct_filter_set(v)
+                    tokens_map[k] = matching_tokens
                     valid_tokens += matching_tokens
+                logits_processor = LogitsProcessorList()
                 valid_tokens = set(valid_tokens)
                 del kwargs['language']
         else:
@@ -932,21 +955,27 @@ class HFTransformersWithConstraints(HF_LLM):
 
 if __name__ == "__main__":
 
-    python_parser = Lark.open_from_package('lark', 'python.lark', ['grammars'], parser='lalr', lexer='contextual', postlex=PythonIndenter(), start='file_input')
-    terminals = python_parser.terminals
-    t_map = {}
-    for t in terminals:
-        t_map[t.name] = t.pattern
+    # python_parser = Lark.open_from_package('lark', 'python.lark', ['grammars'], parser='lalr', lexer='contextual', postlex=PythonIndenter(), start='file_input')
+    # terminals = python_parser.terminals
+    # t_map = {}
+    # for t in terminals:
+    #     t_map[t.name] = t.pattern
 
-    print(t_map)
-    interactive_tree = python_parser.parse_interactive("name=1\n")
-    interactive_tree.exhaust_lexer()
-    print(interactive_tree.accepts())
-    # def handle_errors(e):
-    #     print(e)
+    # interactive_tree = python_parser.parse_interactive("name=1\n")
+    # interactive_tree.exhaust_lexer()
+    # print(interactive_tree.accepts())
+    # # def handle_errors(e):
+    # #     print(e)
        
-    #     return True
-    parse_tree = python_parser.parse("name=1\nres=3 + name\n")
+    # #     return True
+    # parse_tree = python_parser.parse("name=1\nres=3 + name\n")
+
+    python_constraint = PythonTokenConstraint("facebook/opt-350m")
+    python_constraint.parse_grammar()
+
+    res = python_constraint.prefix_state("name=1")
+    print(res)
+
 
 
     
