@@ -27,10 +27,11 @@ import tempfile
 import json
 import os
 import torch
-import re
+import regex as re
 from itertools import chain, combinations
 from lark import Lark
 from lark.indenter import PythonIndenter
+import asyncio
 
 
 __private_key_value_models_map =  {}
@@ -497,7 +498,6 @@ class RegexTokenConstraint(TokenConstraint):
         nl_repr = self.tokenizer.tokenize("\n")[0]
         expression = expression.replace(" ", space_repr)
         expression = expression.replace("\n", nl_repr)
-        expression = expression.replace(" ", self.tokenizer.tokenize(" ")[0])
         valid_tokens = []
         pattern = re.compile(expression, re.UNICODE)
         for subtoken in vocab_map.values():
@@ -506,29 +506,44 @@ class RegexTokenConstraint(TokenConstraint):
         return valid_tokens
 
 
-class PythonTokenConstraint(TokenConstraint):                    
+class PythonTokenConstraint(TokenConstraint): 
 
-        def construct_filter_set(self, expression):
+        async def _async_generator(self, v_map, pattern):
+            for i in v_map.values():
+                if pattern.match(i) is not None:
+                    yield i
+
+        async def _async_generator_final(self, v_set, pattern):
+            for v in v_set:
+                if pattern.match(v) is not None:
+                    yield v
+
+        async def construct_filter_set(self, expressions):
             vocab = self.tokenizer.vocab
             vocab_map = {v: k for k, v in vocab.items()}
-            space_repr = self.tokenizer.tokenize(" ")[0]
-            nl_repr = self.tokenizer.tokenize("\n")[0]
-            expression = expression.replace(" ", space_repr)
-            expression = expression.replace("\n", nl_repr)
-            expression = expression.replace(" ", self.tokenizer.tokenize(" ")[0])
-            valid_tokens = []    
-            pattern = re.compile(expression, re.UNICODE)
-            for subtoken in vocab_map.values():
-                if pattern.match(subtoken) is not None:
-                    valid_tokens.append(subtoken)
-            return valid_tokens
+            valid_tokens = []
+
+            for expression in expressions:
+                space_repr = self.tokenizer.tokenize(" ")[0]
+                nl_repr = self.tokenizer.tokenize("\n")[0]
+                expression = expression.replace(" ", space_repr)
+                expression = expression.replace("\n", nl_repr)
+
+                try:  
+                    pattern = re.compile(expression, re.UNICODE)
+                    async for token in self._async_generator(vocab_map, pattern):
+                        valid_tokens.append(token)
+                except Exception as e: 
+                    print(e) 
+      
+            return set(valid_tokens)
         
         def parse_grammar(self):
             self.parser = Lark.open_from_package('lark', 'python.lark', ['grammars'], parser='lalr', regex=True, lexer='contextual', postlex=PythonIndenter(), start='file_input')
             terminals = self.parser.terminals
             t_map = {}
             for t in terminals:
-                t_map[t.name] = t.pattern
+                t_map[t.name] = t.pattern.value
             return t_map
 
         def prefix_state(self, prefix_str):
@@ -541,13 +556,27 @@ class PythonTokenConstraint(TokenConstraint):
                 valid_next = list(interactive_tree.accepts())
             return valid_next
 
-        def construct_final_filter_set(self, prefix_str, token_map):
+        async def construct_final_filter_set(self, prefix_str, token_map, crude_filter_set):
             next_lex = self.prefix_state(prefix_str)
+            final_tokens_regex = []
             final_tokens = []
             for lex in next_lex:
                 for k, v in token_map.items():
                     if lex == k:
-                        final_tokens += v
+                        final_tokens_regex.append(v)
+            
+            for expression in final_tokens_regex:
+                space_repr = self.tokenizer.tokenize(" ")[0]
+                nl_repr = self.tokenizer.tokenize("\n")[0]
+                expression = expression.replace(" ", space_repr)
+                expression = expression.replace("\n", nl_repr)
+
+                try:  
+                    pattern = re.compile(expression, re.UNICODE)
+                    async for token in self._async_generator_final(crude_filter_set, pattern):
+                        final_tokens.append(token)
+                except Exception as e: 
+                    print(e)
             return set(final_tokens)
             
 
@@ -675,6 +704,7 @@ class HFTransformersWithConstraints(HF_LLM):
                 valid_tokens = []
                 tokens_map = {}
                 for k, v in terminals_map.items():
+                    v = str(v)
                     matching_tokens = python_constraint.construct_filter_set(v)
                     tokens_map[k] = matching_tokens
                     valid_tokens += matching_tokens
@@ -707,15 +737,30 @@ if __name__ == "__main__":
     # print(interactive_tree.accepts())
     # # def handle_errors(e):
     # #     print(e)
-       
     # #     return True
     # parse_tree = python_parser.parse("name=1\nres=3 + name\n")
+    async def main():
+        python_constraint = PythonTokenConstraint("facebook/opt-350m")
+        terminals_map = python_constraint.parse_grammar()
+        valid_tokens = []
+        tokens_map = {}
+        
+        for k, v in terminals_map.items():
+            valid_tokens.append(v)
+        print(valid_tokens)
+        res = await python_constraint.construct_filter_set(valid_tokens)
+        print(res)
 
-    python_constraint = PythonTokenConstraint("facebook/opt-350m")
-    python_constraint.parse_grammar()
 
-    res = python_constraint.prefix_state("name=1")
-    print(res)
+
+    asyncio.run(main())
+    
+    # main()
+    #     tokens_map[k] = matching_tokens
+    #     valid_tokens += matching_tokens
+    # res = python_constraint.construct_filter_set('(?:(?:\r?\n[\t ]*|#[^\n]*))+')
+    # res = python_constraint.construct_final_filter_set("name=1\n", tokens_map)
+    # print(res)
 
 
 
