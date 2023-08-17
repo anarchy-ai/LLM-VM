@@ -131,7 +131,7 @@ class Base_Onsite_LLM(ABC):
         # because they include the prompt.
         return resp[len(prompt):]
 
-    def finetune(self,data, optimizer, c_id):
+    def finetune(self,data, optimizer, c_id, model_filename=None):
         def asynctune():
             old_model = optimizer.storage.get_model(c_id)
             if old_model is not None:
@@ -172,7 +172,7 @@ class Base_Onsite_LLM(ABC):
                 timestamp = datetime.now().strftime('%Y-%m-%dT%H-%M-%S')
             else:
                 timestamp = datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
-            new_model = os.path.join(model_path_default,"finetuned_models",self.model_name, timestamp + '_' + self.model_name + ".pt" )
+            new_model = os.path.join(model_path_default,"finetuned_models",self.model_name, timestamp + '_' + self.model_name + ".pt" ) if model_filename is None else os.path.join(model_path_default,"finetuned_models",model_filename)
             open(new_model,"a")
             torch.save(self.model.state_dict(), new_model) # the model in memory is different now
             self.model_name = self.model_name + "_ft_"+  timestamp

@@ -250,6 +250,7 @@ class LocalOptimizer(Optimizer):
                     train_completion = best_completion if use_completion is None else use_completion
                     new_datapoint = (dynamic_prompt.strip(), train_completion)
                     self.storage.add_example(c_id, new_datapoint)
+                    small_model_filename = kwargs.get("small_model_filename", None)
 
                     if run_data_synthesis:
                         if len(self.storage.get_data(c_id)) < min_examples_for_synthesis:
@@ -264,7 +265,7 @@ class LocalOptimizer(Optimizer):
                     if len(training_exs) >= self.MIN_TRAIN_EXS and not self.storage.get_training_in_progress_set_true(c_id):
                         print("Actually Fine-tuning", flush=True)
                         print("Training examples:",str(len(training_exs)))
-                        asyncStart(self.small_model.finetune(training_exs,self,c_id))
+                        asyncStart(self.small_model.finetune(training_exs,self,c_id,small_model_filename))
                 return (best_completion, actual_train)
 
             best_completion_promise = asyncStart(promiseCompletion)
