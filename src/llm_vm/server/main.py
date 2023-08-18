@@ -1,5 +1,4 @@
 import flask
-from flask import request, jsonify
 import json
 import time
 import traceback
@@ -8,21 +7,25 @@ import openai
 import os
 import hashlib
 import sys
+import logging
 from flask_cors import CORS
 from contextlib import contextmanager
 import llm_vm.server.routes as routes
 from llm_vm.config import settings
 from llm_vm.utils.db_initializer import initialize_db
+from flask import request, jsonify
+from llm_vm.utils.stdlog import setup_logger
 
 app = flask.Flask(__name__)
 CORS(app)
 app.config["DEBUG"] = True
+logger = setup_logger(__name__)
 
 # Register_blueprint from routes to load API
 app.register_blueprint(routes.bp)
 
 initialize_db()
-print('Database initialized successfully')
+logger.info('Database initialized successfully')
 
 def server_entry_point(host = '127.0.0.1', port = 3002):
     """

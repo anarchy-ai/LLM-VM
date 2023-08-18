@@ -5,13 +5,14 @@ import openai
 from llm_vm.agents.REBEL import agent
 from llm_vm.client import Client
 from llm_vm.config import settings
-from llm_vm.utils.logger import log_telemetry
+from llm_vm.utils.stdlog import setup_logger
+
 # load optimizer for endpoint use
 # optimizer = LocalOptimizer(MIN_TRAIN_EXS=2,openai_key=None)
-
+logger = setup_logger(__name__)
 client = Client( big_model=settings.big_model, small_model=settings.small_model)
 
-print('optimizer loaded')
+logger.info('optimizer loaded')
 
 bp = Blueprint('bp',__name__)
 
@@ -30,7 +31,7 @@ def optimizing_complete():
     use_rebel_agent = False
     kwargs = {}
     if "openai_key" not in data.keys():
-        log_telemetry('routes', 'ERROR', "No OpenAI key provided","status:0", 'SystemLog')
+        logger.error("No OpenAI key provided")
         return {"status":0, "resp":"No OpenAI key provided"}
 
     if "temperature" in data.keys():
@@ -97,14 +98,14 @@ def optimizing_complete():
     agent.set_api_key(openai.api_key,"OPENAI_API_KEY")
     try:
         if not use_rebel_agent:
-            log_telemetry('routes', 'INFO', "sending request to openai","", 'SystemLog')
+            logger.info("sending request to openai")
             completion = client.complete(static_context,dynamic_prompt,openai_key=openai.api_key, data_synthesis=data_synthesis,finetune = finetune, **kwargs)
         else:
             completion = rebel_agent.run(static_context+dynamic_prompt,[])[0]
     except Exception as e:
-        log_telemetry('routes', 'ERROR', "No OpenAI key provided","status:0", 'SystemLog')
+        logger.error("No OpenAI key provided")
         return {"status":0, "resp": str(e)}
 
     # return {"completion":completion, "status": 200}
-    log_telemetry('routes', 'INFO', "Completion successfully generated","status:200", 'SystemLog')
+    logger.info("Completion successfully generated")
     return completion

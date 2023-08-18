@@ -1,9 +1,11 @@
 import sqlite3
 import time
 import sys
+from llm_vm.utils.stdlog import setup_logger
 
 def initialize_db():
-    print('Initialising database...', file=sys.stderr)
+    logger = setup_logger(__name__)
+    logger.info('Initialising database...')
     conn = sqlite3.connect('anarchy.db')
     cursor = conn.cursor()
     cursor.execute('''
