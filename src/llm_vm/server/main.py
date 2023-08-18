@@ -12,6 +12,7 @@ from flask_cors import CORS
 from contextlib import contextmanager
 import llm_vm.server.routes as routes
 from llm_vm.config import settings
+from llm_vm.utils.db_initializer import initialize_db
 
 app = flask.Flask(__name__)
 CORS(app)
@@ -19,6 +20,9 @@ app.config["DEBUG"] = True
 
 # Register_blueprint from routes to load API
 app.register_blueprint(routes.bp)
+
+initialize_db()
+print('Database initialized successfully')
 
 def server_entry_point(host = '127.0.0.1', port = 3002):
     """

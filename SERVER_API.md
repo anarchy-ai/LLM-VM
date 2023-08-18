@@ -7,7 +7,7 @@ After you have installed (as above), you now have an anarchy server which provid
 > llm_vm_server
 ```
 
-This will start a flask server at https://localhost:3002/ and will create an endpoint https://localhost:3002/v1/completion.
+This will start a flask server at https://localhost:3002/ and will create an endpoint https://localhost:3002/v1/complete.
 
 
 ## 🕸️ API Usage 🕸️
@@ -78,4 +78,18 @@ Post requests can be sent to this endpoint `https://localhost:3002/` with the to
 To access the completion endpoint programmatically, after starting up the server on your machine, import llm_vm.py into your code and call the completion function. Currently, we do not support tools through the programmatic completion function. To test that the server is working correctly, after starting it, run 
 ```python 
 test_llm_vm.py
+```
+
+```
+Example CURL
+curl -X POST http://localhost:3002/v1/complete \  
+-H "Content-Type: application/json" \
+-d '{
+    "prompt": "What is 2+2",
+    "context": "Answer the math problem with just a number.",
+    "openai_key": "your-api-key",
+    "temperature": 0,
+    "finetune": true,
+    "data_synthesis": true
+}'
 ```
