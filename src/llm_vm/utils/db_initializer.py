@@ -1,8 +1,9 @@
 import sqlite3
 import time
+import sys
 
 def initialize_db():
-    print('Initialising database...')
+    print('Initialising database...', file=sys.stderr)
     conn = sqlite3.connect('anarchy.db')
     cursor = conn.cursor()
     cursor.execute('''
