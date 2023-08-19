@@ -11,6 +11,7 @@ import abc
 import requests
 import hashlib
 import pickle
+from llm_vm.guided_completion import RegexCompletion, ChoicesCompletion, TypeCompletion
 #we need to package-ify so this works
 import llm_vm.completion.data_synthesis as data_synthesis
 import inspect
@@ -181,7 +182,16 @@ class LocalOptimizer(Optimizer):
         self.openai_key = openai_key
         self.data_synthesizer = data_synthesis.DataSynthesis(0.87, 50)
 
-    def complete(self, stable_context, dynamic_prompt, data_synthesis = False, finetune = False, **kwargs):
+    def complete(self, stable_context, dynamic_prompt, data_synthesis = False, finetune = False, regex = None, type = None, choices = None, **kwargs):
+        if regex is not None:
+            return RegexCompletion.complete(stable_context+dynamic_prompt,regex)
+
+        if type is not None:
+            return TypeCompletion.complete(stable_context+dynamic_prompt,type)
+
+        if choices is not None:
+            return ChoicesCompletion.complete(stable_context+dynamic_prompt,choices)
+
         openai.api_key = self.openai_key
         completion, train = self.complete_delay_train(stable_context, dynamic_prompt, run_data_synthesis=data_synthesis, **kwargs)
         print(finetune,flush=True)
