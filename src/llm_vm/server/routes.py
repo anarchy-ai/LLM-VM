@@ -6,9 +6,11 @@ from llm_vm.agents.REBEL import agent
 from llm_vm.client import Client
 from llm_vm.config import settings
 from llm_vm.utils.stdlog import setup_logger
+from llm_vm.utils.record_latency import RecordLatency
 
 # load optimizer for endpoint use
 # optimizer = LocalOptimizer(MIN_TRAIN_EXS=2,openai_key=None)
+
 logger = setup_logger(__name__)
 client = Client( big_model=settings.big_model, small_model=settings.small_model)
 
@@ -22,6 +24,8 @@ def home():
 
 @bp.route('/v1/complete', methods=['POST'])
 def optimizing_complete():
+    latency_recorder = RecordLatency("/v1/complete")
+    latency_recorder.start()
     rebel_agent = agent.Agent("", [], verbose=1)
     data = json.loads(request.data)
     static_context = data["context"]
@@ -108,4 +112,5 @@ def optimizing_complete():
 
     # return {"completion":completion, "status": 200}
     logger.info("Completion successfully generated")
+    latency_recorder.end()
     return completion
