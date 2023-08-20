@@ -1,6 +1,7 @@
 .env
 .python-version
 .envi
+.vscode
 .#*
 __pycache__/
 build/
