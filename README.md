@@ -38,11 +38,11 @@ You can find detailed instructions to try it live here: [anarchy.ai](https://ana
 
 ### 💁 What is the Anarchy LLM-VM?
 
-The Anarchy LLM-VM is a highly optimized and opinionated backend for running LLMs with all the modern features we've come to expect from completion: tool usage, persistent stateful memory, live data augmentation, data and task fine-tuning, output templating, a web playground, api endpoints, student-teacher distillation, data synthesis, load-balancing and orchestration, large context-window mimicry.
+The Anarchy LLM-VM is a highly optimized and opinionated backend for running LLMs with all the modern features we've come to expect from completion: tool usage, persistent stateful memory, live data augmentation, data and task fine-tuning, output templating, a web playground, API endpoints, student-teacher distillation, data synthesis, load-balancing and orchestration, large context-window mimicry.
 
 Formally, it is a virtual machine/interpreter for human language, coordinating between data, models (CPU), your prompts (code), and tools (IO). 
 
-By doing all these things in one spot in an opinionated way, the LLM-VM can properly optimize and batch calls that would be exorbitantly expensive with distributed endpoints.  It furthermore strives for both model and architecture agnosticism, properly optimizing the chosen model for the current architecture.
+By doing all these things in one spot in an opinionated way, the LLM-VM can properly optimize batch calls that would be exorbitantly expensive with distributed endpoints.  It furthermore strives for both model and architecture agnosticism, properly optimizing the chosen model for the current architecture.
 
 ### 🤌 Why use the Anarchy LLM-VM?
 
@@ -62,18 +62,18 @@ In line with Anarchy's mission, the LLM-VM strives to support open-source models
 
 * **Implicit Agents 🔧🕵️:** *The Anarchy LLM-VM can be set up to use external tools through our agents such as **REBEL** just by supplying tool descriptions!*
 
-* **Inference Optimization 🚄:** *The Anarchy LLM-VM is optimized from agent level all the way to assembly on known LLM architectures to get the most bang for your buck. With state of the art batching, sparse inference and quantization, distillation, and multi-level colocation, we aim to provide the fastest framework available.*
+* **Inference Optimization 🚄:** *The Anarchy LLM-VM is optimized from the agent level all the way to assembly on known LLM architectures to get the most bang for your buck. With state-of-the-art batching, sparse inference and quantization, distillation, and multi-level colocation, we aim to provide the fastest framework available.*
 
-* **Task Auto-Optimization 🚅:** *The Anarchy LLM-VM will analyze your use cases for repetative tasks where it can activate student-teacher distillation to train a super-efficient small model from a larger more general model without loosing accuracy.  It can furthermore take advantage of data-synthesis techniques to improve results.*
+* **Task Auto-Optimization 🚅:** *The Anarchy LLM-VM will analyze your use cases for repetitive tasks where it can activate student-teacher distillation to train a super-efficient small model from a larger more general model without losing accuracy.  It can furthermore take advantage of data-synthesis techniques to improve results.*
 
 
-* **Library Callable 📚:** *We provide a library that can be used from any python codebase directly.*
+* **Library Callable 📚:** *We provide a library that can be used from any Python codebase directly.*
 
 * **HTTP Endpoints 🕸️:** *We provide an HTTP standalone server to handle completion requests.*
 
-* **Live Data Augmentation 📊:** (ROADMAP) *You will be able to provide a live updating data-set and the Anarchy LLM-VM will **fine-tune** your models or work with a **vector DB** to provide up-to-date information with citations*
+* **Live Data Augmentation 📊:** (ROADMAP) *You will be able to provide a live updating data set and the Anarchy LLM-VM will **fine-tune** your models or work with a **vector DB** to provide up-to-date information with citations*
 
-* **Web Playground 🛝:** (ROADMAP) *You will be able to run the Anarchy LLM-VM and test it's outputs from the browser.*
+* **Web Playground 🛝:** (ROADMAP) *You will be able to run the Anarchy LLM-VM and test its outputs from the browser.*
 
 * **Load-Balancing and Orchestration ⚖️:** (ROADMAP) *If you have multiple LLMs or providers you'd like to utilize, you will be able to hand them to the Anarchy LLM-VM to automatically figure out which to work with and when to optimize your uptime or your costs*
 
@@ -87,7 +87,7 @@ In line with Anarchy's mission, the LLM-VM strives to support open-source models
 
 #### Installation Requirements
 
-Python >=3.10 Supported. Older versions of python are on a best effort basis. 
+Python >=3.10 Supported. Older versions of Python are on a best-effort basis. 
 
 
 
@@ -95,7 +95,7 @@ Python >=3.10 Supported. Older versions of python are on a best effort basis.
 
 Different models have different system requirements. Limiting factors on most systems will likely be RAM, but many functions will work at even 16 GB of ram. 
 
-That said, always lookup information about models you're using, they all have different sizes and requirements 
+That said, always lookup information about the models you're using, they all have different sizes and requirements 
 in memory and compute resources. 
 
 ### 👨‍💻 Installation
@@ -116,11 +116,11 @@ This will install both the library and test-server.
 
 #### One Last Step, almost there!
 If you're using one of the OpenAI models, you will need to set the `LLM_VM_OPENAI_API_KEY` environment
-variable with your api key. 
+variable with your API key. 
 
 
 ### ✅ Generating Completions
-Our LLM-VM gets you working directly with popular LLMs locally in just 3 lines. Once you've installed (as above), just load your model and start generating!
+Our LLM-VM gets you working directly with popular LLMs locally in just 3 lines. Once you've installed it (as above), just load your model and start generating!
 
 
 
@@ -128,7 +128,7 @@ Our LLM-VM gets you working directly with popular LLMs locally in just 3 lines. 
 # import our client
 from llm_vm.client import Client
 
-# Select which LLM you want to use, here we have openAI's 
+# Select which LLM you want to use, here we have OpenAI's 
 client = Client(big_model = 'chat_gpt')
 
 # Put in your prompt and go!
@@ -137,7 +137,7 @@ print(response)
 # Anarchy is a political ideology that advocates for the absence of government...
 ```
 
-### 🏃‍♀️ Running LLMs Locally
+### 🏃‍♀ Running LLMs Locally
 ```python
 # import our client
 from llm_vm.client import Client
@@ -161,12 +161,12 @@ Supported_Models = ['chat_gpt','gpt','neo','llama','bloom','opt','pythia']
 
 
 
-### ☯️ Picking Different Models
-LLM-VM default model sizes for local models is intended to make experimentation 
+### ☯ Picking Different Models
+LLM-VM default model sizes for local models are intended to make experimentation 
 with LLMs accessible to everyone, but if you have the memory required, larger parameter models 
 will perform far better!
 
-for example if you want to use a large and small neo model  for your teacher and student, and you 
+for example, if you want to use a large and small neo model  for your teacher and student, and you 
 have enough ram:
 
 
@@ -184,11 +184,11 @@ print(response)
 # Anarchy is a political philosophy that advocates no government...
 ```
 
-For some other choices of memory usage and parameter count in each model family, checkout the 
+For some other choices of memory usage and parameter count in each model family, check out the 
 tables in [model_uri_tables](./model_uri_tables.md)
 
 
-### 🛠️ Tool Usage
+### 🛠 Tool Usage
 
 There are two agents: FLAT and REBEL. 
 
