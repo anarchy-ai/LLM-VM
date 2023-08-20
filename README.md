@@ -137,7 +137,7 @@ print(response)
 # Anarchy is a political ideology that advocates for the absence of government...
 ```
 
-### 🏃‍♀️ Running LLMs Locally
+### 🏃‍♀ Running LLMs Locally
 ```python
 # import our client
 from llm_vm.client import Client
@@ -161,7 +161,7 @@ Supported_Models = ['chat_gpt','gpt','neo','llama','bloom','opt','pythia']
 
 
 
-### ☯️ Picking Different Models
+### ☯ Picking Different Models
 LLM-VM default model sizes for local models is intended to make experimentation 
 with LLMs accessible to everyone, but if you have the memory required, larger parameter models 
 will perform far better!
@@ -188,7 +188,7 @@ For some other choices of memory usage and parameter count in each model family,
 tables in [model_uri_tables](./model_uri_tables.md)
 
 
-### 🛠️ Tool Usage
+### 🛠 Tool Usage
 
 There are two agents: FLAT and REBEL. 
 
