@@ -8,7 +8,7 @@ import os
 client = Client(big_model='pythia', small_model='neo')
 
 # Put in your prompt and go!
-response = client.complete(prompt = 'Is Barack Obama the first black president of the USA?',
+response = client.complete(prompt = 'Is 1+1=10000?',
                            context='',regex=r"\s*([Yy]es|[Nn]o|[Nn]ever|[Aa]lways)")
 print(response)
 response = client.complete(prompt = 'Did MJ win 6 titles with the Bulls',

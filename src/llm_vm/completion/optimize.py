@@ -183,23 +183,14 @@ class LocalOptimizer(Optimizer):
         self.data_synthesizer = data_synthesis.DataSynthesis(0.87, 50)
 
     def complete(self, stable_context, dynamic_prompt, data_synthesis = False, finetune = False, regex = None, type = None, choices = None, **kwargs):
-        if regex is not None:
-            return RegexCompletion.complete(stable_context+dynamic_prompt,regex)
-
-        if type is not None:
-            return TypeCompletion.complete(stable_context+dynamic_prompt,type)
-
-        if choices is not None:
-            return ChoicesCompletion.complete(stable_context+dynamic_prompt,choices)
-
+        
         openai.api_key = self.openai_key
-        completion, train = self.complete_delay_train(stable_context, dynamic_prompt, run_data_synthesis=data_synthesis, **kwargs)
-        print(finetune,flush=True)
+        completion, train = self.complete_delay_train(stable_context, dynamic_prompt, run_data_synthesis=data_synthesis, regex = regex, choices = choices, type = type, **kwargs)
         if finetune:
             train()
         return completion
 
-    def complete_delay_train(self, stable_context, dynamic_prompt, run_data_synthesis = False, min_examples_for_synthesis = 1 ,c_id = None, **kwargs):
+    def complete_delay_train(self, stable_context, dynamic_prompt, run_data_synthesis = False, min_examples_for_synthesis = 1 ,c_id = None, regex = None, choices = None, type = None, **kwargs):
         """
         Runs a completion using the string stable_context+dynamic_prompt.  Returns an optional training closure to use if the
         caller decides that the completion was particularly good.
@@ -243,7 +234,7 @@ class LocalOptimizer(Optimizer):
 
         model = self.storage.get_model(c_id)
         # this gives us the model_id
-        if model is not None:
+        if model is not None and regex is None and type is None and choices is None:
             print("Using the new model:", model, flush=True)
             completion = self.call_small(prompt = dynamic_prompt.strip(), model=model, **kwargs)
 
@@ -253,7 +244,16 @@ class LocalOptimizer(Optimizer):
         succeed_train = None
         if len(training_exs) < self.MAX_TRAIN_EXS:
             def promiseCompletion():
-                best_completion = self.call_big(prompt, **kwargs)
+
+                if regex is not None:
+                    best_completion = RegexCompletion.complete(prompt,regex)
+                elif type is not None:
+                    best_completion = TypeCompletion.complete(prompt,type)
+
+                elif choices is not None:
+                    best_completion = ChoicesCompletion.complete(prompt,choices)
+                else:
+                    best_completion = self.call_big(prompt, **kwargs)
 
                 def actual_train(use_completion = None):
 
@@ -286,7 +286,7 @@ class LocalOptimizer(Optimizer):
 
             else:
                 _, succeed_train = asyncAwait(best_completion_promise)
-            print(completion)
+            
 
 
         def succeed_train_closure(use_completion = None):
