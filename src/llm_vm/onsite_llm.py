@@ -281,7 +281,7 @@ class Small_Local_Neo(Base_Onsite_LLM):
     def tokenizer_loader(self):
         return GPT2Tokenizer.from_pretrained(self.model_uri)
 
-@RegisterModelClass("llama")
+@RegisterModelClass("llama2")
 class Small_Local_LLama(Base_Onsite_LLM):
 
     """
@@ -300,7 +300,7 @@ class Small_Local_LLama(Base_Onsite_LLM):
     model_uri="openlm-research/open_llama_3b_v2"
 
     def model_loader(self):
-        return LlamaForCausalLM.from_pretrained(self.model_uri)
+        return Llama2ForCausalLM.from_pretrained(self.model_uri)
     def tokenizer_loader(self):
         return Llama2Tokenizer.from_pretrained(self.model_uri)
 
