@@ -2,13 +2,17 @@ import json
 import sys
 from sentence_transformers import SentenceTransformer, util
 import openai
-
+import os
+import time
+import pickle
+import llm_vm.config as conf
+from llm_vm.guided_completion import RegexCompletion, ChoicesCompletion, TypeCompletion
 
 class DataSynthesis:
-     def __init__(self, variance, examples_to_generate):
-         self.variance = variance
-         self.examples_to_generate = examples_to_generate
-     def data_synthesis(self, optimizer, prompt, response, example_delim="<Datum-Separator/>", openai_key=None, semantic_sim=True, **kwargs):
+    def __init__(self, variance, examples_to_generate):
+        self.variance = variance
+        self.examples_to_generate = examples_to_generate
+    def data_synthesis(self, optimizer, prompt, response, openai_key=None, regex = None, type = None, choices = None, **kwargs):
         """
         This method generates QA pairs using the larger LLM to be used as training data for fine-tuning the smaller LLM.
 
@@ -25,80 +29,59 @@ class DataSynthesis:
         ----------
         - List: A list of tuples containing the QA pairs to be used for fine-tuning.
         """
-        model = SentenceTransformer("all-MiniLM-L6-v2")
-        final_prompt = None
-        if type(prompt) is str:
-            final_prompt = '{"prompt": "' +prompt+'"  , "response": "' +response+'" }'+example_delim
-        elif type(prompt) is list:
-            json_str = ""
-            for idx,p in enumerate(prompt):
-               example_str = '{"prompt": "' + p +'"  , "response": "' + str(response[idx]) +'" }'+example_delim+'\n'
-               json_str += example_str
-            final_prompt = json_str
-        final_prompt = "Generate 50 more jsons like the ones below. Use "+example_delim+" as a delimeter between JSONs.\n" + final_prompt
-        print(final_prompt)
-        data = None
-        openai.api_key=openai_key
-        response=openai.Completion.create(prompt=final_prompt,model="text-davinci-003",max_tokens=1000,temperature=1).choices[0].text
+        if os.path.isfile(conf.settings.data_gen_file):
+            new_file = open(conf.settings.data_gen_file,"rb")
+            return list(pickle.load(new_file))
         datapoints = []
-        print("REPLY"+response,file=sys.stderr)
-        split_response = response.split(sep=example_delim)
-        print(f"Generated {len(split_response)}/{self.examples_to_generate} examples.", file=sys.stderr )
-        if semantic_sim:
-            num_responses = len(split_response)
-            batch_responses = []
-            for idx in range(0, len(split_response), 10):
-                batch_str = None
-                if len(split_response) - idx >= 10:
-                    batch_str = "".join(split_response[idx : idx + 10])
-                else:
-                    batch_str = "".join(split_response[idx : len(split_response)])
-                batch_responses.append(batch_str)
-            embeddings = model.encode(batch_responses, convert_to_tensor=True)
-            cosine_scores = util.cos_sim(embeddings, embeddings)
-            duplicate_idx = []
-            for row_idx, row in enumerate(cosine_scores):
-                for i, score in enumerate(row):
-                    if score >= self.variance and score < 0.99:
-                        duplicate_idx.append((row_idx, i))
-
-            deleted_idx = []
-            for duplicate in duplicate_idx:
-                example_idx, match_idx = duplicate
-                if example_idx in deleted_idx or match_idx in deleted_idx:
-                    continue
-                else:
-                    split_idx = (example_idx + 1) * 10
-                    if split_idx < len(split_response):
-                        del split_response[split_idx - 10 : split_idx]
-                    else:
-                        del split_response[split_idx - 10 : len(split_response)]
-                    deleted_idx.append(example_idx)
-
-            print(
-                f"Found {len(split_response)} valid examples. Removed {num_responses - len(split_response)} duplicate examples.",
-                file=sys.stderr,
-            )
-        datum_failure = 0
-        bad_key_failure =0
-        resp_filter = {}
-
-        for d in split_response:
-            print(d)
-
-            try:
-                the_data = json.loads(d.replace("\n",""))
-                the_tuple = (the_data["prompt"],the_data["response"])
-                if the_tuple in resp_filter:
-                    continue   # dont save a response if its already happened
-                resp_filter[the_tuple]=True  # for now we're treating the (Q,A) pair as a single value
-                datapoints.append(the_tuple)
-            except json.decoder.JSONDecodeError as err:
-                print(F'data_synthesis response parsing failed with: { err } \nExpected a valid JSON Object but received {type(d)} of length {len(d)}',file=sys.stderr)
-                datum_failure+=1
-            except LookupError as err : # i have no evidence that this will happen
-                print(F'data_synthesis key lookup failed with: { err }',file=sys.stderr)
-                bad_key_failure +=1
-        print(F'Out of { len(split_response)} response objects, {datum_failure} were not valid json \n\
-            and {bad_key_failure} were missing a key',file=sys.stderr)
+        final_prompt = '{"prompt": "' +prompt+'"  , "response": "' +response+'" }'
+        final_prompt = "Generate 1 json similar to the one below. \n" + final_prompt
+        while len(datapoints) < self.examples_to_generate:
+            datapoint = self.generate_example(final_prompt, openai_key, regex = regex, type = type, choices = choices)
+            time.sleep(5)
+            datapoints.append(datapoint)
+            print(datapoint)
+        pickle.dump(datapoints,conf.settings.data_gen_file)
         return datapoints
+    
+    def generate_example(self, final_prompt, openai_key, model="gpt-4",max_tokens = 1000,temperature = 1,regex = None,type = None,choices = None):
+        openai.api_key=openai_key
+        cur_prompt = [{'role': "system", 'content' : final_prompt}]
+        if regex is not None:
+            response = openai.ChatCompletion.create(messages=cur_prompt,model=model,max_tokens=max_tokens,temperature=temperature)['choices'][0]['message']['content']
+            try:
+                the_data = json.loads(response.replace("\n",""))
+                prompt = the_data["prompt"]
+                response = RegexCompletion.complete(prompt,regex)
+                the_tuple = (prompt,response)
+            except:
+                pass
+            
+        elif type is not None:
+            response = openai.ChatCompletion.create(messages=cur_prompt,model=model,max_tokens=max_tokens,temperature=temperature)['choices'][0]['message']['content']
+            try:
+                the_data = json.loads(response.replace("\n",""))
+                prompt = the_data["prompt"]
+                response = TypeCompletion.complete(prompt,type)
+                the_tuple = (prompt,response)
+            except:
+                pass
+
+        elif choices is not None:
+            response = openai.ChatCompletion.create(messages=cur_prompt,model=model,max_tokens=max_tokens,temperature=temperature)['choices'][0]['message']['content']
+            try:
+                the_data = json.loads(response.replace("\n",""))
+                prompt = the_data["prompt"]
+                response = ChoicesCompletion.complete(prompt,choices)
+                the_tuple = (prompt,response)
+            except:
+                pass
+
+        else:
+            response = openai.ChatCompletion.create(messages=cur_prompt,model=model,max_tokens=max_tokens,temperature=temperature)['choices'][0]['message']['content']
+            try:
+                the_data = json.loads(response.replace("\n",""))
+                the_tuple = (the_data["prompt"],the_data["response"])
+            except:
+                pass
+        
+        return the_tuple
