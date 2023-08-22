@@ -3,5 +3,5 @@ BIG_MODEL = "chat_gpt"
 PORT = 3002
 SMALL_MODEL = "pythia"
 HOST = "127.0.0.1"
-OPENAI_API_KEY = "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"
+OPENAI_API_KEY = ""
 DATA_GEN_FILE = "data_gen.pkl"
