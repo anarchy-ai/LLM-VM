@@ -105,7 +105,7 @@ def pick_tool(tools_list, question, conversation_history, use_fine_tuned_model =
         return suggested_tool_id, price
     except Exception as e:
         print_big(f'Exception parsing tool_id: "{suggested_tool_str}"')
-        print(e, flush=True)
+        print(e, flush=True, file=sys.stderr)
         return DefaultTools.I_DONT_KNOW.value, price
 
 

@@ -50,8 +50,8 @@ class Agent:
             answer, has_friendly_tags = remove_tags_from_html_string(answer)
 
         except Exception as e:
-            print(e, flush=True)
-            print("Main thread exception: ", e, flush=True)
+            print(e, flush=True, file=sys.stderr)
+            print("Main thread exception: ", e, flush=True, file=sys.stderr)
             answer, calls, debug_return, price, has_friendly_tags = "Error: " + str(e), [], [], 0, False
 
 
@@ -79,7 +79,7 @@ def flat_main():
         inp = input(last+"Human: ")
         return_value = label.run(inp, conversation_history)
         conversation_history = return_value[1]
-        print(return_value[2])
+        print(return_value[2], file=sys.stderr)
         last = "AI: "+str(return_value[0]) + "\n"
 
 # print_op(google(' {"question": ""}'))
