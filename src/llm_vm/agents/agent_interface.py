@@ -3,13 +3,14 @@ This file has been temporarily repurposed as an interface for users to
 call any of the three agents (REBEL, BACKWARD_CHAINING, and FLAT) and interact with them.
 Running this file prompts the user to choose any of the agents and ask it questions.
 """
+import sys
 import llm_vm.agents.REBEL.agent as REBEL
 import llm_vm.agents.FLAT.agent as FLAT
 import os
 key = os.getenv("LLM_VM_OPENAI_API_KEY")
 
 def call_agent():
-    print("Try out any agent!")
+    print("Try out any agent!", file=sys.stderr)
 
     # stores user input for which agent to try out
     model_choice = 0
@@ -25,12 +26,12 @@ def call_agent():
             model_choice = int(model_choice)
 
             if model_choice not in range (1, 4):
-                print("=====Please enter 1, or 2!=====")
+                print("=====Please enter 1, or 2!=====", file=sys.stderr)
             else:
                 # user has entered a valid input
                 break
         except:
-            print("=====Please enter 1 or 2!=====")
+            print("=====Please enter 1 or 2!=====", file=sys.stderr)
 
     # FLAT
     if model_choice == 1:

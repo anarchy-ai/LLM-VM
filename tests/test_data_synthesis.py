@@ -1,3 +1,4 @@
+import sys
 from dotenv import load_dotenv
 import os
 import openai
@@ -12,7 +13,7 @@ if __name__ == "__main__":
     except:
         pass
     openai.api_key = os.getenv('LLM_VM_OPENAI_API_KEY')
-    print("key:", openai.api_key)
+    print("key:", openai.api_key, file=sys.stderr)
 
 
     data_synthesizer = data_synthesis.DataSynthesis(0.87, 50)
@@ -20,7 +21,7 @@ if __name__ == "__main__":
     # for one-shot prompt
     prompt = "What is the currency in myanmmar?"
     response = client.complete(prompt=prompt, context = "", openai_key="",temperature = 0.0)["completion"]
-    print(f"Prompt: {prompt} /nResponse: {response}")
+    print(f"Prompt: {prompt} /nResponse: {response}", file=sys.stderr)
 
     # for k-shot prompt
     prompt_list = ["What is the currency in Madagascar?", "What is the currency in myanmmar?", "What is the currency in Morocco?"]

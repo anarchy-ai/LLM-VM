@@ -1,3 +1,4 @@
+import sys
 import openai
 import llm_vm.onsite_llm as llms
 from llm_vm.onsite_llm import load_model_closure
@@ -54,7 +55,7 @@ class Client:
             os.mkdir("finetuned_models")
         # Specify the model strategy the user will use
         # MODELCONFIG = models.ModelConfig(big_model=big_model, small_model=small_model)
-        print("Using model: " + big_model) # announce the primary LLM that is generating results
+        print("Using model: " + big_model, file=sys.stderr) # announce the primary LLM that is generating results
 
         # These functions allow for proper initialization of the optimizer
         # def CALL_BIG(prompt, max_len=256, **kwargs):
@@ -150,7 +151,7 @@ class Client:
         self.optimizer.openai_key = openai.api_key
         # self.agent.set_api_key(openai.api_key,"OPENAI_API_KEY") # 
         if os.getenv("OPENAI_API_KEY") is None and use_rebel_agent==True :
-            print("warning: you need OPENAI_API_KEY environment variable for ")
+            print("warning: you need OPENAI_API_KEY environment variable for ", file=sys.stderr)
 
         try:
             if not use_rebel_agent:

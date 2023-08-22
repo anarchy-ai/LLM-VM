@@ -49,7 +49,7 @@ def cli():
     """
     port = settings.port
     if port > 65535:
-        print('Port defined out of range, defaulting to 3002')
+        print('Port defined out of range, defaulting to 3002', file=sys.stderr)
         port = 3002
     server_entry_point(host = settings.host, port = port)
 

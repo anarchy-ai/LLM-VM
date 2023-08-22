@@ -1,5 +1,6 @@
 #! /usr/bin/env python3
 # import our client
+import sys
 from llm_vm.client import Client
 import os
 from llm_vm.config import settings
@@ -12,7 +13,7 @@ response = client.complete(prompt = "Answer question Q. ",context="Q: What is th
                            temperature=0.0,
                            data_synthesis=True,
                            finetune=True,)
-print(response)
+print(response, file=sys.stderr)
 
 # response = client.complete(prompt = "Answer question Q. ",context="Q: What is the economic situation in France",
 #                            openai_key=settings.openai_api_key,

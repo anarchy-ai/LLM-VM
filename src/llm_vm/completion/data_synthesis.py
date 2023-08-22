@@ -39,7 +39,7 @@ class DataSynthesis:
             datapoint = self.generate_example(final_prompt, openai_key, regex = regex, type = type, choices = choices)
             time.sleep(5)
             datapoints.append(datapoint)
-            print(datapoint)
+            print(datapoint, file=sys.stderr)
         pickle.dump(datapoints,conf.settings.data_gen_file)
         return datapoints
     

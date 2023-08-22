@@ -1,5 +1,6 @@
 #! /usr/bin/env python3
 # import our client
+import sys
 from llm_vm.client import Client
 import os
 
@@ -10,5 +11,5 @@ client = Client(big_model='pythia', small_model='neo')
 # Put in your prompt and go!
 response = client.complete(prompt = 'What is anarchy?',
                            context='')
-print(response)
+print(response, file=sys.stderr)
 # Anarchy is a political system in which the state is abolished and the people are free...
