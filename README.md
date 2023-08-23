@@ -52,7 +52,7 @@ In line with Anarchy's mission, the LLM-VM strives to support open-source models
   
 * **Lower your costs 💸:** *Running models locally can reduce the pay-as-you-go costs of development and testing.*
   
-* **Flexibility 🧘‍♀️:** *AnarchyAI allows you to rapidly switch between popular models so you can pinpoint the exact right tool for your project.*
+* **Flexibility 🧘‍♀️:** *Anarchy allows you to rapidly switch between popular models so you can pinpoint the exact right tool for your project.*
   
 * **Community Vibes 🫂:** *Join our active community of highly motivated developers and engineers working passionately to democratize AGI*
   
