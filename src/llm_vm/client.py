@@ -13,7 +13,7 @@ else:
     default_big_model= conf.settings.big_model
 
 if conf.settings.small_model is not  None:
-    default_small_model= "pythia"
+    default_small_model= "llama2"
 else:    
     default_small_model = conf.settings.small_model
 
