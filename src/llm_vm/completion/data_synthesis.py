@@ -36,6 +36,7 @@ class DataSynthesis:
         datapoints = []
         final_prompt = '{"prompt": "' +prompt+'"  , "response": "' +response+'" }'
         final_prompt = "Generate 1 json similar to the one below. \n" + final_prompt
+        
         while len(datapoints) < self.examples_to_generate:
             datapoint = self.generate_example(final_prompt, openai_key, regex = regex, type = type, choices = choices)
             time.sleep(5)
