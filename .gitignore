@@ -14,3 +14,4 @@ dist
 *.ipynb
 /finetuned_models/
 settings.toml
+*.pkl
