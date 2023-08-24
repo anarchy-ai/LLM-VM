@@ -1,4 +1,5 @@
 # import our client
+import sys
 from llm_vm.client import Client
 import os
 
@@ -16,5 +17,5 @@ response = client.complete(prompt = 'Is it warmer in Paris or Timbuktu and what 
                             'method': 'GET',
                             'url': "https://api.open-meteo.com/v1/forecast",
                             'static_params': {'current_weather': 'true'}}]) #No tools by default, so you have to add your own
-print(response)
+print(response, file=sys.stderr)
 

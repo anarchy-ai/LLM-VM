@@ -17,7 +17,7 @@ def flatten(a):
 
 
 def print_op(*kargs, **kwargs):
-    print(*kargs, **kwargs, flush=True)
+    print(*kargs, **kwargs, flush=True, file=sys.stderr)
 
 
 def prepPrintPromptContext(p):
@@ -218,7 +218,7 @@ def tool_api_call(self, tool, gpt_suggested_input, question, memory, facts, quer
 
     ret = str(resp.text)
     if self.verbose > 4:
-        print(ret)
+        print(ret, file=sys.stderr)
     try:
         ret = str(json.loads(ret))
     except:

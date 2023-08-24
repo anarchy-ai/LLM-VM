@@ -1,3 +1,4 @@
+import sys
 import openai
 from llm_vm.utils.typings_llm import *
 
@@ -10,7 +11,7 @@ def check_model_status (
     print(
         label,
         finetuned_model["status"],
-        flush=True
+        flush=True, file=sys.stderr
     )
 
     return finetuned_model

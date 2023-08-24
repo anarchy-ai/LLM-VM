@@ -6,6 +6,6 @@ def call_llm(llm_request: LLMCallParams) -> LLMCallReturnType:
         try:
             return call_open_ai(llm_request)
         except Exception as e:
-            print("OpenAI call failed", e)
+            print("OpenAI call failed", e, file=sys.stderr)
             return "OpenAI is down!", 0
 

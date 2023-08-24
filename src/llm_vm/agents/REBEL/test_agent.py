@@ -56,7 +56,7 @@ for i in data["data"]:
 
 op = ['birthplace_rounded_lat', 'birthplace_rounded_lng', 'birthplace_tld', 'birthplace_ccn3', 'birthplace_currency', 'birthplace_currency_short', 'birthplace_currency_symbol', 'birthplace_jpn_common_name', 'birthplace_spa_common_name', 'birthplace_rus_common_name', 'birthplace_est_common_name', 'birthplace_urd_common_name', 'birthplace_callingcode', 'birthyear_nobelLiterature', 'birthdate_uspresident', 'birthyear_masterchamp']
 for j in range(0,len(op)):
-    print(j,op[j])
+    print(j,op[j], file=sys.stderr)
 idx=int(input())
 
 choice=op[idx]
@@ -66,4 +66,4 @@ for i in range(100):
             a=agent.run(q_and_a[choice][i][0],[])
         except Exception as e:
             a = [e,""]
-    print(str(i)+"|",str(a[0])+"|",q_and_a[choice][i][1])
+    print(str(i)+"|",str(a[0])+"|",q_and_a[choice][i][1], file=sys.stderr)

@@ -20,7 +20,7 @@ from bs4 import BeautifulSoup
 random_fixed_seed = random.Random(4)
 
 def print_op(*kargs, **kwargs):
-    print(*kargs, **kwargs, flush=True)
+    print(*kargs, **kwargs, flush=True, file=sys.stderr)
 
 def verbose_answer(data, answer):
     return f'''<{L_ANSWER_DATA}>{str(data)}</{L_ANSWER_DATA}><{L_ANSWER_SUMMARY}>{answer}</{L_ANSWER_SUMMARY}>'''
@@ -55,12 +55,12 @@ def print_big(data, label = ""):
             return formatted_title.format((int((20 - len(x)) / 2) * " ") + x)
     try:
         if len(label):
-            print(do_format(str(label).upper()), data, flush=True)
+            print(do_format(str(label).upper()), data, flush=True, file=sys.stderr)
         else:
-            print(do_format(str(data)), flush=True)
+            print(do_format(str(data)), flush=True, file=sys.stderr)
 
     except:
-        print(label, flush=True)
+        print(label, flush=True, file=sys.stderr)
 
 
 # Tolerance: If string A can be converted into B in more than {tolerance} steps, they are considered different.
