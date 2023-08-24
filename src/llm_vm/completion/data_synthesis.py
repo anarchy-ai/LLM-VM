@@ -29,6 +29,7 @@ class DataSynthesis:
         ----------
         - List: A list of tuples containing the QA pairs to be used for fine-tuning.
         """
+        
         if os.path.isfile(conf.settings.data_gen_file):
             new_file = open(conf.settings.data_gen_file,"rb")
             return list(pickle.load(new_file))
@@ -39,11 +40,12 @@ class DataSynthesis:
             datapoint = self.generate_example(final_prompt, openai_key, regex = regex, type = type, choices = choices)
             time.sleep(5)
             datapoints.append(datapoint)
-            print(datapoint, file=sys.stderr)
-        pickle.dump(datapoints,conf.settings.data_gen_file)
+            print(datapoint)
+        new_file = open(conf.settings.data_gen_file,"wb")
+        pickle.dump(datapoints,new_file)
         return datapoints
     
-    def generate_example(self, final_prompt, openai_key, model="gpt-4",max_tokens = 1000,temperature = 1,regex = None,type = None,choices = None):
+    def generate_example(self, final_prompt, openai_key, example_delim = "<END>", model="gpt-4",max_tokens = 1000,temperature = 1,regex = None,type = None,choices = None):
         openai.api_key=openai_key
         cur_prompt = [{'role': "system", 'content' : final_prompt}]
         if regex is not None:
@@ -52,7 +54,7 @@ class DataSynthesis:
                 the_data = json.loads(response.replace("\n",""))
                 prompt = the_data["prompt"]
                 response = RegexCompletion.complete(prompt,regex)
-                the_tuple = (prompt,response)
+                the_tuple = (prompt,response+example_delim)
             except:
                 pass
             
@@ -62,7 +64,7 @@ class DataSynthesis:
                 the_data = json.loads(response.replace("\n",""))
                 prompt = the_data["prompt"]
                 response = TypeCompletion.complete(prompt,type)
-                the_tuple = (prompt,response)
+                the_tuple = (prompt,response+example_delim)
             except:
                 pass
 
@@ -72,7 +74,7 @@ class DataSynthesis:
                 the_data = json.loads(response.replace("\n",""))
                 prompt = the_data["prompt"]
                 response = ChoicesCompletion.complete(prompt,choices)
-                the_tuple = (prompt,response)
+                the_tuple = (prompt,response+example_delim)
             except:
                 pass
 
@@ -80,7 +82,7 @@ class DataSynthesis:
             response = openai.ChatCompletion.create(messages=cur_prompt,model=model,max_tokens=max_tokens,temperature=temperature)['choices'][0]['message']['content']
             try:
                 the_data = json.loads(response.replace("\n",""))
-                the_tuple = (the_data["prompt"],the_data["response"])
+                the_tuple = (the_data["prompt"],the_data["response"]+example_delim)
             except:
                 pass
         

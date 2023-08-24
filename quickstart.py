@@ -9,7 +9,7 @@ import os
 client = Client(big_model='pythia', small_model='neo')
 
 # Put in your prompt and go!
-response = client.complete(prompt = 'What is anarchy?',
+response = client.complete(prompt = 'What is the capital of the USA?',
                            context='')
 print(response, file=sys.stderr)
 # Anarchy is a political system in which the state is abolished and the people are free...
