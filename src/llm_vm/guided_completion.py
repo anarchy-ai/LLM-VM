@@ -1,7 +1,7 @@
 import outlines.models as models 
 import outlines.text.generate as generate
 
-model = models.transformers("gpt2-medium")
+model = models.transformers("gpt2")
 
 #this class is called when optimize.complete is called with the regex parameter
 class RegexCompletion:

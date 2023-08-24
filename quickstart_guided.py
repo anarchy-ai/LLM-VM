@@ -5,16 +5,16 @@ import os
 
 # Instantiate the client specifying which LLM you want to use
 
-client = Client(big_model='pythia', small_model='neo')
+client = Client(big_model='pythia', small_model='pythia')
 
 # Put in your prompt and go!
 response = client.complete(prompt = 'Is 1+1=10000?',
-                           context='', openai_key=os.getenv("LLM_VM_OPENAI_API_KEY"), finetune = True, data_synthesis = True, regex=r"\s*([Yy]es|[Nn]o|[Nn]ever|[Aa]lways)")
+                           context='', openai_key="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", finetune = True, data_synthesis = True, regex=r"\s*([Yy]es|[Nn]o|[Nn]ever|[Aa]lways)")
 print(response)
-response = client.complete(prompt = 'Did MJ win 6 titles with the Bulls',
-                           context='',choices=["Hell Yeah Dude what a player","No way, Lebron's the Goat"])
-print(response)
-response = client.complete(prompt = 'How many presidents has the USA had?',
-                           context='',type="integer")
-print(response)
+# response = client.complete(prompt = 'Did MJ win 6 titles with the Bulls',
+#                            context='', openai_key="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", finetune = True, data_synthesis = True,choices=["Hell yeah dude that's correct","No way, that's hella false"])
+# print(response)
+# response = client.complete(prompt = 'What does 1+1 equal?',
+#                            context='',  openai_key="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", finetune = True, data_synthesis = True, type="integer")
+# print(response)
 

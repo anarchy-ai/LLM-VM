@@ -149,7 +149,7 @@ class Base_Onsite_LLM(ABC):
                 learning_rate=2e-5,
                 per_device_train_batch_size = 1,
                 per_device_eval_batch_size = 1,
-                num_train_epochs=1,
+                num_train_epochs=5,
                 weight_decay=0.01,
                 report_to= "none",
             )

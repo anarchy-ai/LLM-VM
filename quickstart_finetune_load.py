@@ -7,11 +7,11 @@ import os
 client = Client(big_model='pythia')
 
 # specify the file name of the finetuned model to load
-model_name = '<filename_of_your_model>.pt'
+model_name = '2023-08-23T14-37-13_pythia-70m-deduped.pt'
 client.load_finetune(model_name)
 
 # Put in your prompt and go!
-response = client.complete(prompt = 'What is anarchy?',
-                           context='')
+response = client.complete(prompt = 'The captial of the USA is New Dehli?',
+                           context='')["completion"].split("<END>")[0]
 print(response)
 # Anarchy is a political system in which the state is abolished and the people are free...
