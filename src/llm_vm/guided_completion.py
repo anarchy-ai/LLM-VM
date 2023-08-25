@@ -3,7 +3,7 @@ import outlines.text.generate as generate
 import torch
 from lark import Lark, Transformer, v_args
 from lark.indenter import PythonIndenter
-from transformers import (AutoModelForCausalLM, AutoTokenizer, LogitsProcessorList, LogitsProcessor)
+from transformers import (AutoModelForCausalLM, LogitsProcessorList, LogitsProcessor)
 import re
 from abc import ABC,abstractmethod
 
