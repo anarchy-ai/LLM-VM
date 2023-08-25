@@ -57,7 +57,7 @@ class GrammarCompletion:
                     matching_tokens = python_constraint.construct_filter_set(v)
                     self.terminals_tokens_map[k] = matching_tokens
                 self.terminals_tokens_map['$END'] = [(self.tokenizer.decode(self.eos_token_id), self.eos_token_id)]
-
+        
             print('Created token map')
 
             logits_processor = LogitsProcessorList()
@@ -141,3 +141,35 @@ class PythonConstraint(GrammarConstraint):
         
         return set(valid_next_ids)
 
+
+
+class GrammarLogitsProcessor(LogitsProcessor):
+
+    def __init__(self, constraint_class, terminals_map):
+        self.constraint_class = constraint_class
+        self.terminals_map = terminals_map
+
+    def __call__(self, input_ids, scores):
+
+        print(input_ids)
+        bias = torch.zeros_like(scores, dtype=torch.bool)
+        valid_next_ids = self.constraint_class.construct_final_filter_set(input_ids, self.terminals_map)
+        for id in valid_next_ids:
+            bias[0, id] = True
+        
+        scores += bias
+        return scores
+
+
+prompt = "rand_num = 5"
+
+tokenizer = AutoTokenizer.from_pretrained("gpt2-medium", padding_side='left')
+
+# token_ids = tokenizer(prompt, return_tensors='pt')
+model_kwargs = {
+        'temperature': 1.0,
+        'max_new_tokens': 10
+    }
+model_complete = GrammarCompletion("gpt2-medium", tokenizer)
+result = model_complete.complete(prompt)
+print(result)
