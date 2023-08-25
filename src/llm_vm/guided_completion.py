@@ -57,7 +57,14 @@ class GrammarCompletion:
                     matching_tokens = python_constraint.construct_filter_set(v)
                     self.terminals_tokens_map[k] = matching_tokens
                 self.terminals_tokens_map['$END'] = [(self.tokenizer.decode(self.eos_token_id), self.eos_token_id)]
-        
+        elif grammar_type.lower() == 'json':
+            python_constraint = JSONConstraint(self.model_identifier, self.tokenizer)
+            if(len(self.terminals_tokens_map) == 0):
+                terminal_regex_map = python_constraint.parse_grammar()
+                for k, v in terminal_regex_map.items():
+                    matching_tokens = python_constraint.construct_filter_set(v)
+                    self.terminals_tokens_map[k] = matching_tokens
+                self.terminals_tokens_map['$END'] = [(self.tokenizer.decode(self.eos_token_id), self.eos_token_id)]
             print('Created token map')
 
             logits_processor = LogitsProcessorList()
@@ -141,7 +148,99 @@ class PythonConstraint(GrammarConstraint):
         
         return set(valid_next_ids)
 
+class JSONConstraint(GrammarConstraint): 
 
+    def construct_filter_set(self, expression):
+        vocab = self.tokenizer.vocab
+        valid_tokens = []
+        specials = ['*', '+', ')']
+        if expression[0] in specials:
+            expression = f'\{expression}'
+        elif len(expression) == 1 and (expression == '[' or  expression == '('):
+            expression = f'\{expression}'
+
+        try:
+            pattern = re.compile(expression, re.UNICODE)
+            for token, id in vocab.items():
+                if pattern.match(token) is not None:
+                   valid_tokens.append((token, id))
+        except Exception as e: 
+            print(e, expression) 
+    
+        return set(valid_tokens)
+    
+
+    def parse_grammar(self):
+        json_grammar = r"""
+        ?start: value
+
+        ?value: object
+            | array
+            | string
+            | SIGNED_NUMBER      -> number
+            | "true"             -> true
+            | "false"            -> false
+            | "null"             -> null
+
+        array  : "[" [value ("," value)*] "]"
+        object : "{" [pair ("," pair)*] "}"
+        pair   : string ":" value
+
+        string : ESCAPED_STRING
+
+        %import common.ESCAPED_STRING
+        %import common.SIGNED_NUMBER
+        %import common.WS
+
+        %ignore WS
+        """
+        class TreeToJson(Transformer):
+            @v_args(inline=True)
+            def string(self, s):
+                return s[1:-1].replace('\\"', '"')
+
+            array = list
+            pair = tuple
+            object = dict
+            number = v_args(inline=True)(float)
+
+            null = lambda self, _: None
+            true = lambda self, _: True
+            false = lambda self, _: False
+
+
+        # Create the JSON parser with Lark, using the LALR algorithm
+        self.parser = Lark(json_grammar, parser='lalr',
+                        lexer='contextual',
+                        # Using an internal transformer is faster and more memory efficient
+                        transformer=TreeToJson())
+        terminals = self.parser.terminals
+        t_map = {}
+        for t in terminals:
+            t_map[t.name] = t.pattern.value
+        return t_map
+
+    def prefix_state(self, prefix_str):
+        valid_next = []
+        try:      
+            interactive_tree = self.parser.parse_interactive(prefix_str)
+            interactive_tree.exhaust_lexer()
+            valid_next = list(interactive_tree.accepts())
+        except Exception as e:
+            print(e)
+        return valid_next
+
+    def construct_final_filter_set(self, prefix_ids, terminals_map):
+        prefix_str = self.tokenizer.batch_decode(prefix_ids, skip_special_tokens=True)[0]
+        print(prefix_str)
+        next_lex = self.prefix_state(prefix_str)
+        valid_next_ids = []
+        for lex in next_lex:
+            token_set = terminals_map[lex]
+            for t in token_set:
+                valid_next_ids.append(t[-1])
+        
+        return set(valid_next_ids)
 
 class GrammarLogitsProcessor(LogitsProcessor):
 
