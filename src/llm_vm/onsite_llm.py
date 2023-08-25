@@ -17,7 +17,10 @@ from transformers import (
     GPT2Tokenizer,
     DataCollatorForLanguageModeling,
     TrainingArguments,
-    Trainer)
+    Trainer,
+    GPT2LMHeadModel,
+    BartConfig,
+    BitsAndBytesConfig)
 import time
 from datetime import datetime
 import tempfile
@@ -468,3 +471,54 @@ class Chat_GPT:
         # optimizer.storage.set_training_in_progress(c_id, False)
         # if old_model is not None:
         #     openai.Model.delete(old_model)
+
+# Custom Quantized LLM Class
+class Quantized_Onsite_LLM(GPT2LMHeadModel):
+    model_id = "facebook/opt-350m"  # Store the model ID
+
+    def __init__(self, config, quantization_config):
+        super().__init__(config)
+        self.nf4_config = quantization_config
+
+    def quantized_weights(self, model):
+        """
+        This function applies quantization to the weights of the model
+        Parameters:
+            model (LLM): The model to quantize
+        Returns:
+            LLM: The quantized model
+        """
+        quantized_model = torch.quantization.quantize_dynamic(
+            model, {torch.nn.Linear}, dtype=torch.qint8, quant_config=self.nf4_config
+        )
+        return quantized_model
+
+    @classmethod
+    def from_pretrained(cls, quantization_config):
+        """
+            Load a quantized model from a pre-trained model.
+            Args:
+                quantization_config: The quantization configuration.
+            Returns:
+                A new instance of the quantized model.
+            """
+
+        config = BartConfig.from_pretrained(cls.model_id)
+
+        quantized_model = AutoModelForSeq2SeqLM.from_pretrained(
+            "facebook/opt-350m", config=config,ignore_mismatched_sizes=True
+        )
+
+        return quantized_model
+
+
+# Create a quantization configuration using BitsAndBytesConfig
+nf4_config = BitsAndBytesConfig(
+    load_in_4bit=True, bnb_4bit_quant_type="nf4", bnb_4bit_use_double_quant=True, bnb_4bit_compute_dtype=torch.bfloat16
+)
+
+# Load the quantized model using the custom class
+quantized_model = Quantized_Onsite_LLM.from_pretrained(quantization_config=nf4_config)
+
+# Initialize tokenizer
+tokenizer = AutoTokenizer.from_pretrained(Quantized_Onsite_LLM.model_id)
