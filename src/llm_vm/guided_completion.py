@@ -7,7 +7,7 @@ from transformers import (AutoModelForCausalLM, LogitsProcessorList, LogitsProce
 import re
 from abc import ABC,abstractmethod
 
-model = models.transformers("gpt2-medium")
+model = models.transformers("gpt2")
 
 #this class is called when optimize.complete is called with the regex parameter
 class RegexCompletion:
