@@ -5,7 +5,16 @@ model = models.transformers("gpt2")
 
 
 class Completion:
+    """
+    A class used to generate completions when optimize.complete is called
+    """
+
     def __init__(self, generator, *generator_args):
+        """
+        :param generator Callable[[Transformers, ...generator_args], None]:
+            Generator function to be used on the complete
+        :param *generator_args [Any]: Generator arguments (without model)
+        """
         self.generator = generator
         self.generator_args = generator_args
 
