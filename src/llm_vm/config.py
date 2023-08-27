@@ -1,6 +1,7 @@
 import re
 import os
 import argparse
+import sys
 from dynaconf import Dynaconf
 from xdg import XDG_CONFIG_HOME
 from llm_vm.onsite_llm import model_keys_registered
@@ -30,7 +31,7 @@ if "openai_api_key" in args:
 
 # project_root = os.path.abspath(os.getcwd())
 
-print("Project Root: " + project_root)
+print("Project Root: " + project_root, file=sys.stderr)
 
 
 # default to the local file, and look in XDG if we can't find it
@@ -51,11 +52,11 @@ settings = Dynaconf(
 MODELS_AVAILABLE = set(model_keys_registered)
 
 if settings.big_model not in MODELS_AVAILABLE:
-    print(settings.big_model + " is an invalid Model selection for Big LLM Model")
+    print(settings.big_model + " is an invalid Model selection for Big LLM Model", file=sys.stderr)
     exit()
 
 if settings.small_model not in MODELS_AVAILABLE:
-    print(settings.small_model + " is an invalid Model selection for Small LLM Model")
+    print(settings.small_model + " is an invalid Model selection for Small LLM Model", file=sys.stderr)
     exit()
 
 # do we want to do this early test and exit?
@@ -67,14 +68,14 @@ def isOpenAIModel(str):
     str =="gpt" or str =="chat_gpt"
 
 if settings.openai_api_key is None and (isOpenAIModel(settings.small_model) or isOpenAIModel(settings.big_model)):
-    print("Error: you must have an OpenAI API key set via config files, ./settings.default.toml or via environment variable ")
-    print("LLM_VM_OPEN_AI_API,if you wish to use their models. Exiting")
+    print("Error: you must have an OpenAI API key set via config files, ./settings.default.toml or via environment variable ", file=sys.stderr)
+    print("LLM_VM_OPEN_AI_API,if you wish to use their models. Exiting", file=sys.stderr)
     exit()
 
 # check args.host is a valid IP address
 pattern = r'^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$'
 if not re.match(pattern, settings.host):
-    print("Invalid IP address. Reverting to the default host, 127.0.0.1")
+    print("Invalid IP address. Reverting to the default host, 127.0.0.1", file=sys.stderr)
     settings.host = '127.0.0.1'
 else:
     # validates each number in the IP address is between 0-255
@@ -85,7 +86,7 @@ else:
             valid_ip = False
             break
     if not valid_ip:
-        print("Invalid IP address range. Reverting to the default host, 127.0.0.1")
+        print("Invalid IP address range. Reverting to the default host, 127.0.0.1", file=sys.stderr)
         settings.host = '127.0.0.1'
 
 

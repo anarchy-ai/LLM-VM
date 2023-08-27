@@ -1,3 +1,4 @@
+import sys
 from flask import request, Blueprint
 import json
 import os
@@ -10,7 +11,7 @@ from llm_vm.config import settings
 
 client = Client( big_model=settings.big_model, small_model=settings.small_model)
 
-print('optimizer loaded')
+print('optimizer loaded', file=sys.stderr)
 
 bp = Blueprint('bp',__name__)
 

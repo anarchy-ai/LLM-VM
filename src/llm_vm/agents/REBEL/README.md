@@ -1,4 +1,4 @@
-# REBEL
+<h1 align='center'> 🤖 Anarchy REBEL 🤖 </h1>
 
 This is the code for the "LLM Guided Inductive Inference for Solving Compositional Problems" paper presented at ICML TEACH23
 

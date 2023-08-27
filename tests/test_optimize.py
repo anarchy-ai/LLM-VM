@@ -107,7 +107,7 @@ def run_test_stub():
     openai_api_key = os.getenv('LLM_VM_OPENAI_API_KEY')
     openai.api_key =openai_api_key
     # anarchy_key = os.getenv('LLM_VM_ANARCHY_KEY')
-    print("key:", openai.api_key[0:5])
+    print("key:", openai.api_key[0:5], file=sys.stderr)
     optimizer = LocalOptimizer(MIN_TRAIN_EXS=1,openai_key=openai_api_key)
     #optimizer = HostedOptimizer(openai_key = openai.api_key,
     #                            anarchy_key = anarchy_key,

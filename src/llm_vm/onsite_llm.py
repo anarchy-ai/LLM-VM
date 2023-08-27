@@ -1,5 +1,6 @@
 import abc
 from abc import ABC,abstractmethod
+import sys
 import openai
 import math
 from transformers import (
@@ -9,8 +10,8 @@ from transformers import (
     BertTokenizer,
     OPTForCausalLM,
     BloomForCausalLM,
-    LlamaTokenizer,
-    LlamaForCausalLM,
+    Llama2Tokenizer,
+    Llama2ForCausalLM,
     GPTNeoForCausalLM,
     GPTNeoXForCausalLM,
     GPT2Tokenizer,
@@ -149,7 +150,7 @@ class Base_Onsite_LLM(ABC):
                 learning_rate=2e-5,
                 per_device_train_batch_size = 1,
                 per_device_eval_batch_size = 1,
-                num_train_epochs=1,
+                num_train_epochs=5,
                 weight_decay=0.01,
                 report_to= "none",
             )
@@ -280,7 +281,7 @@ class Small_Local_Neo(Base_Onsite_LLM):
     def tokenizer_loader(self):
         return GPT2Tokenizer.from_pretrained(self.model_uri)
 
-@RegisterModelClass("llama")
+@RegisterModelClass("llama2")
 class Small_Local_LLama(Base_Onsite_LLM):
 
     """
@@ -296,12 +297,12 @@ class Small_Local_LLama(Base_Onsite_LLM):
         tokenizer_loader: Loads the tokenizer into memory
         generate: Generates a response from a given prompt with the loaded LLM and tokenizer
     """
-    model_uri="openlm-research/open_llama_3b_v2"
+    model_uri="meta-llama/Llama-2-7b"
 
     def model_loader(self):
-        return LlamaForCausalLM.from_pretrained(self.model_uri)
+        return Llama2ForCausalLM.from_pretrained(self.model_uri)
     def tokenizer_loader(self):
-        return LlamaTokenizer.from_pretrained(self.model_uri)
+        return Llama2Tokenizer.from_pretrained(self.model_uri)
 
 @RegisterModelClass("flan")# our yummiest model based on similarity to food
 class Small_Local_Flan_T5(Base_Onsite_LLM):
@@ -387,20 +388,20 @@ class GPT3:
         training_file.close()
         fine_tuning_job = openai.FineTune.create(training_file= upload_response.id)
 
-        print(f"Fine-tuning job created: {fine_tuning_job}", flush=True)
+        print(f"Fine-tuning job created: {fine_tuning_job}", flush=True, file=sys.stderr)
         global job_id # global state isn't great, but thats interrupt handlers
         job_id = fine_tuning_job["id"]
         while True:
             fine_tuning_status = openai.FineTune.retrieve(id=job_id)
             status = fine_tuning_status["status"]
-            print(f"Fine-tuning job status: {status}")
+            print(f"Fine-tuning job status: {status}", file=sys.stderr)
             if status in ["succeeded", "completed", "failed"]:
                 break
             time.sleep(30)
         job_id = None #
         new_model_id = fine_tuning_status.fine_tuned_model
 
-        print("New_model_id: ", new_model_id, flush=True)
+        print("New_model_id: ", new_model_id, flush=True, file=sys.stderr)
 
         optimizer.storage.set_model(c_id, new_model_id)
         optimizer.storage.set_training_in_progress(c_id, False)
@@ -440,7 +441,7 @@ class Chat_GPT:
         return ans['choices'][0]['message']['content']
 
     def finetune(self, dataset, optimizer, c_id):
-        print("fine tuning isn't supported by OpenAI on this model")
+        print("fine tuning isn't supported by OpenAI on this model", file=sys.stderr)
         exit()
         # old_model = optimizer.storage.get_model(c_id)
         # training_file = create_jsonl_file(dataset)

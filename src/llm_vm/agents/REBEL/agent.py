@@ -62,7 +62,7 @@ def prepPrintPromptContext(p):
 
 
 def print_op(*kargs, **kwargs):
-    print(*kargs, **kwargs, flush=True)
+    print(*kargs, **kwargs, flush=True, file=sys.stderr)
 
 
 random_fixed_seed = random.Random(4)

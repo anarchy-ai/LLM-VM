@@ -6,7 +6,7 @@ authors = [
     {name = "Anarchy Team", email = "matt@anarchy.ai"},
 ]
 
-requires-python = ">=3.8" # this could be lower if need be
+requires-python = ">=3.10" # this could be lower if need be
 readme = "README.md"
 license = {text = "MIT"}
 dependencies = [
@@ -16,7 +16,7 @@ dependencies = [
     "watchdog>=3.0.0",
     "xdg>=6.0.0",
     "accelerate>=0.21.0",
-    "transformers>=4.29.0",
+    "transformers>=4.18.0",
     "flask>=2.3.2",
     "flask_cors>=4.0.0",
     "llama-index>=0.7.7",
@@ -26,6 +26,7 @@ dependencies = [
     "sentence-transformers>=2.2.2",
     "requests>=2.26.0",
     "spacy>=3.5.3",
+    "outlines>=0.0.1",
     "en_core_web_md @ https://github.com/explosion/spacy-models/releases/download/en_core_web_md-3.6.0/en_core_web_md-3.6.0-py3-none-any.whl",
 ]
 
