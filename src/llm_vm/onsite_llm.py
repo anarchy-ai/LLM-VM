@@ -281,6 +281,29 @@ class Small_Local_Neo(Base_Onsite_LLM):
     def tokenizer_loader(self):
         return GPT2Tokenizer.from_pretrained(self.model_uri)
 
+@RegisterModelClass("llama")
+class Small_Local_OpenLLama(Base_Onsite_LLM):
+
+    """
+    This is a class for Openlm-Research's open_llama-3b LLM
+
+    Attributes:
+        model_uri (str): Hugging Face Endpoint for LLM
+        tokenizer (AutoTokenizer): Tokenizer from Transformer's library
+        model (LLM): The large language model
+
+    Methods:
+        model_loader: Loads the LLM into memory
+        tokenizer_loader: Loads the tokenizer into memory
+        generate: Generates a response from a given prompt with the loaded LLM and tokenizer
+    """
+    model_uri="openlm-research/open_llama_3b_v2"
+
+    def model_loader(self):
+        return LlamaForCausalLM.from_pretrained(self.model_uri)
+    def tokenizer_loader(self):
+        return LlamaTokenizer.from_pretrained(self.model_uri)
+
 @RegisterModelClass("llama2")
 class Small_Local_LLama(Base_Onsite_LLM):
 
