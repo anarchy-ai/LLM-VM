@@ -1,24 +1,42 @@
-import outlines.models as models 
+import outlines.models as models
 import outlines.text.generate as generate
 
 model = models.transformers("gpt2")
 
-#this class is called when optimize.complete is called with the regex parameter
-class RegexCompletion:
-    def complete(prompt,regex):
-        guided = generate.regex(model,regex)(prompt)
-        return guided
 
-#this class is called when optimize.complete is called with the choices parameter
-class ChoicesCompletion:
-    def complete(prompt,choices):
-        guided = generate.choice(model,choices)(prompt)
-        return guided
-    
-#this class is called with optimize.complete is caled with the type parameter
-class TypeCompletion:
-    def complete(prompt,type):
-        if type != "float" and type != "integer":
+class Completion:
+    def __init__(self, generator, *generator_args):
+        self.generator = generator
+        self.generator_args = generator_args
+
+    def complete(self, prompt):
+        return self.generator(model, *self.generator_args)(prompt)
+
+    @staticmethod
+    def regex_completion(regex):
+        return Completion(generate.regex, regex)
+
+    @staticmethod
+    def choices_completion(choices):
+        return Completion(generate.choice, choices)
+
+    @staticmethod
+    def type_completion(type_name):
+        if type_name not in ["float", "integer"]:
             raise Exception("type must be float or integer")
-        guided = getattr(generate,type)(model)(prompt)
-        return guided
+        return Completion(getattr(generate, type_name))
+
+    @staticmethod
+    def empty_completion():
+        return Completion(lambda _: (lambda x: x['response']))
+
+    @staticmethod
+    def create(regex, type, choices):
+        completion = Completion.empty_completion()
+        if regex is not None:
+            completion = Completion.regex_completion(regex)
+        elif type is not None:
+            completion = Completion.type_completion(type)
+        elif choices is not None:
+            completion = Completion.choices_completion(choices)
+        return completion

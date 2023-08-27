@@ -6,7 +6,7 @@ import os
 import time
 import pickle
 import llm_vm.config as conf
-from llm_vm.guided_completion import RegexCompletion, ChoicesCompletion, TypeCompletion
+from llm_vm.guided_completion import Completion
 
 class DataSynthesis:
     def __init__(self, variance, examples_to_generate):
@@ -36,9 +36,10 @@ class DataSynthesis:
         datapoints = []
         final_prompt = '{"prompt": "' +prompt+'"  , "response": "' +response+'" }'
         final_prompt = "Generate 1 json similar to the one below. \n" + final_prompt
-        
+
+        completion = Completion.create(regex=regex, type=type, choices=choices)
         while len(datapoints) < self.examples_to_generate:
-            datapoint = self.generate_example(final_prompt, openai_key, regex = regex, type = type, choices = choices)
+            datapoint = self.generate_example(final_prompt, openai_key, completion=completion)
             time.sleep(5)
             datapoints.append(datapoint)
             print(datapoint)
@@ -46,45 +47,21 @@ class DataSynthesis:
         pickle.dump(datapoints,new_file)
         return datapoints
     
-    def generate_example(self, final_prompt, openai_key, example_delim = "<END>", model="gpt-4",max_tokens = 1000,temperature = 1,regex = None,type = None,choices = None):
-        openai.api_key=openai_key
-        cur_prompt = [{'role': "system", 'content' : final_prompt}]
-        if regex is not None:
-            response = openai.ChatCompletion.create(messages=cur_prompt,model=model,max_tokens=max_tokens,temperature=temperature)['choices'][0]['message']['content']
-            try:
-                the_data = json.loads(response.replace("\n",""))
-                prompt = the_data["prompt"]
-                response = RegexCompletion.complete(prompt,regex)
-                the_tuple = (prompt,response+example_delim)
-            except:
-                pass
-            
-        elif type is not None:
-            response = openai.ChatCompletion.create(messages=cur_prompt,model=model,max_tokens=max_tokens,temperature=temperature)['choices'][0]['message']['content']
-            try:
-                the_data = json.loads(response.replace("\n",""))
-                prompt = the_data["prompt"]
-                response = TypeCompletion.complete(prompt,type)
-                the_tuple = (prompt,response+example_delim)
-            except:
-                pass
+    def generate_example(self, final_prompt, openai_key, example_delim="<END>", model="gpt-4", max_tokens=1000, temperature=1, completion=None):
+        openai.api_key = openai_key
+        cur_prompt = [{'role': "system", 'content': final_prompt}]
+        the_tuple = None
 
-        elif choices is not None:
-            response = openai.ChatCompletion.create(messages=cur_prompt,model=model,max_tokens=max_tokens,temperature=temperature)['choices'][0]['message']['content']
-            try:
-                the_data = json.loads(response.replace("\n",""))
-                prompt = the_data["prompt"]
-                response = ChoicesCompletion.complete(prompt,choices)
-                the_tuple = (prompt,response+example_delim)
-            except:
-                pass
+        response = openai.ChatCompletion.create(messages=cur_prompt, model=model, max_tokens=max_tokens, temperature=temperature)['choices'][0]['message']['content']
+        if completion is None:
+            completion = Completion.empty_completion()
 
-        else:
-            response = openai.ChatCompletion.create(messages=cur_prompt,model=model,max_tokens=max_tokens,temperature=temperature)['choices'][0]['message']['content']
-            try:
-                the_data = json.loads(response.replace("\n",""))
-                the_tuple = (the_data["prompt"],the_data["response"]+example_delim)
-            except:
-                pass
-        
+        try:
+            the_data = json.loads(response.replace("\n", ""))
+            prompt = the_data["prompt"]
+            response = completion.complete(prompt)
+            the_tuple = (prompt, response+example_delim)
+        except:
+            pass
+
         return the_tuple
