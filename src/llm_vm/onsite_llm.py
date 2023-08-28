@@ -10,8 +10,6 @@ from transformers import (
     BertTokenizer,
     OPTForCausalLM,
     BloomForCausalLM,
-    Llama2Tokenizer,
-    Llama2ForCausalLM,
     GPTNeoForCausalLM,
     GPTNeoXForCausalLM,
     GPT2Tokenizer,
@@ -300,9 +298,9 @@ class Small_Local_LLama(Base_Onsite_LLM):
     model_uri="meta-llama/Llama-2-7b"
 
     def model_loader(self):
-        return Llama2ForCausalLM.from_pretrained(self.model_uri)
+        return LlamaForCausalLM.from_pretrained(self.model_uri)
     def tokenizer_loader(self):
-        return Llama2Tokenizer.from_pretrained(self.model_uri)
+        return AutoTokenizer.from_pretrained(self.model_uri)
 
 @RegisterModelClass("flan")# our yummiest model based on similarity to food
 class Small_Local_Flan_T5(Base_Onsite_LLM):
