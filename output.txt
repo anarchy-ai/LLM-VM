@@ -1,7 +1,0 @@
-  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
-                                 Dload  Upload   Total   Spent    Left  Speed
-  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0100   301  100    89  100   212    138    330 --:--:-- --:--:-- --:--:--   469
-{
-  "resp": "Placeholder storage has not been allocated on MPS device!",
-  "status": 0
-}
