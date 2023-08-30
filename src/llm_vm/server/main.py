@@ -12,6 +12,7 @@ from flask_cors import CORS
 from contextlib import contextmanager
 import llm_vm.server.routes as routes
 from llm_vm.config import settings
+from llm_vm.utils.ram import RAMLogger
 
 app = flask.Flask(__name__)
 CORS(app)
@@ -47,11 +48,16 @@ def cli():
          None
 
     """
+    logger = RAMLogger()
+    logger.start()
     port = settings.port
     if port > 65535:
         print('Port defined out of range, defaulting to 3002', file=sys.stderr)
         port = 3002
-    server_entry_point(host = settings.host, port = port)
+    try:
+        server_entry_point(host = settings.host, port = port)
+    finally:
+        logger.end()
 
 if __name__ == '__main__':
     cli()
