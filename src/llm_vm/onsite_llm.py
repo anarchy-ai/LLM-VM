@@ -12,6 +12,8 @@ from transformers import (
     BloomForCausalLM,
     GPTNeoForCausalLM,
     GPTNeoXForCausalLM,
+    LlamaForCausalLM,
+    LlamaTokenizer,
     GPT2Tokenizer,
     DataCollatorForLanguageModeling,
     TrainingArguments,
