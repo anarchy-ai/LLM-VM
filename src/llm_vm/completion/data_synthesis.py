@@ -12,7 +12,7 @@ class DataSynthesis:
     def __init__(self, variance, examples_to_generate):
         self.variance = variance
         self.examples_to_generate = examples_to_generate
-    def data_synthesis(self, optimizer, prompt, response, openai_key=None, regex = None, type = None, choices = None, **kwargs):
+    def data_synthesis(self, optimizer, prompt, response, openai_key=None, completion = None, **kwargs):
         """
         This method generates QA pairs using the larger LLM to be used as training data for fine-tuning the smaller LLM.
 
@@ -37,8 +37,6 @@ class DataSynthesis:
         final_prompt = '{"prompt": "' +prompt+'"  , "response": "' +response+'" }'
         final_prompt = "Generate 1 json similar to the one below. \n" + final_prompt
 
-        completion = Completion.create(regex=regex, type=type, choices=choices,
-                                       default=Completion.response_completion())
         while len(datapoints) < self.examples_to_generate:
             datapoint = self.generate_example(final_prompt, openai_key, completion=completion)
             time.sleep(5)
