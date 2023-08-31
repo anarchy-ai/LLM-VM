@@ -261,7 +261,7 @@ class LocalOptimizer(Optimizer):
                         if len(self.storage.get_data(c_id)) < min_examples_for_synthesis:
                             print("Data synthesis is not available right now, need more examples in storage.", file=sys.stderr)
                         else:
-                            for j in self.data_synthesizer.data_synthesis(self,prompt,best_completion,openai_key=self.openai_key, regex = regex, type = type, choices = choices, **kwargs):
+                            for j in self.data_synthesizer.data_synthesis(self,prompt,best_completion,openai_key=self.openai_key, completion=completion_model, **kwargs):
                                 self.storage.add_example(c_id, j)
                     training_exs = self.storage.get_data(c_id)
                     print(training_exs, file=sys.stderr)
