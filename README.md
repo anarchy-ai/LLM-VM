@@ -89,6 +89,9 @@ In line with Anarchy's mission, the LLM-VM strives to support open-source models
 
 Python >=3.10 Supported. Older versions of Python are on a best-effort basis. 
 
+Use ```bash > python3 --version ``` to check what version you are on. 
+
+To upgrade your python, either create a new python env using ```bash > conda create -n myenv python=3.10 ``` or go to https://www.python.org/downloads/ to download the latest version.
 
 
 #### System Requirements
