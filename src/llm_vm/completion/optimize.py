@@ -11,10 +11,11 @@ import abc
 import requests
 import hashlib
 import pickle
-from llm_vm.guided_completion import RegexCompletion, ChoicesCompletion, TypeCompletion
+from llm_vm.guided_completion import RegexCompletion, ChoicesCompletion, TypeCompletion, GrammarCompletion
 #we need to package-ify so this works
 import llm_vm.completion.data_synthesis as data_synthesis
 import inspect
+from transformers import AutoTokenizer
 
 
 job_id = None # we want to be able to cancel a fine_tune if you kill the program
@@ -190,7 +191,7 @@ class LocalOptimizer(Optimizer):
             train()
         return completion
 
-    def complete_delay_train(self, stable_context, dynamic_prompt, run_data_synthesis = False, min_examples_for_synthesis = 1 ,c_id = None, regex = None, choices = None, type = None, **kwargs):
+    def complete_delay_train(self, stable_context, dynamic_prompt, run_data_synthesis = False, min_examples_for_synthesis = 1 ,c_id = None, regex = None, choices = None, type = None, grammar_type = None, **kwargs):
         """
         Runs a completion using the string stable_context+dynamic_prompt.  Returns an optional training closure to use if the
         caller decides that the completion was particularly good.
@@ -250,6 +251,10 @@ class LocalOptimizer(Optimizer):
                     best_completion = TypeCompletion.complete(prompt,type)
                 elif choices is not None:
                     best_completion = ChoicesCompletion.complete(prompt,choices)
+                elif grammar_type is not None:
+                    tokenizer = AutoTokenizer.from_pretrained("gpt2-medium", padding_side='left')
+                    constraint_model = GrammarCompletion("gpt2-medium", tokenizer)
+                    best_completion = constraint_model.complete(prompt, grammar_type=grammar_type)
                 else:
                     best_completion = self.call_big(prompt, **kwargs)
 
