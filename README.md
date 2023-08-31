@@ -71,7 +71,8 @@ In line with Anarchy's mission, the LLM-VM strives to support open-source models
 
 * **HTTP Endpoints 🕸️:** *We provide an HTTP standalone server to handle completion requests.*
 
-* **Live Data Augmentation 📊:** (ROADMAP) *You will be able to provide a live updating data set and the Anarchy LLM-VM will **fine-tune** your models or work with a **vector DB** to provide up-to-date information with citations*
+* **Live Data Augmentation 📊:** *You will be able to provide a live updating data set and the Anarchy LLM-VM will **fine-tune** your models or work with a **vector DB** to provide up-to-date information with citations*
+
 
 * **Web Playground 🛝:** (ROADMAP) *You will be able to run the Anarchy LLM-VM and test its outputs from the browser.*
 
