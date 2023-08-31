@@ -112,6 +112,8 @@ class GrammarConstraint(ABC):
         self.model_uri = model_uri
         self.tokenizer = tokenizer
         self.parser = None
+        self._parser_state = None
+        self._copy_state = False
 
     @abstractmethod
     def construct_filter_set(self, expression):
@@ -155,28 +157,49 @@ class PythonConstraint(GrammarConstraint):
         # Return a map of terminal tokens and their corresponding regex patterns
         return t_map
 
-    def _prefix_state(self, prefix_str):
+    def _prefix_state(self, prefix_str=None, last_token=None):
         valid_next = []
-        try:      
-            # Parse the token sequence
-            interactive_tree = self.parser.parse_interactive(prefix_str)
-            interactive_tree.exhaust_lexer()
-            
-            # Get the valid next states
-            valid_next = list(interactive_tree.accepts())
-        except Exception as e:
-            print("Parsing Error: ", e)
-        
+        if self._parser_state is None:
+            try:      
+                # Parse the entire token sequence
+                interactive_tree = self.parser.parse_interactive(prefix_str)
+                interactive_tree.exhaust_lexer()
+                self._parser_state = interactive_tree.copy()
+                
+                # Get the valid next states
+                valid_next = list(interactive_tree.accepts())
+            except Exception as e:
+                # print("Parsing Error: ", e)
+                pass
+        else:
+            try:
+                # lex the last token
+                last_lex = list(self.parser.lex(last_token))
+                # update parser state by feeding last token
+                self._parser_state.feed_token(last_lex[0])
+                valid_next = list(self._parser_state.accepts())
+            except Exception as e:
+                # print("Parsing Error: ", e)
+                pass
+
         # Return a list of valid next terminals
         return valid_next
 
     def construct_final_filter_set(self, prefix_ids, terminals_map):
-        # Decode the prefix IDs
-        prefix_str = self.tokenizer.batch_decode(prefix_ids, skip_special_tokens=True)[0]
-        
-        # Get valid next terminals for the prefix
-        next_lex = self._prefix_state(prefix_str)
         valid_next_ids = []
+        
+        if self._copy_state == True:
+            # Decode only the last prefix ID
+            last_token = self.tokenizer.batch_decode(prefix_ids[:, -1], skip_special_tokens=True)[0]
+            # Get valid next terminals from the last token
+            next_lex = self._prefix_state(last_token=last_token)
+        else:
+            # Decode all the prefix IDs
+            prefix_str = self.tokenizer.batch_decode(prefix_ids, skip_special_tokens=True)[0]
+            # Get valid next terminals for the prefix
+            next_lex = self._prefix_state(prefix_str=prefix_str)
+            self._copy_state = True
+
         for lex in next_lex:
             # Get the token set for each terminal symbol
             token_set = terminals_map[lex]
@@ -268,35 +291,56 @@ class JSONConstraint(GrammarConstraint):
         # Return a map of terminal tokens and their corresponding regex patterns
         return t_map
 
-    def _prefix_state(self, prefix_str):
+    def _prefix_state(self, prefix_str=None, last_token=None):
         valid_next = []
-        try:      
-            # Parse the token sequence
-            interactive_tree = self.parser.parse_interactive(prefix_str)
-            interactive_tree.exhaust_lexer()
-            
-            # Get the valid next states
-            valid_next = list(interactive_tree.accepts())
-        except Exception as e:
-            print("Parsing Error: ", e)
-        
+        if self._parser_state is None:
+            try:      
+                # Parse the entire token sequence
+                interactive_tree = self.parser.parse_interactive(prefix_str)
+                interactive_tree.exhaust_lexer()
+                self._parser_state = interactive_tree.copy()
+                
+                # Get the valid next states
+                valid_next = list(interactive_tree.accepts())
+            except Exception as e:
+                # print("Parsing Error: ", e)
+                pass
+        else:
+            try:
+                # lex the last token
+                last_lex = list(self.parser.lex(last_token))
+                # update parser state by feeding last token
+                self._parser_state.feed_token(last_lex[0])
+                valid_next = list(self._parser_state.accepts())
+            except Exception as e:
+                # print("Parsing Error: ", e)
+                pass
+
         # Return a list of valid next terminals
         return valid_next
-    
+
     def construct_final_filter_set(self, prefix_ids, terminals_map):
-        # Decode the prefix IDs
-        prefix_str = self.tokenizer.batch_decode(prefix_ids, skip_special_tokens=True)[0]
-        
-        # Get valid next terminals for the prefix
-        next_lex = self._prefix_state(prefix_str)
         valid_next_ids = []
+        
+        if self._copy_state == True:
+            # Decode only the last prefix ID
+            last_token = self.tokenizer.batch_decode(prefix_ids[:, -1], skip_special_tokens=True)[0]
+            # Get valid next terminals from the last token
+            next_lex = self._prefix_state(last_token=last_token)
+        else:
+            # Decode all the prefix IDs
+            prefix_str = self.tokenizer.batch_decode(prefix_ids, skip_special_tokens=True)[0]
+            # Get valid next terminals for the prefix
+            next_lex = self._prefix_state(prefix_str=prefix_str)
+            self._copy_state = True
+
         for lex in next_lex:
             # Get the token set for each terminal symbol
             token_set = terminals_map[lex]
             for t in token_set:
                 # Add valid token IDs to the list
                 valid_next_ids.append(t[-1])
-        
+                
         # Return a set of valid next token IDs
         return set(valid_next_ids)
 
