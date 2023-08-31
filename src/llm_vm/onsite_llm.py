@@ -10,10 +10,10 @@ from transformers import (
     BertTokenizer,
     OPTForCausalLM,
     BloomForCausalLM,
-    LlamaTokenizer,
-    LlamaForCausalLM,
     GPTNeoForCausalLM,
     GPTNeoXForCausalLM,
+    LlamaForCausalLM,
+    LlamaTokenizer,
     GPT2Tokenizer,
     DataCollatorForLanguageModeling,
     TrainingArguments,
@@ -150,7 +150,7 @@ class Base_Onsite_LLM(ABC):
                 learning_rate=2e-5,
                 per_device_train_batch_size = 1,
                 per_device_eval_batch_size = 1,
-                num_train_epochs=1,
+                num_train_epochs=5,
                 weight_decay=0.01,
                 report_to= "none",
             )
@@ -281,7 +281,7 @@ class Small_Local_Neo(Base_Onsite_LLM):
     def tokenizer_loader(self):
         return GPT2Tokenizer.from_pretrained(self.model_uri)
 
-@RegisterModelClass("llama")
+@RegisterModelClass("llama2")
 class Small_Local_LLama(Base_Onsite_LLM):
 
     """
@@ -297,12 +297,12 @@ class Small_Local_LLama(Base_Onsite_LLM):
         tokenizer_loader: Loads the tokenizer into memory
         generate: Generates a response from a given prompt with the loaded LLM and tokenizer
     """
-    model_uri="openlm-research/open_llama_3b_v2"
+    model_uri="meta-llama/Llama-2-7b"
 
     def model_loader(self):
         return LlamaForCausalLM.from_pretrained(self.model_uri)
     def tokenizer_loader(self):
-        return LlamaTokenizer.from_pretrained(self.model_uri)
+        return AutoTokenizer.from_pretrained(self.model_uri)
 
 @RegisterModelClass("flan")# our yummiest model based on similarity to food
 class Small_Local_Flan_T5(Base_Onsite_LLM):
