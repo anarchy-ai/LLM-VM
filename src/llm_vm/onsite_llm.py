@@ -10,6 +10,8 @@ from transformers import (
     BertTokenizer,
     OPTForCausalLM,
     BloomForCausalLM,
+    LlamaTokenizer,
+    LlamaForCausalLM,
     GPTNeoForCausalLM,
     GPTNeoXForCausalLM,
     LlamaForCausalLM,
@@ -122,7 +124,7 @@ class Base_Onsite_LLM(ABC):
             str: LLM Generated Response
 
         Example:
-           >>> Small_Local_OPT.generate("How long does it take for an apple to grow?)
+           >>> Small_Local_OPT.generate("How long does it take for an apple to grow?")
            I think it takes about a week for the apple to grow.
         """
         inputs=self.tokenizer(prompt,return_tensors="pt")
@@ -281,11 +283,34 @@ class Small_Local_Neo(Base_Onsite_LLM):
     def tokenizer_loader(self):
         return GPT2Tokenizer.from_pretrained(self.model_uri)
 
+@RegisterModelClass("llama")
+class Small_Local_OpenLLama(Base_Onsite_LLM):
+
+    """
+    This is a class for Openlm-Research's open_llama-3b LLM
+
+    Attributes:
+        model_uri (str): Hugging Face Endpoint for LLM
+        tokenizer (AutoTokenizer): Tokenizer from Transformer's library
+        model (LLM): The large language model
+
+    Methods:
+        model_loader: Loads the LLM into memory
+        tokenizer_loader: Loads the tokenizer into memory
+        generate: Generates a response from a given prompt with the loaded LLM and tokenizer
+    """
+    model_uri="openlm-research/open_llama_3b_v2"
+
+    def model_loader(self):
+        return LlamaForCausalLM.from_pretrained(self.model_uri)
+    def tokenizer_loader(self):
+        return LlamaTokenizer.from_pretrained(self.model_uri)
+
 @RegisterModelClass("llama2")
 class Small_Local_LLama(Base_Onsite_LLM):
 
     """
-    This is a class for Openlm-Research's open_llama-3b LLM
+    This is a class for Meta's llama-7b LLM
 
     Attributes:
         model_uri (str): Hugging Face Endpoint for LLM
@@ -302,7 +327,7 @@ class Small_Local_LLama(Base_Onsite_LLM):
     def model_loader(self):
         return LlamaForCausalLM.from_pretrained(self.model_uri)
     def tokenizer_loader(self):
-        return AutoTokenizer.from_pretrained(self.model_uri)
+        return LlamaTokenizer.from_pretrained(self.model_uri)
 
 @RegisterModelClass("flan")# our yummiest model based on similarity to food
 class Small_Local_Flan_T5(Base_Onsite_LLM):
@@ -373,7 +398,7 @@ class GPT3:
             str: LLM Generated Response
 
         Example:
-            >>> Small_Local_OPT.generate("How long does it take for an apple to grow?)
+            >>> Small_Local_OPT.generate("How long does it take for an apple to grow?")
             It typically takes about 100-200 days...
         """
 
@@ -430,7 +455,7 @@ class Chat_GPT:
             str: LLM Generated Response
 
         Example:
-            >>> Small_Local_OPT.generate("How long does it take for an apple to grow?)
+            >>> Small_Local_OPT.generate("How long does it take for an apple to grow?")
             It typically takes about 100-200 days...
         """
         cur_prompt = [{'role': "system", 'content' : prompt}]
