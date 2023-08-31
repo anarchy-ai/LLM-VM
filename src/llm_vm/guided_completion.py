@@ -36,12 +36,12 @@ class Completion:
         return Completion(getattr(generate, type_name))
 
     @staticmethod
-    def empty_completion():
+    def response_completion():
         return Completion(lambda _: (lambda x: x['response']))
 
     @staticmethod
-    def create(regex, type, choices):
-        completion = Completion.empty_completion()
+    def create(regex, type, choices, default=None):
+        completion = default
         if regex is not None:
             completion = Completion.regex_completion(regex)
         elif type is not None:

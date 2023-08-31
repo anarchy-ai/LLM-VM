@@ -11,7 +11,7 @@ import abc
 import requests
 import hashlib
 import pickle
-from llm_vm.guided_completion import RegexCompletion, ChoicesCompletion, TypeCompletion
+from llm_vm.guided_completion import Completion
 #we need to package-ify so this works
 import llm_vm.completion.data_synthesis as data_synthesis
 import inspect
@@ -231,10 +231,11 @@ class LocalOptimizer(Optimizer):
                     }) if c_id is None else c_id
         c_id = generate_hash(c_id_repr)
         completion = None
+        completion_model = Completion.create(regex, type, choices)
 
         model = self.storage.get_model(c_id)
         # this gives us the model_id
-        if model is not None and regex is None and type is None and choices is None:
+        if model is not None and completion_model is None:
             print("Using the new model:", model, flush=True, file=sys.stderr)
             completion = self.call_small(prompt = dynamic_prompt.strip(), model=model, **kwargs)
 
@@ -244,12 +245,8 @@ class LocalOptimizer(Optimizer):
         succeed_train = None
         if len(training_exs) < self.MAX_TRAIN_EXS:
             def promiseCompletion():
-                if regex is not None:
-                    best_completion = RegexCompletion.complete(prompt,regex)
-                elif type is not None:
-                    best_completion = TypeCompletion.complete(prompt,type)
-                elif choices is not None:
-                    best_completion = ChoicesCompletion.complete(prompt,choices)
+                if completion_model is not None:
+                    best_completion = completion_model.complete(prompt)
                 else:
                     best_completion = self.call_big(prompt, **kwargs)
 

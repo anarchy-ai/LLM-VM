@@ -37,7 +37,8 @@ class DataSynthesis:
         final_prompt = '{"prompt": "' +prompt+'"  , "response": "' +response+'" }'
         final_prompt = "Generate 1 json similar to the one below. \n" + final_prompt
 
-        completion = Completion.create(regex=regex, type=type, choices=choices)
+        completion = Completion.create(regex=regex, type=type, choices=choices,
+                                       default=Completion.response_completion())
         while len(datapoints) < self.examples_to_generate:
             datapoint = self.generate_example(final_prompt, openai_key, completion=completion)
             time.sleep(5)
@@ -54,7 +55,7 @@ class DataSynthesis:
 
         response = openai.ChatCompletion.create(messages=cur_prompt, model=model, max_tokens=max_tokens, temperature=temperature)['choices'][0]['message']['content']
         if completion is None:
-            completion = Completion.empty_completion()
+            completion = Completion.response_completion()
 
         try:
             the_data = json.loads(response.replace("\n", ""))
