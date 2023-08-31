@@ -7,27 +7,6 @@ from xdg import XDG_CONFIG_HOME
 from llm_vm.onsite_llm import model_keys_registered
 from llm_vm.data_path import project_root
 
-# Parse CLI arguments
-parser = argparse.ArgumentParser()
-parser.add_argument('-b', '--big_model', type=str, help='Big LLM Model.')
-parser.add_argument('-p', '--port', type=int,      help='Port Number.')
-parser.add_argument('-s', '--small_model',type=str,help='Small LLM Model.')
-parser.add_argument('-H', '--host', type=str,      help='Host Address.')
-parser.add_argument('-K', '--openai_key',type=str,help='OpenAI api key')
-args = parser.parse_args()
-
-# Set the CLI argument values to environment variables if they are present
-if args.big_model is not None:
-    os.environ['LLM_VM_BIG_MODEL'] = args.big_model
-if args.port is not None:
-    os.environ['LLM_VM_PORT'] = str(args.port)
-if args.small_model is not None:
-    os.environ['LLM_VM_SMALL_MODEL'] = args.small_model
-if args.host is not None:
-    os.environ['LLM_VM_HOST'] = args.host
-if "openai_api_key" in args:
-    os.environ['LLM_VM_OPENAI_API_KEY'] = args.openai_api_key
-
 
 # project_root = os.path.abspath(os.getcwd())
 
