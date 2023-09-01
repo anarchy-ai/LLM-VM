@@ -190,7 +190,7 @@ class LocalOptimizer(Optimizer):
             train()
         return completion
 
-    def complete_delay_train(self, stable_context, dynamic_prompt, run_data_synthesis = False, min_examples_for_synthesis = 1 ,c_id = None, regex = None, choices = None, type = None, **kwargs):
+    def complete_delay_train(self, stable_context, dynamic_prompt, run_data_synthesis = False, min_examples_for_synthesis = 1 ,c_id = None, regex = None, choices = None, type = None, grammar_type = None, **kwargs):
         """
         Runs a completion using the string stable_context+dynamic_prompt.  Returns an optional training closure to use if the
         caller decides that the completion was particularly good.

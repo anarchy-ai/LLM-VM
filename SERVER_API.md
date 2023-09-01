@@ -7,7 +7,7 @@ After you have installed (as above), you now have an anarchy server which provid
 > llm_vm_server
 ```
 
-This will start a flask server at https://localhost:3002/ and will create an endpoint https://localhost:3002/v1/completion.
+This will start a flask server at https://localhost:3002/ and will create an endpoint http://localhost:3002/v1/complete.
 
 
 ## 🕸️ API Usage 🕸️
@@ -34,7 +34,7 @@ The package defaults to using chatGPT as the big model that we use for completio
 
 #### Submitting a Request to the LLM
 
-Post requests can be sent to this endpoint `https://localhost:3002/` in the following format:
+Post requests can be sent to this endpoint `http://localhost:3002/v1/complete` in the following format:
 
 ```
 {
@@ -45,6 +45,11 @@ Post requests can be sent to this endpoint `https://localhost:3002/` in the foll
     "finetune": true,
     "data_synthesis: true
 }
+
+```
+Example Curl:
+```bash
+curl -X POST http://localhost:3002/v1/complete -H "Content-Type: application/json" -d '{"prompt": "What is 2+2", "context": "Answer the math problem with just a number.", "openai_key": "your-key", "temperature": 0, "finetune": true, "data_synthesis": true}'
 ```
 
 If no `temperature`, `finetune`, or `data_synthesis` are provided, these values will default to `0`, `false`, and `false` respectively. 
@@ -56,7 +61,7 @@ If no `temperature`, `finetune`, or `data_synthesis` are provided, these values 
 
 An agent is an algorithm that uses the LLM in a way to increase its reasoning capabilities such as allowing the use of outside tools or allowing the LLM to answer compositional questions. To use the REBEL (REcursion Based Extensible Llm) endpoint with tools, add a tool in the following way. We have used the finnhub api to get stocks data as an example.
 
-Post requests can be sent to this endpoint `https://localhost:3002/` with the tools optional parameter:
+Post requests can be sent to this endpoint `http://localhost:3002/v1/complete` with the tools optional parameter:
 ```
 {
     "prompt":"What is the price of apple stock?",

@@ -6,13 +6,14 @@ import os
 import time
 import pickle
 import llm_vm.config as conf
-from llm_vm.guided_completion import Completion
+from llm_vm.guided_completion import GenerativeCompletion
 
 class DataSynthesis:
     def __init__(self, variance, examples_to_generate):
         self.variance = variance
         self.examples_to_generate = examples_to_generate
-    def data_synthesis(self, optimizer, prompt, response, openai_key=None, completion = None, **kwargs):
+
+    def data_synthesis(self, optimizer, prompt, response, openai_key=None, completion=None, **kwargs):
         """
         This method generates QA pairs using the larger LLM to be used as training data for fine-tuning the smaller LLM.
 
@@ -53,7 +54,7 @@ class DataSynthesis:
 
         response = openai.ChatCompletion.create(messages=cur_prompt, model=model, max_tokens=max_tokens, temperature=temperature)['choices'][0]['message']['content']
         if completion is None:
-            completion = Completion.response_completion()
+            completion = GenerativeCompletion.response_completion()
 
         try:
             the_data = json.loads(response.replace("\n", ""))
