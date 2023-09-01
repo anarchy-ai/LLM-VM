@@ -3,7 +3,7 @@ import outlines.text.generate as generate
 import torch
 from lark import Lark, Transformer, v_args
 from lark.indenter import PythonIndenter
-from transformers import (AutoModelForCausalLM, LogitsProcessorList, LogitsProcessor)
+from transformers import (AutoModelForCausalLM, LogitsProcessorList, LogitsProcessor, AutoTokenizer)
 import re
 from abc import ABC,abstractmethod
 
@@ -20,7 +20,7 @@ class Completion(ABC):
         pass
 
     @staticmethod
-    def create(regex, type, choices, default=None):
+    def create(regex, type, choices, grammar_type, *, default=None):
         completion = default
         if regex is not None:
             completion = GenerativeCompletion.regex_completion(regex)
@@ -28,6 +28,9 @@ class Completion(ABC):
             completion = GenerativeCompletion.type_completion(type)
         elif choices is not None:
             completion = GenerativeCompletion.choices_completion(choices)
+        elif grammar_type is not None:
+            tokenizer = AutoTokenizer.from_pretrained("gpt2-medium", padding_side='left')
+            completion = GrammarCompletion("gpt2-medium", tokenizer)
         return completion
 
 

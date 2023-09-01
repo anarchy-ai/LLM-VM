@@ -231,7 +231,7 @@ class LocalOptimizer(Optimizer):
                     }) if c_id is None else c_id
         c_id = generate_hash(c_id_repr)
         completion = None
-        completion_model = Completion.create(regex, type, choices)
+        completion_model = Completion.create(regex, type, choices, grammar_type)
 
         model = self.storage.get_model(c_id)
         # this gives us the model_id
