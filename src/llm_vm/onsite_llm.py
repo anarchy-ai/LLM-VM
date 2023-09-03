@@ -406,7 +406,7 @@ class GPT3:
         return ans['choices'][0]['text']
 
 
-    def finetune(self, dataset, optimizer, c_id):
+    def finetune(self, dataset, optimizer, c_id, small_model_filename=None):
         old_model = optimizer.storage.get_model(c_id)
         training_file = create_jsonl_file(dataset)
         upload_response = openai.File.create(file=training_file, purpose="fine-tune")
