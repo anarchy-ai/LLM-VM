@@ -40,7 +40,10 @@ def generate_hash(input_string):
 def asyncStart(foo):
     t = [None, None]
     def new_thread():
-        t[0] = foo()
+        if callable(foo):
+            t[0] = foo()
+        else:
+            t[0] = lambda x: x
     t[1] = threading.Thread(target=new_thread)
     t[1].start()
     return t
