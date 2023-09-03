@@ -117,6 +117,8 @@ edit in place.
 
 This will install both the library and test-server.  
 
+And for installing dev dependencies, use `pip3 install -e ."[dev]"`
+
 #### One Last Step, almost there!
 If you're using one of the OpenAI models, you will need to set the `LLM_VM_OPENAI_API_KEY` environment
 variable with your API key. 

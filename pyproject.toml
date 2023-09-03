@@ -30,6 +30,12 @@ dependencies = [
     "en_core_web_md @ https://github.com/explosion/spacy-models/releases/download/en_core_web_md-3.6.0/en_core_web_md-3.6.0-py3-none-any.whl",
 ]
 
+[project.optional-dependencies]
+dev = [
+    "black>=23.7.0",
+    "mypy>=1.5.1",
+]
+
 # todo: https://setuptools.pypa.io/en/latest/userguide/datafiles.html 
 
 [project.scripts] # these names are just placeholders
