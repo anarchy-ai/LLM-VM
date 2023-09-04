@@ -1,4 +1,3 @@
-import abc
 from abc import ABC,abstractmethod
 import sys
 import openai
@@ -10,8 +9,6 @@ from transformers import (
     BertTokenizer,
     OPTForCausalLM,
     BloomForCausalLM,
-    LlamaTokenizer,
-    LlamaForCausalLM,
     GPTNeoForCausalLM,
     GPTNeoXForCausalLM,
     LlamaForCausalLM,
@@ -40,6 +37,12 @@ __private_key_value_models_map =  {}
 #         "flan" : Small_Local_Flan_T5,
 #         "pythia" : Small_Local_Pythia,
 #         }
+
+# Check available devices
+if torch.cuda.device_count() > 1:
+    device = [f"cuda:{i}" for i in range(torch.cuda.device_count())]  # List of available GPUs
+else:  # If only one GPU is available, use cuda:0, else use CPU
+    device = "cuda:0" if torch.cuda.is_available() else "cpu"
 
 def RegisterModelClass(name):
     def regClass(cls):
@@ -88,6 +91,16 @@ class Base_Onsite_LLM(ABC):
         self.model=self.model_loader(**model_kw_args)
         self.tokenizer=self.tokenizer_loader(**tokenizer_kw_args)
 
+        # Move the model to the specified device(s)
+        if isinstance(device, list):
+            # If multiple GPUs are available, use DataParallel to parallelize the model
+            self.model = torch.nn.DataParallel(self.model, device_ids=[i for i in range(len(device))])
+            self.model.to(device[0])  # Move model to the first GPU in the list
+            print(f"`{self.model_uri}` loaded on {len(device)} GPUs.", file=sys.stderr)
+        else:
+            self.model.to(device)  # Move model to the selected device (single GPU or CPU)
+            print(f"`{self.model_uri}` loaded on {device}.", file=sys.stderr)
+
     @property
     @abstractmethod
     def model_uri(self):
@@ -127,7 +140,11 @@ class Base_Onsite_LLM(ABC):
            >>> Small_Local_OPT.generate("How long does it take for an apple to grow?")
            I think it takes about a week for the apple to grow.
         """
-        inputs=self.tokenizer(prompt,return_tensors="pt")
+        if isinstance(device, list):
+            # If multiple GPUs are available, use first one
+            inputs = self.tokenizer(prompt, return_tensors="pt").to(device[0])
+        else:
+            inputs = self.tokenizer(prompt, return_tensors="pt").to(device)
         generate_ids=self.model.generate(inputs.input_ids,max_length=max_length)
         resp= self.tokenizer.batch_decode(generate_ids,skip_special_tokens=True,clean_up_tokenization_spaces=False)[0]
         # need to drop the len(prompt) prefix with these sequences generally
