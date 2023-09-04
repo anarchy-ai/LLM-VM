@@ -1,4 +1,3 @@
-import abc
 from abc import ABC,abstractmethod
 import sys
 import openai
@@ -7,16 +6,12 @@ from transformers import (
     AutoModelForMaskedLM,
     AutoModelForSeq2SeqLM,
     AutoTokenizer,
-    BertTokenizer,
     OPTForCausalLM,
     BloomForCausalLM,
-    LlamaTokenizer,
-    LlamaForCausalLM,
     GPTNeoForCausalLM,
     GPTNeoXForCausalLM,
     LlamaForCausalLM,
     LlamaTokenizer,
-    GPT2Tokenizer,
     DataCollatorForLanguageModeling,
     TrainingArguments,
     Trainer)
@@ -281,7 +276,7 @@ class Small_Local_Neo(Base_Onsite_LLM):
     def model_loader(self):
         return GPTNeoForCausalLM.from_pretrained(self.model_uri)
     def tokenizer_loader(self):
-        return GPT2Tokenizer.from_pretrained(self.model_uri)
+        return AutoTokenizer.from_pretrained(self.model_uri)
 
 @RegisterModelClass("llama")
 class Small_Local_OpenLLama(Base_Onsite_LLM):
@@ -374,7 +369,7 @@ class Small_Local_BERT(Base_Onsite_LLM):
     def model_loader(self):
         return AutoModelForMaskedLM.from_pretrained(self.model_uri)
     def tokenizer_loader(self):
-        return BertTokenizer.from_pretrained(self.model_uri)
+        return AutoTokenizer.from_pretrained(self.model_uri)
 @RegisterModelClass("gpt")
 class GPT3:
 
@@ -409,7 +404,7 @@ class GPT3:
     def finetune(self, dataset, optimizer, c_id):
         old_model = optimizer.storage.get_model(c_id)
         training_file = create_jsonl_file(dataset)
-        upload_response = openai.File.create(file=training_file, purpose="fine-tune")
+        upload_response = openai.File.create(file=training_file, purpose="fine-tune", model="gpt-3.5-turbo-0613")
         training_file.close()
         fine_tuning_job = openai.FineTune.create(training_file= upload_response.id)
 
