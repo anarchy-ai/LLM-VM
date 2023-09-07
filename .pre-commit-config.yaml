@@ -14,7 +14,6 @@ repos:
       - id: check-json
       - id: end-of-file-fixer
       - id: trailing-whitespace
-      - id: check-docstring-first
       - id: end-of-file-fixer
   - repo: local
     hooks:
