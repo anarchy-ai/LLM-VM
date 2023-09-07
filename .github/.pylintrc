@@ -146,6 +146,17 @@ disable=abstract-method,
         wrong-import-order,
         xrange-builtin,
         zip-builtin-not-iterating,
+        missing-class-docstring,
+        missing-module-docstring,
+        dangerous-default-value,
+        invalid-name,
+        singleton-comparison,
+        unused-argument,
+        global-variable-undefined,
+        unspecified-encoding,
+        consider-using-with,
+        undefined-variable,
+        pointless-string-statement
 
 
 [REPORTS]
