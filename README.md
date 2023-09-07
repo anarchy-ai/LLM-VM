@@ -40,7 +40,7 @@ You can find detailed instructions to try it live here: [anarchy.ai](https://ana
 
 The Anarchy LLM-VM is a highly optimized and opinionated backend for running LLMs with all the modern features we've come to expect from completion: tool usage, persistent stateful memory, live data augmentation, data and task fine-tuning, output templating, a web playground, API endpoints, student-teacher distillation, data synthesis, load-balancing and orchestration, large context-window mimicry.
 
-Formally, it is a virtual machine/interpreter for human language, coordinating between data, models (CPU), your prompts (code), and tools (IO). 
+Formally, it is a virtual machine/interpreter for human language, coordinating between data, models (CPU), your prompts (code), and tools (IO).
 
 By doing all these things in one spot in an opinionated way, the LLM-VM can properly optimize batch calls that would be exorbitantly expensive with distributed endpoints.  It furthermore strives for both model and architecture agnosticism, properly optimizing the chosen model for the current architecture.
 
@@ -49,13 +49,13 @@ By doing all these things in one spot in an opinionated way, the LLM-VM can prop
 In line with Anarchy's mission, the LLM-VM strives to support open-source models. By utilizing open-source models and running them locally you achieve a number of benefits:
 
 * **Speed up your AGI development 🚀:** *With AnarchyAI, one interface is all you need to interact with the latest LLMs available.*
-  
+
 * **Lower your costs 💸:** *Running models locally can reduce the pay-as-you-go costs of development and testing.*
-  
+
 * **Flexibility 🧘‍♀️:** *Anarchy allows you to rapidly switch between popular models so you can pinpoint the exact right tool for your project.*
-  
+
 * **Community Vibes 🫂:** *Join our active community of highly motivated developers and engineers working passionately to democratize AGI*
-  
+
 * **WYSIWYG 👀:** *Open source means nothing is hidden; we strive for transparency and efficiency so you can focus on building.*
 
 ### 🎁 Features and Roadmap
@@ -87,41 +87,53 @@ In line with Anarchy's mission, the LLM-VM strives to support open-source models
 
 #### Installation Requirements
 
-Python >=3.10 Supported. Older versions of Python are on a best-effort basis. 
+Python >=3.10 Supported. Older versions of Python are on a best-effort basis.
 
-Use ```bash > python3 --version ``` to check what version you are on. 
+Use ```bash > python3 --version ``` to check what version you are on.
 
 To upgrade your python, either create a new python env using ```bash > conda create -n myenv python=3.10 ``` or go to https://www.python.org/downloads/ to download the latest version.
 
 
 #### System Requirements
 
-Different models have different system requirements. Limiting factors on most systems will likely be RAM, but many functions will work at even 16 GB of ram. 
+Different models have different system requirements. Limiting factors on most systems will likely be RAM, but many functions will work at even 16 GB of ram.
 
-That said, always lookup information about the models you're using, they all have different sizes and requirements 
-in memory and compute resources. 
+That said, always lookup information about the models you're using, they all have different sizes and requirements
+in memory and compute resources.
 
-### 👨‍💻 Installation
+### 👨‍💻 LLM-VM Installation
 
-To install the LLM-VM you simply need to download this repository and install it with pip like so:
+Get the LLM-VM project source code:
 
 ```bash
 > git clone https://github.com/anarchy-ai/LLM-VM.git
 > cd LLM-VM
-> pip3 install .
 ```
+
+#### Setup Poetry
+
+LLM-VM utilizes Poetry for package management. If you haven't installed Poetry yet:
+- Check [the official guide](https://python-poetry.org/docs/#installation) to see all possible options.
+
+#### Building from Source
+
+Install the necessary dependencies:
+
+```bash
+> make install
+```
+
 #### Developer Setup
-the best way to test run code while writing a patch is to use 
-`pip3 install --editable .`, which will expose the code as a library you can 
-edit in place.
 
-This will install both the library and test-server.  
-
-And for installing dev dependencies, use `pip3 install -e ."[dev]"`
+For development purposes, you might prefer an editable installation:
+```bash
+> make install-dev
+```
+This approach allows for real-time testing of your code modifications. It installs both the library and the test-server for a holistic development environment.
 
 #### One Last Step, almost there!
 If you're using one of the OpenAI models, you will need to set the `LLM_VM_OPENAI_API_KEY` environment
-variable with your API key. 
+variable with your API key.
 
 
 ### ✅ Generating Completions
@@ -133,7 +145,7 @@ Our LLM-VM gets you working directly with popular LLMs locally in just 3 lines. 
 # import our client
 from llm_vm.client import Client
 
-# Select which LLM you want to use, here we have OpenAI's 
+# Select which LLM you want to use, here we have OpenAI's
 client = Client(big_model = 'chat_gpt')
 
 # Put in your prompt and go!
@@ -167,11 +179,11 @@ Supported_Models = ['chat_gpt','gpt','neo','llama','bloom','opt','pythia']
 
 
 ### ☯ Picking Different Models
-LLM-VM default model sizes for local models are intended to make experimentation 
-with LLMs accessible to everyone, but if you have the memory required, larger parameter models 
+LLM-VM default model sizes for local models are intended to make experimentation
+with LLMs accessible to everyone, but if you have the memory required, larger parameter models
 will perform far better!
 
-for example, if you want to use a large and small neo model  for your teacher and student, and you 
+for example, if you want to use a large and small neo model  for your teacher and student, and you
 have enough ram:
 
 
@@ -180,7 +192,7 @@ have enough ram:
 from llm_vm.client import Client
 
 # Select the LlaMA model
-client = Client(big_model = 'neo', big_model_config={'model_uri':'EleutherAI/gpt-neox-20b'}, 
+client = Client(big_model = 'neo', big_model_config={'model_uri':'EleutherAI/gpt-neox-20b'},
                 small_model ='neo', small_model_config={'model_uri':'EleutherAI/gpt-neox-125m'})
 
 # Put in your prompt and go!
@@ -189,19 +201,19 @@ print(response)
 # Anarchy is a political philosophy that advocates no government...
 ```
 
-For some other choices of memory usage and parameter count in each model family, check out the 
+For some other choices of memory usage and parameter count in each model family, check out the
 tables in [model_uri_tables](./model_uri_tables.md)
 
 
 ### 🛠 Tool Usage
 
-There are two agents: FLAT and REBEL. 
+There are two agents: FLAT and REBEL.
 
-Run the agents separately by going into the `src/llm_vm/agents/<AGENT_FOLDER>` and running the file that is 
-titled `agent.py`. 
+Run the agents separately by going into the `src/llm_vm/agents/<AGENT_FOLDER>` and running the file that is
+titled `agent.py`.
 
-Alternatively, to run a simple interface and choose an agent to run from the CLI, run the `src/llm_vm/agents/agent_interface.py` file 
-and follow the command prompt instructions. 
+Alternatively, to run a simple interface and choose an agent to run from the CLI, run the `src/llm_vm/agents/agent_interface.py` file
+and follow the command prompt instructions.
 
 
 ## 🩷 Contributing 🩷
@@ -210,7 +222,7 @@ We welcome contributors!  The best way to get started is to join our active [dis
 
 ### Jobs
 
-- We're always looking for serious hackers.  Prove that you can build and creatively solve hard problems and reach out! 
+- We're always looking for serious hackers.  Prove that you can build and creatively solve hard problems and reach out!
 - The easiest way to secure a job/internship with us is to submit a pull request that closes a ticket.
 - The second easiest is to submit good tickets.
 - Otherwise, to apply directly: https://forms.gle/bUWDKW3cwZ8n6qsU8
@@ -230,16 +242,16 @@ Some tickets we'll pay you for closing! Look at the ticket labels to see how muc
 - **Abhigya Sodani** - Research Intern
   - GitHub: [@abhigya-sodani](https://github.com/abhigya-sodani)
   - LinkedIn: [@abhigya-sodani](https://www.linkedin.com/in/abhigya-sodani-405918160/)
- 
 
-- **Carter Schonwald** - Community Engineering Leader 
+
+- **Carter Schonwald** - Community Engineering Leader
   - GitHub: [@cartazio](https://github.com/cartazio)
   - LinkedIn: [@carter-schonwald](https://www.linkedin.com/in/carter-schonwald-aa178132/)
- 
+
 - **Andrew Nelson** - Basilisk Trainer
   - GitHub: [@ajn2004](https://github.com/ajn2004)
   - LinkedIn: [@ajnelsnyc](https://www.linkedin.com/in/ajnelsnyc/)
- 
+
 - **Kyle Wild** - Undoomer
   - GitHub: [@dorkitude](https://github.com/dorkitude)
   - LinkedIn: [@kylewild](https://www.linkedin.com/in/kylewild/)
@@ -251,7 +263,7 @@ Some tickets we'll pay you for closing! Look at the ticket labels to see how muc
 - **Aarushi Banerjee** - Fearless Contributor
   - GitHub: [@AB3000](https://github.com/AB3000)
   - LinkedIn: [@ab99](https://www.linkedin.com/in/ab99/)
-    
+
 ## License
 
 [MIT License](LICENSE)

@@ -1,0 +1,25 @@
+#
+# Created on Wed Aug 02 2023
+# Copyright (c) 2023 Subramanya N
+#
+repos:
+  - repo: https://github.com/google/pyink
+    rev: 23.3.0
+    hooks:
+      - id: pyink
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: check-yaml
+      - id: check-json
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+      - id: check-docstring-first
+      - id: end-of-file-fixer
+  - repo: local
+    hooks:
+      - id: pylint
+        name: pylint
+        entry: poetry run pylint --rcfile=.github/.pylintrc
+        language: system
+        types: [python]
