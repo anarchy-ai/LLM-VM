@@ -64,6 +64,10 @@ def create_jsonl_file(data_list):
     return out
 
 
+class UnsupportedOperationException(Exception):
+    pass
+
+
 class FinetuningDataset(torch.utils.data.Dataset):
     def __init__(self,iterable_dataset,length):
         self.dataset = list(iterable_dataset)
@@ -461,8 +465,8 @@ class Chat_GPT:
         return ans['choices'][0]['message']['content']
 
     def finetune(self, dataset, optimizer, c_id):
-        print("fine tuning isn't supported by OpenAI on this model", file=sys.stderr)
-        exit()
+        message = "fine tuning isn't supported by OpenAI on this model"
+        raise UnsupportedOperationException(message)
         # old_model = optimizer.storage.get_model(c_id)
         # training_file = create_jsonl_file(dataset)
         # upload_response = openai.File.create(file=training_file, purpose="fine-tune")
