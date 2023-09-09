@@ -206,14 +206,13 @@ and follow the command prompt instructions.
 
 ## 🩷 Contributing 🩷
 
-We welcome contributors!  The best way to get started is to join our active [discord community](https://discord.anarchy.ai).  Otherwise here are some ways to contribute and get paid:
+We welcome contributors!  To get started is to join our active [discord community](https://discord.anarchy.ai).  Otherwise here are some ways to contribute and get paid:
 
 ### Jobs
 
 - We're always looking for serious hackers.  Prove that you can build and creatively solve hard problems and reach out! 
-- The easiest way to secure a job/internship with us is to submit a pull request that closes a ticket.
-- The second easiest is to submit good tickets.
-- Otherwise, to apply directly: https://forms.gle/bUWDKW3cwZ8n6qsU8
+- The easiest way to secure a job/internship with us is to submit pull requests that closes tickets.
+- Then you can apply directly here https://forms.gle/bUWDKW3cwZ8n6qsU8
 
 ### Bounty
 
