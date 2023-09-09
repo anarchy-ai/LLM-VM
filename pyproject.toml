@@ -15,7 +15,6 @@ dependencies = [
     "numpy>=1.22.4",
     "watchdog>=3.0.0",
     "xdg>=6.0.0",
-    "accelerate>=0.21.0",
     "transformers>=4.31.0",
     "ctransformers>=0.2.24",
     "flask>=2.3.2",
@@ -30,6 +29,10 @@ dependencies = [
     "outlines>=0.0.1",
     "en_core_web_md @ https://github.com/explosion/spacy-models/releases/download/en_core_web_md-3.6.0/en_core_web_md-3.6.0-py3-none-any.whl",
     "gradio>=3.42.0",  # Specify the latest version of gradio
+    "bitsandbytes>=0.39.0",
+    "git+https://github.com/huggingface/accelerate.git",
+    "git+https://github.com/huggingface/peft.git",
+    "trl>=0.7.1"
 ]
 
 [project.optional-dependencies]
