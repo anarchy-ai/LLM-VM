@@ -53,41 +53,29 @@ class DataSynthesis:
 
         response = openai.ChatCompletion.create(messages=cur_prompt,model=model,max_tokens=max_tokens,temperature=temperature)['choices'][0]['message']['content']
 
-        the_data = json.loads(response.replace("\n",""))
-        prompt = the_data["prompt"]
+        try:
+            the_data = json.loads(response.replace("\n",""))
+            prompt = the_data["prompt"]
 
-        if regex is not None:
-            try:
+            if regex is not None:
                 response = RegexCompletion.complete(prompt,regex)
-            except:
-                pass
-            
-        elif type is not None:
-            try:
+                
+            elif type is not None:
                 response = TypeCompletion.complete(prompt,type)
-            except:
-                pass
 
-        elif choices is not None:
-            try:
+            elif choices is not None:
                 response = ChoicesCompletion.complete(prompt,choices)
-            except:
-                pass
 
-        elif grammar_type is not None:
-            try:
+            elif grammar_type is not None:
                 tokenizer = AutoTokenizer.from_pretrained("gpt2-medium", padding_side='left')
                 constraint_model = GrammarCompletion("gpt2-medium", tokenizer)
                 response = constraint_model.complete(prompt, grammar_type=grammar_type)
-            except:
-                pass
 
-
-        else:
-            try:
+            else:
                 response = the_data["response"]
-            except:
-                pass
-            
+        
+        except Exception as e:
+            print(f"Error: {str(e)}")
+
         the_tuple = (prompt,response+example_delim)
         return the_tuple
