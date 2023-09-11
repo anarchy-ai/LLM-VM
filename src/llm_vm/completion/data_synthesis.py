@@ -50,8 +50,10 @@ class DataSynthesis:
     def generate_example(self, final_prompt, openai_key, example_delim = "<END>", model="gpt-4",max_tokens = 1000,temperature = 1,regex = None,type = None,choices = None, grammar_type = None):
         openai.api_key=openai_key
         cur_prompt = [{'role': "system", 'content' : final_prompt}]
+
+        response = openai.ChatCompletion.create(messages=cur_prompt,model=model,max_tokens=max_tokens,temperature=temperature)['choices'][0]['message']['content']
+        
         if regex is not None:
-            response = openai.ChatCompletion.create(messages=cur_prompt,model=model,max_tokens=max_tokens,temperature=temperature)['choices'][0]['message']['content']
             try:
                 the_data = json.loads(response.replace("\n",""))
                 prompt = the_data["prompt"]
@@ -61,7 +63,6 @@ class DataSynthesis:
                 pass
             
         elif type is not None:
-            response = openai.ChatCompletion.create(messages=cur_prompt,model=model,max_tokens=max_tokens,temperature=temperature)['choices'][0]['message']['content']
             try:
                 the_data = json.loads(response.replace("\n",""))
                 prompt = the_data["prompt"]
@@ -71,7 +72,6 @@ class DataSynthesis:
                 pass
 
         elif choices is not None:
-            response = openai.ChatCompletion.create(messages=cur_prompt,model=model,max_tokens=max_tokens,temperature=temperature)['choices'][0]['message']['content']
             try:
                 the_data = json.loads(response.replace("\n",""))
                 prompt = the_data["prompt"]
@@ -81,7 +81,6 @@ class DataSynthesis:
                 pass
 
         elif grammar_type is not None:
-            response = openai.ChatCompletion.create(messages=cur_prompt,model=model,max_tokens=max_tokens,temperature=temperature)['choices'][0]['message']['content']
             try:
                 tokenizer = AutoTokenizer.from_pretrained("gpt2-medium", padding_side='left')
                 constraint_model = GrammarCompletion("gpt2-medium", tokenizer)
@@ -94,7 +93,6 @@ class DataSynthesis:
 
 
         else:
-            response = openai.ChatCompletion.create(messages=cur_prompt,model=model,max_tokens=max_tokens,temperature=temperature)['choices'][0]['message']['content']
             try:
                 the_data = json.loads(response.replace("\n",""))
                 the_tuple = (the_data["prompt"],the_data["response"]+example_delim)
