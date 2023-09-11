@@ -29,6 +29,7 @@ dependencies = [
     "outlines>=0.0.1",
     "en_core_web_md @ https://github.com/explosion/spacy-models/releases/download/en_core_web_md-3.6.0/en_core_web_md-3.6.0-py3-none-any.whl",
     "gradio>=3.42.0",  # Specify the latest version of gradio
+    "backoff>=2.2.1",
 ]
 
 [project.optional-dependencies]
