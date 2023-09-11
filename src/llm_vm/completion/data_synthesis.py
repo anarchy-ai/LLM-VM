@@ -53,26 +53,23 @@ class DataSynthesis:
 
         response = openai.ChatCompletion.create(messages=cur_prompt,model=model,max_tokens=max_tokens,temperature=temperature)['choices'][0]['message']['content']
 
+        the_data = json.loads(response.replace("\n",""))
+        prompt = the_data["prompt"]
+
         if regex is not None:
             try:
-                the_data = json.loads(response.replace("\n",""))
-                prompt = the_data["prompt"]
                 response = RegexCompletion.complete(prompt,regex)
             except:
                 pass
             
         elif type is not None:
             try:
-                the_data = json.loads(response.replace("\n",""))
-                prompt = the_data["prompt"]
                 response = TypeCompletion.complete(prompt,type)
             except:
                 pass
 
         elif choices is not None:
             try:
-                the_data = json.loads(response.replace("\n",""))
-                prompt = the_data["prompt"]
                 response = ChoicesCompletion.complete(prompt,choices)
             except:
                 pass
@@ -81,8 +78,6 @@ class DataSynthesis:
             try:
                 tokenizer = AutoTokenizer.from_pretrained("gpt2-medium", padding_side='left')
                 constraint_model = GrammarCompletion("gpt2-medium", tokenizer)
-                the_data = json.loads(response.replace("\n",""))
-                prompt = the_data["prompt"]
                 response = constraint_model.complete(prompt, grammar_type=grammar_type)
             except:
                 pass
@@ -90,10 +85,9 @@ class DataSynthesis:
 
         else:
             try:
-                the_data = json.loads(response.replace("\n",""))
-                prompt=the_data["prompt"]
-                response=the_data["response"]
+                response = the_data["response"]
             except:
                 pass
+            
         the_tuple = (prompt,response+example_delim)
         return the_tuple
