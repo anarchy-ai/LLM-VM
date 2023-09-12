@@ -1,0 +1,9 @@
+<map id="bothandler.calcCost" name="bothandler.calcCost">
+<area shape="rect" id="Node000001" title=" " alt="" coords="228,64,364,91"/>
+<area shape="rect" id="Node000002" href="$namespacebothandler.html#a258139a13fadde7a664a435296aa85ba" title=" " alt="" coords="5,5,180,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="232,62,141,35,142,30,234,57"/>
+<area shape="rect" id="Node000003" href="$namespacebothandler.html#ac9cea3e73329811a799a95d4defa0b4f" title=" " alt="" coords="25,56,160,99"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="213,80,160,80,160,75,213,75"/>
+<area shape="rect" id="Node000004" href="$namespacebothandler.html#a5e9df0b7bad9ac3f3def0acf71ceb133" title=" " alt="" coords="18,123,167,149"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="234,98,142,125,141,120,232,93"/>
+</map>

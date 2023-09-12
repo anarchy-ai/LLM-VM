@@ -1,0 +1,8 @@
+<map id="typings.AnswerFromMemoryModelData" name="typings.AnswerFromMemoryModelData">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,128,193,171"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="59,5,139,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="94,47,95,128,90,128,89,47"/>
+<area shape="poly" id="edge2_Node000001_Node000002" title=" " alt="" coords="109,47,108,128,103,128,104,47"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="163,5,217,32"/>
+<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="175,46,116,129,111,126,170,43"/>
+</map>

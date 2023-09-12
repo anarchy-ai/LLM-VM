@@ -1,0 +1,14 @@
+<map id="typings.SingleTool" name="typings.SingleTool">
+<area shape="rect" id="Node000001" title=" " alt="" coords="31,267,158,293"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,5,85,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="42,47,47,117,61,202,71,237,84,265,79,268,66,239,56,203,41,118,36,47"/>
+<area shape="poly" id="edge2_Node000001_Node000002" title=" " alt="" coords="58,46,70,117,85,202,101,266,96,267,80,203,64,118,53,47"/>
+<area shape="rect" id="Node000003" href="$classtypings_1_1_tool_type_args.html" title=" " alt="" coords="83,176,229,203"/>
+<area shape="poly" id="edge4_Node000003_Node000002" title=" " alt="" coords="57,44,100,113,145,174,140,177,96,116,53,47"/>
+<area shape="poly" id="edge5_Node000003_Node000002" title=" " alt="" coords="70,43,118,112,155,174,150,177,113,115,65,46"/>
+<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="141,216,105,268,101,265,137,213"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="121,5,190,32"/>
+<area shape="poly" id="edge6_Node000003_Node000004" title=" " alt="" coords="158,47,158,176,153,176,153,47"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="253,176,307,203"/>
+<area shape="poly" id="edge7_Node000001_Node000005" title=" " alt="" coords="241,212,122,268,120,264,239,207"/>
+</map>

@@ -1,0 +1,9 @@
+<map id="onsite_llm.Small_Local_Pythia.tokenizer_loader" name="onsite_llm.Small_Local_Pythia.tokenizer_loader">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,170,48"/>
+<area shape="rect" id="Node000002" href="$classonsite__llm_1_1_base___onsite___l_l_m.html#a35dea6002ebd20666ce5296465314cb7" title=" " alt="" coords="425,5,584,48"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="170,12,217,8,297,5,377,8,410,11,410,16,377,13,297,10,218,13,170,18"/>
+<area shape="rect" id="Node000003" href="$classonsite__llm_1_1_base___onsite___l_l_m.html#a637874ab83763ff4430f8dcd97312163" title=" " alt="" coords="218,47,377,89"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="171,40,204,47,203,52,170,45"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="377,50,410,43,411,48,378,55"/>
+<area shape="poly" id="edge4_Node000003_Node000003" title=" " alt="" coords="258,47,256,37,263,28,277,22,297,20,321,23,334,30,332,34,319,28,297,25,278,27,266,32,261,38,263,46"/>
+</map>

@@ -1,0 +1,9 @@
+<map id="onsite_llm.Small_Local_LLama.model_loader" name="onsite_llm.Small_Local_LLama.model_loader">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,161,48"/>
+<area shape="rect" id="Node000002" href="$classonsite__llm_1_1_base___onsite___l_l_m.html#a35dea6002ebd20666ce5296465314cb7" title=" " alt="" coords="416,5,575,48"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="161,13,208,8,288,5,368,8,401,11,401,16,368,13,288,10,209,13,161,18"/>
+<area shape="rect" id="Node000003" href="$classonsite__llm_1_1_base___onsite___l_l_m.html#a637874ab83763ff4430f8dcd97312163" title=" " alt="" coords="209,47,368,89"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="161,40,194,46,193,52,160,45"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="368,50,401,43,402,48,369,55"/>
+<area shape="poly" id="edge4_Node000003_Node000003" title=" " alt="" coords="249,47,248,37,254,28,268,22,288,20,311,23,325,30,322,34,310,28,288,25,269,27,257,32,253,38,254,46"/>
+</map>

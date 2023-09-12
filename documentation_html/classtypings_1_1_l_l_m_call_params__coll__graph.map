@@ -1,0 +1,13 @@
+<map id="typings.LLMCallParams" name="typings.LLMCallParams">
+<area shape="rect" id="Node000001" title=" " alt="" coords="13,172,173,199"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,81,85,108"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="53,121,82,170,77,173,49,123"/>
+<area shape="poly" id="edge2_Node000001_Node000002" title=" " alt="" coords="69,119,95,170,90,173,64,122"/>
+<area shape="rect" id="Node000003" href="$classtypings_1_1_l_l_m_call_type.html" title=" " alt="" coords="109,81,251,108"/>
+<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="159,121,107,173,103,170,155,117"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="152,5,207,32"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="174,46,175,81,170,81,168,46"/>
+<area shape="poly" id="edge5_Node000003_Node000004" title=" " alt="" coords="191,46,189,81,184,81,186,46"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="275,81,327,108"/>
+<area shape="poly" id="edge6_Node000001_Node000005" title=" " alt="" coords="262,115,124,174,122,169,260,111"/>
+</map>

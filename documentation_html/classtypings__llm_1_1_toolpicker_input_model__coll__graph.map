@@ -1,0 +1,13 @@
+<map id="typings_llm.ToolpickerInputModel" name="typings_llm.ToolpickerInputModel">
+<area shape="rect" id="Node000001" title=" " alt="" coords="29,172,208,215"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,81,85,108"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="58,119,97,170,93,173,54,122"/>
+<area shape="poly" id="edge2_Node000001_Node000002" title=" " alt="" coords="73,117,112,170,108,173,68,121"/>
+<area shape="rect" id="Node000003" href="$classtypings__llm_1_1_open_a_i_model.html" title=" " alt="" coords="108,81,278,108"/>
+<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="176,122,136,173,132,170,172,118"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="165,5,221,32"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="187,46,189,81,183,81,182,46"/>
+<area shape="poly" id="edge5_Node000003_Node000004" title=" " alt="" coords="204,46,203,81,197,81,199,46"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="301,81,344,108"/>
+<area shape="poly" id="edge6_Node000001_Node000005" title=" " alt="" coords="300,120,256,150,199,174,196,169,253,146,297,115"/>
+</map>

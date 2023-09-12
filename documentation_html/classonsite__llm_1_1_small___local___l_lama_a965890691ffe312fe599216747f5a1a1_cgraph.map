@@ -1,0 +1,9 @@
+<map id="onsite_llm.Small_Local_LLama.tokenizer_loader" name="onsite_llm.Small_Local_LLama.tokenizer_loader">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,172,48"/>
+<area shape="rect" id="Node000002" href="$classonsite__llm_1_1_base___onsite___l_l_m.html#a35dea6002ebd20666ce5296465314cb7" title=" " alt="" coords="427,5,586,48"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="172,12,219,8,299,5,379,8,412,11,412,16,379,13,299,10,220,13,172,18"/>
+<area shape="rect" id="Node000003" href="$classonsite__llm_1_1_base___onsite___l_l_m.html#a637874ab83763ff4430f8dcd97312163" title=" " alt="" coords="220,47,379,89"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="173,40,205,47,204,52,172,46"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="379,50,412,43,413,48,380,55"/>
+<area shape="poly" id="edge4_Node000003_Node000003" title=" " alt="" coords="260,47,258,37,265,28,279,22,299,20,323,23,336,30,334,34,321,28,299,25,280,27,268,32,263,38,265,46"/>
+</map>

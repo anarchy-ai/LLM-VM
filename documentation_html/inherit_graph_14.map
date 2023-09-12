@@ -1,0 +1,7 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="Node000000" href="$classoptimize_1_1_optimizer.html" title=" " alt="" coords="5,31,136,57"/>
+<area shape="rect" id="Node000001" href="$classoptimize_1_1_hosted_optimizer.html" title=" " alt="" coords="184,5,355,32"/>
+<area shape="poly" id="edge25_Node000000_Node000001" title=" " alt="" coords="150,31,183,27,184,32,151,36"/>
+<area shape="rect" id="Node000002" href="$classoptimize_1_1_local_optimizer.html" title=" " alt="" coords="189,56,350,83"/>
+<area shape="poly" id="edge26_Node000000_Node000002" title=" " alt="" coords="151,52,189,56,188,62,150,57"/>
+</map>

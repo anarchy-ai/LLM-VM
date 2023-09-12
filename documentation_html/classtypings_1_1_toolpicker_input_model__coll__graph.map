@@ -1,0 +1,13 @@
+<map id="typings.ToolpickerInputModel" name="typings.ToolpickerInputModel">
+<area shape="rect" id="Node000001" title=" " alt="" coords="18,172,208,199"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,81,85,108"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="58,119,99,170,95,173,54,122"/>
+<area shape="poly" id="edge2_Node000001_Node000002" title=" " alt="" coords="73,118,112,170,108,173,69,121"/>
+<area shape="rect" id="Node000003" href="$classtypings_1_1_open_a_i_model.html" title=" " alt="" coords="108,81,254,108"/>
+<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="164,122,125,173,121,170,160,119"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="153,5,209,32"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="175,46,177,81,171,81,170,46"/>
+<area shape="poly" id="edge5_Node000003_Node000004" title=" " alt="" coords="192,46,191,81,185,81,187,46"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="277,81,320,108"/>
+<area shape="poly" id="edge6_Node000001_Node000005" title=" " alt="" coords="281,121,245,150,215,164,184,174,183,169,213,159,242,146,277,117"/>
+</map>

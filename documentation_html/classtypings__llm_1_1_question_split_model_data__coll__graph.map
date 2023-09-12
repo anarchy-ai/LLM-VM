@@ -1,0 +1,8 @@
+<map id="typings_llm.QuestionSplitModelData" name="typings_llm.QuestionSplitModelData">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,128,175,171"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="50,5,130,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="85,47,86,128,81,128,80,47"/>
+<area shape="poly" id="edge2_Node000001_Node000002" title=" " alt="" coords="100,47,99,128,94,128,95,47"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="154,5,208,32"/>
+<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="166,46,107,129,102,126,161,43"/>
+</map>

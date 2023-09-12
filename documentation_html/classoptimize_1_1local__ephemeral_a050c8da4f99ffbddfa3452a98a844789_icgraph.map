@@ -1,0 +1,15 @@
+<map id="optimize.local_ephemeral.init_if_null" name="optimize.local_ephemeral.init_if_null">
+<area shape="rect" id="Node000001" title=" " alt="" coords="276,156,465,199"/>
+<area shape="rect" id="Node000002" href="$classoptimize_1_1local__ephemeral.html#aff730dae4af9f0e48e4686e26ee26245" title=" " alt="" coords="20,5,213,48"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="336,147,287,104,226,62,201,51,204,46,229,58,290,99,340,143"/>
+<area shape="rect" id="Node000003" href="$classoptimize_1_1local__ephemeral.html#ab06b68315ca02e1ec867e271be59d986" title=" " alt="" coords="5,72,228,99"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="314,151,227,113,187,102,189,97,229,108,317,146"/>
+<area shape="rect" id="Node000004" href="$classoptimize_1_1local__ephemeral.html#a66893116b71c91f4b3fdb81e73698e1d" title=" " alt="" coords="21,123,212,165"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="261,166,212,159,212,154,261,160"/>
+<area shape="rect" id="Node000005" href="$classoptimize_1_1local__ephemeral.html#a248f1511a302cb8e31bcf758c143b2c0" title=" " alt="" coords="17,189,216,232"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="261,194,217,200,216,195,261,189"/>
+<area shape="rect" id="Node000006" href="$classoptimize_1_1local__ephemeral.html#a9b66bbbd6881fd16411cc151351591dc" title=" " alt="" coords="21,256,212,299"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="315,208,229,246,196,258,194,253,227,242,313,203"/>
+<area shape="rect" id="Node000007" href="$classoptimize_1_1local__ephemeral.html#a24ade8ce3a9b452e9864df7e3e057463" title=" " alt="" coords="21,323,212,365"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="344,212,294,264,263,290,229,313,205,324,203,320,226,308,260,286,291,260,341,208"/>
+</map>

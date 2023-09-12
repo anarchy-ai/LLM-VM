@@ -1,0 +1,8 @@
+<map id="typings.ToolInputModelData" name="typings.ToolInputModelData">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,96,187,123"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="56,5,136,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="90,47,92,95,87,96,85,47"/>
+<area shape="poly" id="edge2_Node000001_Node000002" title=" " alt="" coords="107,47,105,96,100,95,102,47"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="160,5,229,32"/>
+<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="172,44,112,97,108,93,168,40"/>
+</map>

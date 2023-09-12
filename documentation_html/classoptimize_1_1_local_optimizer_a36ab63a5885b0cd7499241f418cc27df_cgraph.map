@@ -1,0 +1,11 @@
+<map id="optimize.LocalOptimizer.complete" name="optimize.LocalOptimizer.complete">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,56,224,83"/>
+<area shape="rect" id="Node000002" href="$classoptimize_1_1_local_optimizer.html#a365c9d11c6f1122dc3962abd348e7a7e" title=" " alt="" coords="272,48,490,91"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="224,67,256,67,256,72,224,72"/>
+<area shape="rect" id="Node000003" href="$namespaceoptimize.html#a20b2331b4def856144d644f51405b49e" title=" " alt="" coords="547,5,688,32"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="483,45,537,33,538,38,484,50"/>
+<area shape="rect" id="Node000004" href="$namespaceoptimize.html#ae26aa8f229da8ebd19b4a53b3467edcc" title=" " alt="" coords="549,56,686,83"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="490,67,534,67,534,72,490,72"/>
+<area shape="rect" id="Node000005" href="$namespaceoptimize.html#a974b5a85fe71291c880b3f8bb345e9ec" title=" " alt="" coords="538,107,697,133"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="484,89,538,100,537,106,483,94"/>
+</map>

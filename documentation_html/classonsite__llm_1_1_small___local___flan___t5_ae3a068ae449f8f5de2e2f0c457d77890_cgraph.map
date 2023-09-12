@@ -1,0 +1,9 @@
+<map id="onsite_llm.Small_Local_Flan_T5.tokenizer_loader" name="onsite_llm.Small_Local_Flan_T5.tokenizer_loader">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,179,48"/>
+<area shape="rect" id="Node000002" href="$classonsite__llm_1_1_base___onsite___l_l_m.html#a35dea6002ebd20666ce5296465314cb7" title=" " alt="" coords="434,5,593,48"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="179,12,226,8,306,5,386,8,419,11,419,16,386,13,306,10,227,13,179,17"/>
+<area shape="rect" id="Node000003" href="$classonsite__llm_1_1_base___onsite___l_l_m.html#a637874ab83763ff4430f8dcd97312163" title=" " alt="" coords="227,47,386,89"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="179,41,212,47,211,52,178,46"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="386,50,419,43,420,48,387,55"/>
+<area shape="poly" id="edge4_Node000003_Node000003" title=" " alt="" coords="267,47,265,37,272,28,286,22,306,20,330,23,343,30,341,34,328,28,306,25,287,27,275,32,270,38,272,46"/>
+</map>

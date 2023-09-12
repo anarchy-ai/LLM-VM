@@ -1,0 +1,14 @@
+<map id="agent.buildExampleTools" name="agent.buildExampleTools">
+<area shape="rect" id="Node000001" title=" " alt="" coords="541,56,708,83"/>
+<area shape="rect" id="Node000002" href="$classagent_1_1_agent.html#a284c469c58f5a94eb4114d1c7a2d987a" title=" " alt="" coords="353,5,493,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="554,54,478,35,480,30,555,49"/>
+<area shape="rect" id="Node000003" href="$classagent_1_1_agent.html#a286d9ab52e670ff5640b01327c2553d0" title=" " alt="" coords="167,93,305,120"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="527,81,353,97,305,102,305,97,353,92,527,75"/>
+<area shape="rect" id="Node000005" href="$namespaceagent.html#a1d47917d330f5e1c9e10381e1c14999b" title=" " alt="" coords="363,131,483,157"/>
+<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="574,91,462,133,461,128,572,86"/>
+<area shape="poly" id="edge3_Node000003_Node000003" title=" " alt="" coords="266,81,256,75,236,72,218,74,208,79,206,84,211,92,206,94,201,85,204,75,216,69,236,67,258,70,269,77"/>
+<area shape="rect" id="Node000004" href="$classagent_1_1_agent.html#a61947e7316f5241a89757df60e569f96" title=" " alt="" coords="5,93,119,120"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="152,109,119,109,119,104,152,104"/>
+<area shape="poly" id="edge6_Node000005_Node000003" title=" " alt="" coords="348,132,305,123,306,118,349,126"/>
+<area shape="poly" id="edge7_Node000005_Node000005" title=" " alt="" coords="456,119,445,112,423,109,404,111,393,116,391,121,396,129,391,132,385,122,389,112,402,106,423,104,447,107,458,114"/>
+</map>

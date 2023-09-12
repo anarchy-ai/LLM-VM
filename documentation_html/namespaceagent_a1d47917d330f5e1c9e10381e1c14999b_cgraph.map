@@ -1,0 +1,6 @@
+<map id="agent.rebel_main" name="agent.rebel_main">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,29,126,56"/>
+<area shape="poly" id="edge2_Node000001_Node000001" title=" " alt="" coords="33,30,27,21,31,11,44,5,66,3,89,6,101,13,99,17,88,11,65,8,46,10,35,15,32,20,37,27"/>
+<area shape="rect" id="Node000002" href="$namespaceagent.html#ac01d5360594e822ebd547bbfb7653308" title=" " alt="" coords="174,29,340,56"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="126,40,158,40,158,45,126,45"/>
+</map>

@@ -1,0 +1,8 @@
+<map id="typings.LLMTrainingResult" name="typings.LLMTrainingResult">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,96,180,123"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="53,5,132,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="87,47,89,95,83,96,81,47"/>
+<area shape="poly" id="edge2_Node000001_Node000002" title=" " alt="" coords="104,47,102,96,96,95,98,47"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="157,5,199,32"/>
+<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="158,45,107,97,103,94,154,41"/>
+</map>
