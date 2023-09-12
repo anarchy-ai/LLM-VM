@@ -523,7 +523,7 @@ class ChatGPT:
             **kwargs)
         return ans['choices'][0]['message']['content']
 
-    def finetune(self, dataset, optimizer, c_id):
+    def finetune(self, dataset, optimizer, c_id, small_model_filename=None):
         print("fine tuning isn't supported by OpenAI on this model", file=sys.stderr)
         raise Exception("fine tuning isn't supported by OpenAI on this model")
         # old_model = optimizer.storage.get_model(c_id)
