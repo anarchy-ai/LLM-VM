@@ -235,10 +235,6 @@ Some tickets we'll pay you for closing! Look at the ticket labels to see how muc
   - GitHub: [@cartazio](https://github.com/cartazio)
   - LinkedIn: [@carter-schonwald](https://www.linkedin.com/in/carter-schonwald-aa178132/)
  
-- **Andrew Nelson** - Basilisk Trainer
-  - GitHub: [@ajn2004](https://github.com/ajn2004)
-  - LinkedIn: [@ajnelsnyc](https://www.linkedin.com/in/ajnelsnyc/)
- 
 - **Kyle Wild** - Undoomer
   - GitHub: [@dorkitude](https://github.com/dorkitude)
   - LinkedIn: [@kylewild](https://www.linkedin.com/in/kylewild/)
@@ -250,6 +246,10 @@ Some tickets we'll pay you for closing! Look at the ticket labels to see how muc
 - **Aarushi Banerjee** - Fearless Contributor
   - GitHub: [@AB3000](https://github.com/AB3000)
   - LinkedIn: [@ab99](https://www.linkedin.com/in/ab99/)
+
+- **Andrew Nelson** - Fearless Contributor
+  - GitHub: [@ajn2004](https://github.com/ajn2004)
+  - LinkedIn: [@ajnelsnyc](https://www.linkedin.com/in/ajnelsnyc/)
     
 ## License
 
