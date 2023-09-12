@@ -80,7 +80,7 @@ class Client:
         return self.teacher.generate(prompt, max_len,**kwargs)
 
     def complete(self, prompt,
-                 context,
+                 context = "", # TODO: change back to static_context because otherwise 
                  openai_key = None,
                  finetune=False,
                  data_synthesis = False,
@@ -93,7 +93,7 @@ class Client:
 
         Parameters:
             prompt (str): Prompt to send to LLM for generation
-            context (str): Context to send to the LLM for generation
+            context (str): Unchanging context to send to the LLM for generation.  Defaults to "" and doesn't do fine-tuning.
             finetune (bool): Boolean value that begins fine tuning when set to True
             data_synthesis (bool): Boolean value to determine whether data should be synthesized for fine-tuning or not
             temperature (float): An analog
