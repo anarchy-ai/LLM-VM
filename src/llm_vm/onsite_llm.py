@@ -49,7 +49,7 @@ lora_config = LoraConfig(
 )
 
 # Combine all the configs
-combination_bnb_config = BitsAndBytesConfig(
+combination_4_bit_bnb_config = BitsAndBytesConfig(
     load_in_4bit=True,                     # Load weights in 4-bit format for memory efficiency.
     bnb_4bit_quant_type="nf4",             # Specify the use of NF4 quantization for compression.
     bnb_4bit_use_double_quant=True,        # Apply double quantization for additional compression.
@@ -57,19 +57,19 @@ combination_bnb_config = BitsAndBytesConfig(
 )
 
 # Use double quantization if memory is a concern.
-double_quant_config = BitsAndBytesConfig(
+double_quant_4bit_config = BitsAndBytesConfig(
     load_in_4bit=True,                  # Load weights in 4-bit format.
     bnb_4bit_use_double_quant=True      # Apply double quantization for additional compression.
 )
 
 # Use a 16-bit compute dtype for faster fine-tuning.
-bfloat16_config = BitsAndBytesConfig(
+bfloat16_4bit_config = BitsAndBytesConfig(
     load_in_4bit=True,                     # Load weights in 4-bit format.
     bnb_4bit_compute_dtype=torch.bfloat16  # Set compute data type to bfloat16 for faster training.
 )
 
 # Use NF4 quantization for higher precision.
-nf4_config = BitsAndBytesConfig(
+nf4_4bit_config = BitsAndBytesConfig(
     load_in_4bit=True,                  # Load weights in 4-bit format.
     bnb_4bit_quant_type="nf4"           # Use NF4 quantization.
 )
@@ -140,15 +140,27 @@ class BaseOnsiteLLM(ABC):
         # `double_quant` for memory
         # `bfloat16` for speed
         # `nf4` for precision
-        quantization_config = model_kw_args.get("quantization_config")
-        if quantization_config == "combination" or quantization_config is None:
-            self.model.quantization_config = combination_bnb_config
-        elif quantization_config == "double_quant":
-            self.model.quantization_config = double_quant_config
-        elif quantization_config == "bfloat16":
-            self.model.quantization_config = bfloat16_config
-        elif quantization_config == "nf4":
-            self.model.quantization_config = nf4_config
+        quantization_config = model_kw_args.get("quantization_config", None)
+        if quantization_config:
+            # TODO(us): pass all parameters as kwargs for more flexibility!
+            if quantization_config == "8bit":
+                self.model.quantization_config = BitsAndBytesConfig(
+                    load_in_8bit=True,  # Load weights in 8-bit format.
+                    llm_int8_skip_modules=model_kw_args.get("llm_int8_skip_modules", None),
+                    llm_int8_threshold = model_kw_args.get("llm_int8_threshold", 6.0),
+                )
+            elif quantization_config == "combination_4bit":
+                self.model.quantization_config = combination_4_bit_bnb_config
+            elif quantization_config == "double_quant_4bit":
+                self.model.quantization_config = double_quant_4bit_config
+            elif quantization_config == "bfloat16_4bit":
+                self.model.quantization_config = bfloat16_4bit_config
+            elif quantization_config == "nf4_4bit":
+                self.model.quantization_config = nf4_4bit_config
+            elif quantization_config == "8bit":
+            else:
+                raise ValueError(f"Invalid quantization config: {quantization_config}"
+                                 f"Valid options are: ")
 
     @property
     @abstractmethod
