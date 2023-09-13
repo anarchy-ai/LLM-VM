@@ -505,7 +505,7 @@ class ChatGPT:
 
     def finetune(self, dataset, optimizer, c_id):
         print("fine tuning isn't supported by OpenAI on this model", file=sys.stderr)
-        exit()
+        raise Exception("fine tuning isn't supported by OpenAI on this model")
         # old_model = optimizer.storage.get_model(c_id)
         # training_file = create_jsonl_file(dataset)
         # upload_response = openai.File.create(file=training_file, purpose="fine-tune")
