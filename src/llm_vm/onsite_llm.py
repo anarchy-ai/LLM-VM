@@ -22,6 +22,9 @@ import tempfile
 import json
 import os
 import torch
+from auto_gptq import AutoGPTQForCausalLM, BaseQuantizeConfig 
+# For Nvidia(CUDA 11.7) run "pip install auto-gptq"
+# For AMD(ROCm 5.4.2) run "pip install auto-gptq --extra-index-url https://huggingface.github.io/autogptq-index/whl/rocm542/"
 
 
 __private_key_value_models_map =  {}
@@ -531,3 +534,42 @@ class ChatGPT:
         # optimizer.storage.set_training_in_progress(c_id, False)
         # if old_model is not None:
         #     openai.Model.delete(old_model)
+
+
+class QuantLLMGPTQ: 
+    def __init__(self, model_uri, tokenizer, quantized_model_uri="quantized-model", device="cuda:0"):
+
+        self.model_uri = model_uri
+        self.tokenizer = tokenizer
+        self.quantized_model_uri = quantized_model_uri
+        self.q_model = None
+        self.device = device
+
+    def quantize(self, bits=4):
+        examples = [
+            self.tokenizer(
+                "You can write any text here, it serves as an input for the quantization process."
+            )]
+
+        quantize_config = BaseQuantizeConfig(
+            bits=bits,
+            group_size=128,  
+            desc_act=False,  
+        )
+
+        model = AutoGPTQForCausalLM.from_pretrained(self.model_uri, quantize_config)
+
+        model.quantize(examples)
+
+        model.save_quantized(self.quantized_model_uri)
+
+        self.q_model = AutoGPTQForCausalLM.from_quantized(self.quantized_model_uri, device=self.device)
+
+    def generate(self, prompt, **kwargs):
+        model = self.q_model
+        inp = self.tokenizer(prompt, return_tensors="pt").to(self.device)
+        res = model.generate(input_ids=inp['input_ids'], attention_mask=inp['attention_mask'], return_dict_in_generate=True, **kwargs)
+        text_res = self.tokenizer.batch_decode(res.sequences,  skip_special_tokens=True)[0]
+        return text_res.strip()
+
+
