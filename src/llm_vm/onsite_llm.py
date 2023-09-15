@@ -1,16 +1,8 @@
-import json
-import math
-import os
+from abc import ABC,abstractmethod
 import sys
-import tempfile
-import time
-from abc import ABC, abstractmethod
-from datetime import datetime
-
 import openai
-import torch
+import math
 from ctransformers import AutoModelForCausalLM
-from peft import LoraConfig
 from transformers import (
     AutoModelForMaskedLM,
     AutoModelForSeq2SeqLM,
@@ -23,8 +15,14 @@ from transformers import (
     LlamaTokenizer,
     DataCollatorForLanguageModeling,
     TrainingArguments,
-    BitsAndBytesConfig)
-from trl import SFTTrainer
+    Trainer)
+import time
+from datetime import datetime
+import tempfile
+import json
+import os
+import torch
+
 
 __private_key_value_models_map =  {}
 # []   {
@@ -38,55 +36,6 @@ __private_key_value_models_map =  {}
 #         "flan" : SmallLocalFlanT5,
 #         "pythia" : SmallLocalPythia,
 #         }
-
-# default lora config
-lora_config = LoraConfig(
-      lora_alpha=16,
-      lora_dropout=0.1,
-      r=64,
-      bias="none",
-      task_type="CAUSAL_LM",
-)
-
-# Combine all the configs
-combination_bnb_config = BitsAndBytesConfig(
-    load_in_4bit=True,                     # Load weights in 4-bit format for memory efficiency.
-    bnb_4bit_quant_type="nf4",             # Specify the use of NF4 quantization for compression.
-    bnb_4bit_use_double_quant=True,        # Apply double quantization for additional compression.
-    bnb_4bit_compute_dtype=torch.bfloat16  # Set compute data type to bfloat16 for faster training.
-)
-
-# Use double quantization if memory is a concern.
-double_quant_config = BitsAndBytesConfig(
-    load_in_4bit=True,                  # Load weights in 4-bit format.
-    bnb_4bit_use_double_quant=True      # Apply double quantization for additional compression.
-)
-
-# Use a 16-bit compute dtype for faster fine-tuning.
-bfloat16_config = BitsAndBytesConfig(
-    load_in_4bit=True,                     # Load weights in 4-bit format.
-    bnb_4bit_compute_dtype=torch.bfloat16  # Set compute data type to bfloat16 for faster training.
-)
-
-# Use NF4 quantization for higher precision.
-nf4_config = BitsAndBytesConfig(
-    load_in_4bit=True,                  # Load weights in 4-bit format.
-    bnb_4bit_quant_type="nf4"           # Use NF4 quantization.
-)
-
-def formatting_func(example):
-    """
-    This function formats the example for the SFTTrainer.
-
-    Parameters:
-        example (dict): Dictionary containing the question and answer
-
-    Returns:
-        str: Formatted string containing the question and answer
-    """
-    text = f"### Question: {example['question']}\n ### Answer: {example['answer']}"
-    return text
-
 
 def RegisterModelClass(name):
     def regClass(cls):
@@ -131,24 +80,9 @@ class BaseOnsiteLLM(ABC):
             self.model_uri= model_uri
         if model_uri is None and self.model_uri is None:
             raise ValueError('A very specific bad thing happened.')
-        self.model_name : str = self.model_uri.split('/')[-1]  # our default for deriving model name
+        self.model_name : str = self.model_uri.split('/')[-1] # our default for deriving model name
         self.model=self.model_loader(**model_kw_args)
         self.tokenizer=self.tokenizer_loader(**tokenizer_kw_args)
-
-        # set `quantization_config` to one of the following:
-        # `combination` for all the configs (default)
-        # `double_quant` for memory
-        # `bfloat16` for speed
-        # `nf4` for precision
-        quantization_config = model_kw_args.get("quantization_config")
-        if quantization_config == "combination" or quantization_config is None:
-            self.model.quantization_config = combination_bnb_config
-        elif quantization_config == "double_quant":
-            self.model.quantization_config = double_quant_config
-        elif quantization_config == "bfloat16":
-            self.model.quantization_config = bfloat16_config
-        elif quantization_config == "nf4":
-            self.model.quantization_config = nf4_config
 
     @property
     @abstractmethod
@@ -158,6 +92,8 @@ class BaseOnsiteLLM(ABC):
     @model_uri.setter
     def model_uri(self,val):
         self.model_uri=val # check if this is correct
+
+    # model_name : str = self.model_uri.split('/')[-1]
 
     @abstractmethod
     def model_loader(self):
@@ -169,6 +105,7 @@ class BaseOnsiteLLM(ABC):
 
     def load_finetune(self, model_filename):
         self.model.load_state_dict(torch.load(os.path.join(model_path_default,"finetuned_models", self.model_name, model_filename)))
+
 
     def generate(self,prompt,max_length=100,**kwargs): # both tokenizer and model take kwargs :(
         """
@@ -203,7 +140,6 @@ class BaseOnsiteLLM(ABC):
                 untokenized_final_dataset.append(prompt + response)
             tokenized_final_dataset = map(self.tokenizer,untokenized_final_dataset)
             self.tokenizer.pad_token = self.tokenizer.eos_token
-            # TODO(us): `SFTTrainer.packing` parameter not supported when `trl.DataCollatorForCompletionOnlyLM` used. Which one is more effective use that one.
             data_collator = DataCollatorForLanguageModeling(tokenizer=self.tokenizer, mlm=False)
             optimizer.storage.set_training_in_progress(c_id, True)
             training_args = TrainingArguments(
@@ -215,26 +151,16 @@ class BaseOnsiteLLM(ABC):
                 num_train_epochs=5,
                 weight_decay=0.01,
                 report_to= "none",
-                gradient_checkpointing=True  # Gradient checkpointing is a technique used to reduce memory consumption
-                # during the training of deep neural networks, especially in situations where memory usage is a limiting
-                # factor. Gradient checkpointing selectively re-computes intermediate activations during the backward
-                # pass instead of storing them all, thus performing some extra computation to reduce memory usage.
             )
             test_set = FinetuningDataset(tokenized_final_dataset,len(untokenized_final_dataset))
 
-            #  SFTTrainer is same as Trainer but accepts a peft config, so it can run lora fine-tuning
-            #  (https://discuss.huggingface.co/t/when-to-use-sfttrainer/40998/4)
-            trainer = SFTTrainer(
+            trainer = Trainer(
                 model=self.model,
                 args=training_args,
                 train_dataset=test_set,
                 eval_dataset=test_set,
                 data_collator=data_collator,
-                peft_config=lora_config,
-                packing=True,
-                formatting_func=formatting_func,
             )
-
             os.makedirs(os.path.join(model_path_default,"finetuned_models", self.model_name), exist_ok=True)
             if tokenized_final_dataset:
                 trainer.train()
