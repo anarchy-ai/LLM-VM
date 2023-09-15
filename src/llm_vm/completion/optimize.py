@@ -175,7 +175,7 @@ class HostedOptimizer(Optimizer):
 
 
 class LocalOptimizer(Optimizer):
-    def __init__(self, storage=local_ephemeral(), MIN_TRAIN_EXS = 1, MAX_TRAIN_EXS = 2000, call_small = None , call_big = None , big_model = None, small_model = None, openai_key="", variance=0.87, num_examples=50):
+    def __init__(self, storage=LocalEphemeral(), MIN_TRAIN_EXS = 1, MAX_TRAIN_EXS = 2000, call_small = None , call_big = None , big_model = None, small_model = None, openai_key="", variance=0.87, num_examples=50):
         self.storage = storage
         self.MIN_TRAIN_EXS = MIN_TRAIN_EXS
         self.MAX_TRAIN_EXS = MAX_TRAIN_EXS
