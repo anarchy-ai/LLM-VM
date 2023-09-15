@@ -2,6 +2,7 @@ from abc import ABC,abstractmethod
 import sys
 import openai
 import math
+from ctransformers import AutoModelForCausalLM
 from transformers import (
     AutoModelForMaskedLM,
     AutoModelForSeq2SeqLM,
@@ -25,23 +26,23 @@ import torch
 
 __private_key_value_models_map =  {}
 # []   {
-#         "opt": Small_Local_OPT,
-#         "bloom": Small_Local_Bloom,
-#         "neo": Small_Local_Neo,
-#         "llama": Small_Local_LLama,
-#         "pythia": Small_Local_Pythia,
+#         "opt": SmallLocalOpt,
+#         "bloom": SmallLocalBloom,
+#         "neo": SmallLocalNeo,
+#         "llama": SmallLocalOpenLLama,
+#         "llama2": SmallLocalLLama,
 #         "gpt": GPT3,
-#         "chat_gpt": Chat_GPT,
-#         "flan" : Small_Local_Flan_T5,
-#         "pythia" : Small_Local_Pythia,
+#         "chat_gpt": ChatGPT,
+#         "flan" : SmallLocalFlanT5,
+#         "pythia" : SmallLocalPythia,
 #         }
 
 def RegisterModelClass(name):
     def regClass(cls):
-        __private_key_value_models_map[name]=cls 
+        __private_key_value_models_map[name]=cls
     return regClass
 
-model_keys_registered = __private_key_value_models_map.keys()        
+model_keys_registered = __private_key_value_models_map.keys()
 # Dictionary of models to be loaded in ModelConfig
 def load_model_closure(model_name):
     models = __private_key_value_models_map
@@ -73,7 +74,7 @@ class FinetuningDataset(torch.utils.data.Dataset):
     def __getitem__(self, idx):
         return self.dataset[idx]
 
-class Base_Onsite_LLM(ABC):
+class BaseOnsiteLLM(ABC):
     def __init__(self,model_uri=None,tokenizer_kw_args={},model_kw_args={}):
         if model_uri != None :
             self.model_uri= model_uri
@@ -119,7 +120,7 @@ class Base_Onsite_LLM(ABC):
             str: LLM Generated Response
 
         Example:
-           >>> Small_Local_OPT.generate("How long does it take for an apple to grow?")
+           >>> SmallLocalOpt.generate("How long does it take for an apple to grow?")
            I think it takes about a week for the apple to grow.
         """
         inputs=self.tokenizer(prompt,return_tensors="pt")
@@ -187,7 +188,7 @@ this factorization isn't necessarily the greatest, nor should it be viewed
 as likely being more general, aside from covering hugging face transformers
 """
 @RegisterModelClass("pythia")
-class Small_Local_Pythia(Base_Onsite_LLM):
+class SmallLocalPythia(BaseOnsiteLLM):
     """
     This is a class for ElutherAI's Pythia-70m LLM
 
@@ -212,7 +213,7 @@ class Small_Local_Pythia(Base_Onsite_LLM):
 
 
 @RegisterModelClass("opt")
-class Small_Local_OPT(Base_Onsite_LLM):
+class SmallLocalOpt(BaseOnsiteLLM):
 
     """
     This is a class for Facebook's OPT-350m LLM
@@ -234,7 +235,7 @@ class Small_Local_OPT(Base_Onsite_LLM):
         return AutoTokenizer.from_pretrained(self.model_uri)
 
 @RegisterModelClass("bloom")
-class Small_Local_Bloom(Base_Onsite_LLM):
+class SmallLocalBloom(BaseOnsiteLLM):
 
     """
     This is a class for BigScience's bloom-560 LLM
@@ -257,7 +258,7 @@ class Small_Local_Bloom(Base_Onsite_LLM):
         return AutoTokenizer.from_pretrained(self.model_uri)
 
 @RegisterModelClass("neo")
-class Small_Local_Neo(Base_Onsite_LLM):
+class SmallLocalNeo(BaseOnsiteLLM):
 
     """
 
@@ -279,7 +280,7 @@ class Small_Local_Neo(Base_Onsite_LLM):
         return AutoTokenizer.from_pretrained(self.model_uri)
 
 @RegisterModelClass("llama")
-class Small_Local_OpenLLama(Base_Onsite_LLM):
+class SmallLocalOpenLLama(BaseOnsiteLLM):
 
     """
     This is a class for Openlm-Research's open_llama-3b LLM
@@ -300,9 +301,51 @@ class Small_Local_OpenLLama(Base_Onsite_LLM):
         return LlamaForCausalLM.from_pretrained(self.model_uri)
     def tokenizer_loader(self):
         return LlamaTokenizer.from_pretrained(self.model_uri)
+    
+@RegisterModelClass("quantized-llama")
+class Quantized_Llama(BaseOnsiteLLM):
+    """
+    Class for running quantized Llama instances that use GGML
+
+    Attributes:
+        model_uri (str): Hugging Face Endpoint for LLM
+        model (LLM): The large language model. CTransformers includes its own tokenizer in the model
+
+    Methods:
+        __init__: Takes the same parameters as the base class, except it looks to see if there is a specific quantization you want to use
+        Quantized weights can be found (here)[https://huggingface.co/TheBloke/LLaMa-7B-GGML#provided-files]
+        model_loader: Loads the LLM into memory
+        tokenizer_loader: Does nothing. CTransformers includes its own tokenizer so this is unnecessary
+        generate: Generates a response from a given prompt with the loaded LLM and tokenizer
+    """
+
+    model_uri="TheBloke/LLaMa-7B-GGML"
+
+    def __init__(self,model_uri=None,tokenizer_kw_args={},model_kw_args={}):
+        # Pop because we don't want to pass model_file onto the super class.
+        self.model_file = model_kw_args.pop('model_file', None)
+        if self.model_file is None:
+        #     # Set default to smallest quantization available
+            self.model_file = "llama-7b.ggmlv3.q2_K.bin"
+        super().__init__(model_uri, tokenizer_kw_args, model_kw_args)
+
+
+    def model_loader(self):
+        # This file specifically is the smallest model.
+        return AutoModelForCausalLM.from_pretrained(self.model_uri, model_file=self.model_file)
+
+    # CTransformers loads its tokenizer in the model, so this function is unnecessary
+    def tokenizer_loader(self):
+        return
+
+    def generate(self, prompt, max_length=100, **kwargs):
+        inputs = self.model.tokenize(prompt)
+        generated_tokens = self.model.generate(inputs)
+        resp = (self.model.detokenize(generated_tokens))
+        return resp
 
 @RegisterModelClass("llama2")
-class Small_Local_LLama(Base_Onsite_LLM):
+class SmallLocalLLama(BaseOnsiteLLM):
 
     """
     This is a class for Meta's llama-7b LLM
@@ -325,7 +368,7 @@ class Small_Local_LLama(Base_Onsite_LLM):
         return LlamaTokenizer.from_pretrained(self.model_uri)
 
 @RegisterModelClass("flan")# our yummiest model based on similarity to food
-class Small_Local_Flan_T5(Base_Onsite_LLM):
+class SmallLocalFlanT5(BaseOnsiteLLM):
 
     """
     This is a class for Google's flan-t5 LLM
@@ -348,7 +391,7 @@ class Small_Local_Flan_T5(Base_Onsite_LLM):
         return AutoTokenizer.from_pretrained(self.model_uri)
 
 @RegisterModelClass("bert")
-class Small_Local_BERT(Base_Onsite_LLM):
+class SmallLocalBERT(BaseOnsiteLLM):
 
     """
     This is a class for BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding
@@ -393,7 +436,7 @@ class GPT3:
             str: LLM Generated Response
 
         Example:
-            >>> Small_Local_OPT.generate("How long does it take for an apple to grow?")
+            >>> SmallLocalOpt.generate("How long does it take for an apple to grow?")
             It typically takes about 100-200 days...
         """
 
@@ -401,7 +444,7 @@ class GPT3:
         return ans['choices'][0]['text']
 
 
-    def finetune(self, dataset, optimizer, c_id):
+    def finetune(self, dataset, optimizer, c_id, small_model_filename=None):
         old_model = optimizer.storage.get_model(c_id)
         training_file = create_jsonl_file(dataset)
         upload_response = openai.File.create(file=training_file, purpose="fine-tune", model="gpt-3.5-turbo-0613")
@@ -429,7 +472,7 @@ class GPT3:
             openai.Model.delete(old_model)
 
 @RegisterModelClass("chat_gpt")
-class Chat_GPT:
+class ChatGPT:
     """
     This is a class for openAI's gpt-3.5-turbo LLM
 
@@ -450,7 +493,7 @@ class Chat_GPT:
             str: LLM Generated Response
 
         Example:
-            >>> Small_Local_OPT.generate("How long does it take for an apple to grow?")
+            >>> SmallLocalOpt.generate("How long does it take for an apple to grow?")
             It typically takes about 100-200 days...
         """
         cur_prompt = [{'role': "system", 'content' : prompt}]
@@ -462,7 +505,7 @@ class Chat_GPT:
 
     def finetune(self, dataset, optimizer, c_id):
         print("fine tuning isn't supported by OpenAI on this model", file=sys.stderr)
-        exit()
+        raise Exception("fine tuning isn't supported by OpenAI on this model")
         # old_model = optimizer.storage.get_model(c_id)
         # training_file = create_jsonl_file(dataset)
         # upload_response = openai.File.create(file=training_file, purpose="fine-tune")

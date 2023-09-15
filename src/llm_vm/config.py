@@ -6,6 +6,7 @@ from dynaconf import Dynaconf
 from xdg import XDG_CONFIG_HOME
 from llm_vm.onsite_llm import model_keys_registered
 from llm_vm.data_path import project_root
+from ipaddress import ip_address
 
 
 # project_root = os.path.abspath(os.getcwd())
@@ -51,22 +52,19 @@ if settings.openai_api_key is None and (isOpenAIModel(settings.small_model) or i
     print("LLM_VM_OPEN_AI_API,if you wish to use their models. Exiting", file=sys.stderr)
     exit()
 
-# check args.host is a valid IP address
-pattern = r'^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$'
-if not re.match(pattern, settings.host):
-    print("Invalid IP address. Reverting to the default host, 127.0.0.1", file=sys.stderr)
+# check settings.host is a valid IP address
+def isValidIP(ip):
+    try:
+        # if object created IP is valid
+        tmp = ip_address(ip)
+        return True
+    except ValueError:
+        return False
+
+if isValidIP(settings.host) is False:
+    print("Invalid IP4/IP6 address. Reverting to the default host: 127.0.0.1", file=sys.stderr)
     settings.host = '127.0.0.1'
-else:
-    # validates each number in the IP address is between 0-255
-    octets = settings.host.split('.')
-    valid_ip = True
-    for octet in octets:
-        if not 0 <= int(octet) <= 255:
-            valid_ip = False
-            break
-    if not valid_ip:
-        print("Invalid IP address range. Reverting to the default host, 127.0.0.1", file=sys.stderr)
-        settings.host = '127.0.0.1'
+
 
 
 assert settings.big_model in MODELS_AVAILABLE, f"{settings.big_model} is not a valid Model selection for Big LLM Model"

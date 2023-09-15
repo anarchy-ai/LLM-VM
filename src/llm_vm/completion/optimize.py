@@ -53,7 +53,7 @@ def asyncAwait(t):
     return t[0]
 
 
-class local_ephemeral:
+class LocalEphemeral:
 
     def __init__(self):
         self.training_store = {}
@@ -187,7 +187,7 @@ class LocalOptimizer(Optimizer):
         self.data_synthesizer = data_synthesis.DataSynthesis(variance, num_examples)
 
     def complete(self, stable_context, dynamic_prompt, data_synthesis = False, finetune = False, regex = None, type = None, choices = None, **kwargs):
-        
+
         openai.api_key = self.openai_key
         completion, train = self.complete_delay_train(stable_context, dynamic_prompt, run_data_synthesis=data_synthesis, regex = regex, choices = choices, type = type, **kwargs)
         if finetune:
@@ -292,7 +292,7 @@ class LocalOptimizer(Optimizer):
 
             else:
                 _, succeed_train = asyncAwait(best_completion_promise)
-            
+
 
 
         def succeed_train_closure(use_completion = None):
@@ -317,5 +317,3 @@ def create_jsonl_file(data_list):
         out.write(json.dumps({'prompt': a, 'completion': b}) + "\n")
     out.seek(0)
     return out
-
-
