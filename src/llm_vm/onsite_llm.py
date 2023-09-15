@@ -303,7 +303,7 @@ class SmallLocalOpenLLama(BaseOnsiteLLM):
         return LlamaTokenizer.from_pretrained(self.model_uri)
     
 @RegisterModelClass("quantized-llama")
-class Quantized_Llama(Base_Onsite_LLM):
+class Quantized_Llama(BaseOnsiteLLM):
     """
     Class for running quantized Llama instances that use GGML
 
