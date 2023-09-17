@@ -65,29 +65,6 @@ def create_jsonl_file(data_list):
     return out
 
 
-def create_conversational_jsonl_file(data_list):
-        """
-        Creates a temporary JSONL file from a list of conversation pairs.
-
-        Args:
-        - data_list (list of tuple): A list of tuples where each tuple contains a user message and an assistant response.
-
-        Returns:
-        - file: A temporary file object pointing to the start of the created JSONL file.
-        """
-        out = tempfile.TemporaryFile('w+')
-        for a, b in data_list:
-            out.write(json.dumps({
-                'messages': [
-                    {'role': 'system', 'content': 'Complete the prompt as an AI assistant.'},
-                    {'role': 'user', 'content': a},
-                    {'role': 'assistant', 'content': b}
-                ]
-            }) + "\n")
-        out.seek(0)
-        return out
-
-
 class FinetuningDataset(torch.utils.data.Dataset):
     def __init__(self,iterable_dataset,length):
         self.dataset = list(iterable_dataset)
@@ -503,13 +480,14 @@ class ChatGPT:
         generate: Generates a response from a given prompt through OpenAI's endpoint
     """
 
-    def generate(self, prompt, max_length=100, **kwargs): 
+    def generate(self,prompt, max_length=100,**kwargs): # both tokenizer and model take kwargs :(
         """
         This function uses openAI's API to generate a response from the prompt
 
         Parameters:
             prompt (str): Prompt to send to LLM
             max_length (int): Optional parameter limiting response length
+
 
         Returns:
             str: LLM Generated Response
@@ -518,68 +496,38 @@ class ChatGPT:
             >>> SmallLocalOpt.generate("How long does it take for an apple to grow?")
             It typically takes about 100-200 days...
         """
-        cur_prompt = [{'role': "system", 'content': prompt}]
+        cur_prompt = [{'role': "system", 'content' : prompt}]
         ans = openai.ChatCompletion.create(
             messages=cur_prompt,
             model="gpt-3.5-turbo-0301",
             **kwargs)
         return ans['choices'][0]['message']['content']
-    
-    
-    def finetune(self, dataset, optimizer, c_id, model_filename=None):
-        """
-        Fine-tunes a GPT-3.5-turbo model using the OpenAI API.
 
-        Args:
-        - dataset (list of tuple): A list of tuples representing the dataset for fine-tuning.
-        - optimizer (object): An optimizer object that has methods for storing and retrieving models.
-        - c_id (str): A string identifier for the current model.
-        - model_filename (str, optional): A filename to be used as a suffix for the new model. Defaults to None.
+    def finetune(self, dataset, optimizer, c_id):
+        print("fine tuning isn't supported by OpenAI on this model", file=sys.stderr)
+        raise Exception("fine tuning isn't supported by OpenAI on this model")
+        # old_model = optimizer.storage.get_model(c_id)
+        # training_file = create_jsonl_file(dataset)
+        # upload_response = openai.File.create(file=training_file, purpose="fine-tune")
+        # training_file.close()
+        # fine_tuning_job = openai.FineTune.create(training_file= upload_response.id)
 
-        Returns:
-        - function: The `start` function which, when called, initiates the fine-tuning process.
-        """
-        def start():
-            old_model = optimizer.storage.get_model(c_id)
-            training_file = create_conversational_jsonl_file(dataset)
-            upload_response = openai.File.create(file=training_file, purpose="fine-tune")
-            training_file.close()
+        # print(f"Fine-tuning job created: {fine_tuning_job}", flush=True)
+        # global job_id # global state isn't great, but thats interrupt handlers
+        # job_id = fine_tuning_job["id"]
+        # while True:
+        #     fine_tuning_status = openai.FineTune.retrieve(id=job_id)
+        #     status = fine_tuning_status["status"]
+        #     print(f"Fine-tuning job status: {status}")
+        #     if status in ["succeeded", "completed", "failed"]:
+        #         break
+        #     time.sleep(30)
+        # job_id = None #
+        # new_model_id = fine_tuning_status.fine_tuned_model
 
-            while True:
-                upload_response = openai.File.retrieve(upload_response.id)
-                if upload_response.status == 'processed':  
-                    break
-                print('Waiting for uploaded file to be processed...')
-                time.sleep(30)
+        # print("New_model_id: ", new_model_id, flush=True)
 
-            if model_filename:
-                fine_tuning_job = openai.FineTuningJob.create(training_file=upload_response.id, 
-                                                             model='gpt-3.5-turbo',
-                                                             suffix=model_filename)
-            else:
-                fine_tuning_job = openai.FineTuningJob.create(training_file=upload_response.id, model='gpt-3.5-turbo')
-            print(f"Fine-tuning job created: {fine_tuning_job}", flush=True)
-
-            global job_id  
-            job_id = fine_tuning_job["id"]
-            while True:
-                fine_tuning_status = openai.FineTuningJob.retrieve(id=job_id)
-                status = fine_tuning_status["status"]
-                print(f"Fine-tuning job status: {status}")
-                if status in ["succeeded", "completed", "failed"]:
-                    break
-                time.sleep(30)
-            job_id = None
-            new_model_id = fine_tuning_status.fine_tuned_model
-
-            print("New_model_id: ", new_model_id, flush=True)
-
-            optimizer.storage.set_model(c_id, new_model_id)
-            optimizer.storage.set_training_in_progress(c_id, False)
-            if old_model is not None:
-                print("Deleting old model:", old_model)
-                openai.Model.delete(old_model)
-
-        return start
-
-
+        # optimizer.storage.set_model(c_id, new_model_id)
+        # optimizer.storage.set_training_in_progress(c_id, False)
+        # if old_model is not None:
+        #     openai.Model.delete(old_model)
