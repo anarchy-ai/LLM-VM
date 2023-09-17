@@ -1,12 +1,15 @@
-import openai
-from llm_vm.client import Client
-import pickle
-from math import sqrt, pow, exp
-import spacy 
-nlp=spacy.load("en_core_web_md")
-import re
 import sys
+import re
 import os
+import pickle
+from math import sqrt
+
+import spacy
+
+from llm_vm.client import Client
+
+nlp = spacy.load("en_core_web_md")
+
 
 class suppress_output:
     def __init__(self, suppress_stdout=False, suppress_stderr=False):
@@ -16,14 +19,14 @@ class suppress_output:
         self._stderr = None
 
     def __enter__(self):
-        devnull = open(os.devnull, "w")
-        if self.suppress_stdout:
-            self._stdout = sys.stdout
-            sys.stdout = devnull
+        with open(os.devnull, "w", encoding='utf-8') as devnull:
+            if self.suppress_stdout:
+                self._stdout = sys.stdout
+                sys.stdout = devnull
 
-        if self.suppress_stderr:
-            self._stderr = sys.stderr
-            sys.stderr = devnull
+            if self.suppress_stderr:
+                self._stderr = sys.stderr
+                sys.stderr = devnull
 
     def __exit__(self, *args):
         if self.suppress_stdout:
@@ -35,9 +38,11 @@ class suppress_output:
 def squared_sum(x):
     """return 3 rounded square rooted value"""
 
-    return round(sqrt(sum([a * a for a in x])), 3)
+    return round(sqrt(sum(a * a for a in x)), 3)
 
-#metrics that can be used for evaluation
+
+# metrics that can be used for evaluation
+
 
 def cos_similarity(x, y):
     """return cosine similarity between two lists"""
@@ -46,16 +51,19 @@ def cos_similarity(x, y):
     denominator = squared_sum(x) * squared_sum(y)
     return round(numerator / float(denominator), 3)
 
-def regex_check(str, regex):
-    if re.match(regex,str) is not None:
+
+def regex_check(string, regex):
+    if re.match(regex, string) is not None:
         return 1
     return 0
+
 
 def metric():
     return regex_check
 
-new_file = open("data_gen.pkl","rb")
-examples = list(pickle.load(new_file))
+
+with open("data_gen.pkl", "rb") as new_file:
+    examples = list(pickle.load(new_file))
 with suppress_output(suppress_stdout=True, suppress_stderr=True):
     client_test = Client(big_model='pythia')
     # specify the file name of the finetuned model to load
@@ -64,11 +72,13 @@ with suppress_output(suppress_stdout=True, suppress_stderr=True):
 metrics = []
 for i in examples:
     with suppress_output(suppress_stdout=True, suppress_stderr=True):
-        response_test = client_test.complete(prompt = i[0], context = '')["completion"].split("<END>")[0]
+        response_test = client_test.complete(prompt=i[0], context='')[
+            "completion"].split("<END>")[0]
     ground_truth = i[1].split("<END>")[0]
-    print("Response: "+response_test,"Ground Truth: "+ground_truth)
-    #final_met = [metric()(nlp(response_test).vector, nlp(ground_truth).vector)]
-    final_met = [metric()(response_test,r"\s*([Yy]es|[Nn]o|[Nn]ever|[Aa]lways)")]
+    print("Response: " + response_test, "Ground Truth: " + ground_truth)
+    # final_met = [metric()(nlp(response_test).vector, nlp(ground_truth).vector)]
+    final_met = [
+        metric()(response_test, r"\s*([Yy]es|[Nn]o|[Nn]ever|[Aa]lways)")]
     print(final_met)
     metrics.append(final_met)
 print(metrics)
