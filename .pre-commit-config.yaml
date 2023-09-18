@@ -30,7 +30,7 @@ repos:
      hooks:
        - id: docformatter
 
-   - repo: https://github.com/pycqa/pydocstyl
+   - repo: https://github.com/pycqa/pydocstyle
      rev: 6.3.0
      hooks:
        - id: pydocstyle
