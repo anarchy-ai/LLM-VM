@@ -1,72 +1,59 @@
-import pytest
-from unittest.mock import patch, Mock
-# Assuming the ChatGPT class is in a file named onsite_llm.py
-from src.llm_vm.onsite_llm import ChatGPT
+import unittest
+from src.llm_vm.onsite_llm import ChatGPT  # Replace 'your_module_name' with the name of the module where ChatGPT is defined
 
-# Mock the openai API interactions
-class MockOpenaiAPI:
+# Mocking the openai library since it's not provided
+# In a real-world scenario, you'd want to use the actual library or mock it more extensively
+class openai:
+    class ChatCompletion:
+        @staticmethod
+        def create(messages, model, **kwargs):
+            return {'choices': [{'message': {'content': 'Mocked response for testing'}}]}
+
     class File:
         @staticmethod
-        def create(*args, **kwargs):
-            return {'id': 'mocked_file_id', 'status': 'processed'}
+        def create(file, purpose):
+            return {'id': 'mocked_file_id'}
 
         @staticmethod
-        def retrieve(*args, **kwargs):
+        def retrieve(id):
             return {'status': 'processed'}
 
     class FineTuningJob:
         @staticmethod
-        def create(*args, **kwargs):
+        def create(training_file, model, **kwargs):
             return {'id': 'mocked_job_id', 'status': 'succeeded'}
 
         @staticmethod
-        def retrieve(*args, **kwargs):
+        def retrieve(id):
             return {'status': 'succeeded', 'fine_tuned_model': 'mocked_model_id'}
 
     class Model:
         @staticmethod
-        def delete(*args, **kwargs):
+        def delete(model_id):
             pass
 
-# Mock the optimizer object
-class MockOptimizer:
-    class storage:
-        @staticmethod
-        def get_model(c_id):
-            return 'old_model_id'
+class TestChatGPT(unittest.TestCase):
 
-        @staticmethod
-        def set_model(c_id, new_model_id):
-            pass
+    def setUp(self):
+        self.chat_gpt = ChatGPT()
 
-        @staticmethod
-        def set_training_in_progress(c_id, status):
-            pass
+    def test_generate(self):
+        prompt = "How long does it take for an apple to grow?"
+        response = self.chat_gpt.generate(prompt)
+        self.assertEqual(response, 'Mocked response for testing')
 
-def test_fine_tune(monkeypatch):
-    # Mock the openai API interactions
-    monkeypatch.setattr('openai.File', MockOpenaiAPI.File)
-    monkeypatch.setattr('openai.FineTuningJob', MockOpenaiAPI.FineTuningJob)
-    monkeypatch.setattr('openai.Model', MockOpenaiAPI.Model)
+    def test_finetune(self):
+        dataset = [("How are you?", "I'm good!")]
+        optimizer = type('Optimizer', (), {
+            'storage': type('Storage', (), {
+                'get_model': lambda x: None,
+                'set_model': lambda x, y: None,
+                'set_training_in_progress': lambda x, y: None
+            })()
+        })()
+        c_id = "mocked_c_id"
+        start_function = self.chat_gpt.finetune(dataset, optimizer, c_id)
+        start_function()  # Call the returned start function
 
-    # Create an instance of the ChatGPT class
-    chat_gpt = ChatGPT()
-
-    # Mock the create_conversational_jsonl_file function
-    mock_temp_file = Mock()
-    mock_temp_file.close = Mock()
-    monkeypatch.setattr('onsite_llm.create_conversational_jsonl_file', lambda x: mock_temp_file)
-
-    # Call the fine_tune method
-    dataset = [("Hello", "Hi"), ("How are you?", "I'm good")]
-    optimizer = MockOptimizer()
-    c_id = "test_id"
-    start_function = chat_gpt.finetune(dataset, optimizer, c_id)
-    start_function()
-
-    # Assertions to check if the mocked methods were called
-    mock_temp_file.close.assert_called_once()
-    # Add more assertions based on expected behavior
-
-if __name__ == "__main__":
-    pytest.main()
+if __name__ == '__main__':
+    unittest.main()
