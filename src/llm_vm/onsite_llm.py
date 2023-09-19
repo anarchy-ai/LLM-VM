@@ -387,6 +387,31 @@ class SmallLocalLLama(BaseOnsiteLLM):
     def tokenizer_loader(self):
         return LlamaTokenizer.from_pretrained(self.model_uri)
 
+
+@RegisterModelClass("codellama-7b")
+class SmallLocalCodeLLama(BaseOnsiteLLM):
+        
+    """
+    This is a class for Meta's code-llama-7b LLM
+    
+    Attributes:
+        model_uri (str): Hugging Face Endpoint for LLM
+        tokenizer (AutoTokenizer): Tokenizer from Transformer's library
+        model (LLM): The large language model
+    
+    Methods:
+        model_loader: Loads the LLM into memory
+        tokenizer_loader: Loads the tokenizer into memory
+        generate: Generates a response from a given prompt with the loaded LLM and tokenizer
+    """
+    model_uri="codellama/CodeLlama-7b-hf"
+    
+    def model_loader(self):
+        return LlamaForCausalLM.from_pretrained(self.model_uri)
+    def tokenizer_loader(self):
+        return LlamaTokenizer.from_pretrained(self.model_uri)    
+
+
 @RegisterModelClass("flan")# our yummiest model based on similarity to food
 class SmallLocalFlanT5(BaseOnsiteLLM):
 
