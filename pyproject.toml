@@ -8,40 +8,36 @@ requires-python = ">=3.10" # this could be lower if need be
 readme = "README.md"
 license = { text = "MIT" }
 
-[tool.poetry.dependencies]
-python = "^3.10.5"
-dynaconf = "^3.2.0"
-openai = "^0.27.6"
-numpy = "^1.22.4"
-watchdog = "^3.0.0"
-xdg = "^6.0.0"
-accelerate = "^0.21.0"
-transformers = "^4.31.0"
-ctransformers = "^0.2.24"
-flask = "^2.3.2"
-flask_cors = "^4.0.0"
-llama-index = "^0.7.7"
-python-Levenshtein = "^0.21.1"
-bs4 = "^0.0.1"
-sentencepiece = "^0.1.99"
-sentence-transformers = "^2.2.2"
-requests = "^2.26.0"
-spacy = "^3.5.3"
-outlines = "^0.0.8"
-en_core_web_md = { url = "https://github.com/explosion/spacy-models/releases/download/en_core_web_md-3.6.0/en_core_web_md-3.6.0-py3-none-any.whl" }
-gradio = "^3.42.0"                                                                                                                                  # Specify the latest version of gradio
-backoff = "^2.2.1"
+dependencies = [
+    "dynaconf>=3.2.0",
+    "openai>=0.27.6",
+    "numpy>=1.22.4",
+    "watchdog>=3.0.0",
+    "xdg>=6.0.0",
+    "accelerate>=0.21.0",
+    "transformers>=4.31.0",
+    "ctransformers>=0.2.24",
+    "flask>=2.3.2",
+    "flask_cors>=4.0.0",
+    "llama-index>=0.7.7",
+    "python-Levenshtein>=0.21.1",
+    "bs4>=0.0.1",
+    "sentencepiece>=0.1.99",
+    "sentence-transformers>=2.2.2",
+    "requests>=2.26.0",
+    "spacy>=3.5.3",
+    "outlines>=0.0.1",
+    "en_core_web_md @ https://github.com/explosion/spacy-models/releases/download/en_core_web_md-3.6.0/en_core_web_md-3.6.0-py3-none-any.whl",
+    "gradio>=3.42.0",                                                                                                                          # Specify the latest version of gradio
+    "backoff>=2.2.1",
+]
 
-[tool.poetry.group.dev.dependencies]
-black = "^23.7.0"
-isort = "^5.11.3"
-mypy = "^1.5.1"
-pytest = "^7.2.0"
-
+[project.optional-dependencies]
+dev = ["black>=23.7.0", "mypy>=1.5.1"]
 
 # todo: https://setuptools.pypa.io/en/latest/userguide/datafiles.html 
 
-[tool.poetry.scripts] # these names are just placeholders
+[project.scripts] # these names are just placeholders
 #llm_vm_test_optimize = "tests.test_optimize:run_test_stub"
 llm_vm_server = "llm_vm.server.main:cli"
 
@@ -52,7 +48,7 @@ llm_vm_run_agent_flat = "llm_vm.agents.FLAT.agent:flat_main"
 # package_dir = {}
 
 [build-system]
-requires = ["setuptools>=61", "wheel", "poetry-core>=1.1"]
+requires = ["setuptools>=61", "wheel"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.setuptools]
@@ -94,9 +90,6 @@ exclude = '''
 )
 '''
 
-[tool.isort]
-profile = "black"
-
 [tool.poetry]
 # does poetry make sense as a tool to use?
 # ... this is also the default anyways
@@ -105,3 +98,7 @@ name = "llm_vm"
 version = "0.0.1"
 description = "Taming LLMs to do whatever you want"
 authors = ["Anarchy Team"]
+
+[tool.poetry.scripts]
+llm_vm_server = "llm_vm.server.main:cli"
+my_script = "llm_vm.server.main:cli"
