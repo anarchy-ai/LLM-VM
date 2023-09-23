@@ -130,30 +130,15 @@ function setup_direnv() {
 }
 
 ########## Poetry #############
-function setup_poetry() {
+function setup_pip() {
     echo_step "Upgrading pip..."
     python -m pip install --upgrade pip
-
-    echo_step "Setting up poetry..."
-
-    if ! command -v poetry &> /dev/null
-    then
-        echo_warn "poetry could not be found; doing fresh install..."
-    else
-        poetrydir="$(dirname "$(dirname "$(which poetry)")")"
-        echo "found existing poetry installation; replacing with fresh install..."
-        rm -rf "$poetrydir"
-    fi
-
-    # install poetry
-    curl -sSL https://install.python-poetry.org | POETRY_HOME=$HOME/.poetry python - --version=1.5.1
-    export PATH="$HOME/.poetry/bin:$PATH"
 }
 
 ########## poetry dependencies ############
 function install_deps() {
     echo_step "Installing dependencies..."
-    poetry install
+    python -m pip install -e ."[dev]"
 }
 
 ######## setup pyenv ############
@@ -241,7 +226,7 @@ skip_or_run set_homebrew "brew"
 skip_or_run setup_pyenv "pyenv"
 skip_or_run setup_python "python"
 skip_or_run setup_direnv "direnv"
-skip_or_run setup_poetry "poetry"
+skip_or_run setup_pip "pip"
 skip_or_run install_deps "deps"
 echo_warn "Congratulations - your local setup is complete!\n\nPlease reload your shell..."
 # reload_shell
