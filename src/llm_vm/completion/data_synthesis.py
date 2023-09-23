@@ -2,6 +2,7 @@ import json
 import sys
 from sentence_transformers import SentenceTransformer, util
 import openai
+import backoff 
 import os
 import time
 import pickle
@@ -47,58 +48,36 @@ class DataSynthesis:
         pickle.dump(datapoints,new_file)
         return datapoints
     
+    @backoff.on_exception(backoff.expo, openai.error.RateLimitError)
     def generate_example(self, final_prompt, openai_key, example_delim = "<END>", model="gpt-4",max_tokens = 1000,temperature = 1,regex = None,type = None,choices = None, grammar_type = None):
         openai.api_key=openai_key
         cur_prompt = [{'role': "system", 'content' : final_prompt}]
-        if regex is not None:
-            response = openai.ChatCompletion.create(messages=cur_prompt,model=model,max_tokens=max_tokens,temperature=temperature)['choices'][0]['message']['content']
-            try:
-                the_data = json.loads(response.replace("\n",""))
-                prompt = the_data["prompt"]
+
+        response = openai.ChatCompletion.create(messages=cur_prompt,model=model,max_tokens=max_tokens,temperature=temperature)['choices'][0]['message']['content']
+
+        try:
+            the_data = json.loads(response.replace("\n",""))
+            prompt = the_data["prompt"]
+
+            if regex is not None:
                 response = RegexCompletion.complete(prompt,regex)
-                the_tuple = (prompt,response+example_delim)
-            except:
-                pass
-            
-        elif type is not None:
-            response = openai.ChatCompletion.create(messages=cur_prompt,model=model,max_tokens=max_tokens,temperature=temperature)['choices'][0]['message']['content']
-            try:
-                the_data = json.loads(response.replace("\n",""))
-                prompt = the_data["prompt"]
+                
+            elif type is not None:
                 response = TypeCompletion.complete(prompt,type)
-                the_tuple = (prompt,response+example_delim)
-            except:
-                pass
 
-        elif choices is not None:
-            response = openai.ChatCompletion.create(messages=cur_prompt,model=model,max_tokens=max_tokens,temperature=temperature)['choices'][0]['message']['content']
-            try:
-                the_data = json.loads(response.replace("\n",""))
-                prompt = the_data["prompt"]
+            elif choices is not None:
                 response = ChoicesCompletion.complete(prompt,choices)
-                the_tuple = (prompt,response+example_delim)
-            except:
-                pass
 
-        elif grammar_type is not None:
-            response = openai.ChatCompletion.create(messages=cur_prompt,model=model,max_tokens=max_tokens,temperature=temperature)['choices'][0]['message']['content']
-            try:
+            elif grammar_type is not None:
                 tokenizer = AutoTokenizer.from_pretrained("gpt2-medium", padding_side='left')
                 constraint_model = GrammarCompletion("gpt2-medium", tokenizer)
-                the_data = json.loads(response.replace("\n",""))
-                prompt = the_data["prompt"]
                 response = constraint_model.complete(prompt, grammar_type=grammar_type)
-                the_tuple = (prompt,response+example_delim)
-            except:
-                pass
 
-
-        else:
-            response = openai.ChatCompletion.create(messages=cur_prompt,model=model,max_tokens=max_tokens,temperature=temperature)['choices'][0]['message']['content']
-            try:
-                the_data = json.loads(response.replace("\n",""))
-                the_tuple = (the_data["prompt"],the_data["response"]+example_delim)
-            except:
-                pass
+            else:
+                response = the_data["response"]
         
+        except Exception as e:
+            print(f"Error: {str(e)}")
+
+        the_tuple = (prompt,response+example_delim)
         return the_tuple
