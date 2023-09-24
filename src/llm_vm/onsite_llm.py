@@ -29,7 +29,6 @@ __private_key_value_models_map =  {}
 #         "opt": SmallLocalOpt,
 #         "bloom": SmallLocalBloom,
 #         "neo": SmallLocalNeo,
-#         "llama": SmallLocalOpenLLama,
 #         "llama2": SmallLocalLLama,
 #         "gpt": GPT3,
 #         "chat_gpt": ChatGPT,
@@ -299,29 +298,6 @@ class SmallLocalNeo(BaseOnsiteLLM):
     def tokenizer_loader(self):
         return AutoTokenizer.from_pretrained(self.model_uri)
 
-@RegisterModelClass("llama")
-class SmallLocalOpenLLama(BaseOnsiteLLM):
-
-    """
-    This is a class for Openlm-Research's open_llama-3b LLM
-
-    Attributes:
-        model_uri (str): Hugging Face Endpoint for LLM
-        tokenizer (AutoTokenizer): Tokenizer from Transformer's library
-        model (LLM): The large language model
-
-    Methods:
-        model_loader: Loads the LLM into memory
-        tokenizer_loader: Loads the tokenizer into memory
-        generate: Generates a response from a given prompt with the loaded LLM and tokenizer
-    """
-    model_uri="openlm-research/open_llama_3b_v2"
-
-    def model_loader(self):
-        return LlamaForCausalLM.from_pretrained(self.model_uri)
-    def tokenizer_loader(self):
-        return LlamaTokenizer.from_pretrained(self.model_uri)
-    
 @RegisterModelClass("quantized-llama")
 class Quantized_Llama(BaseOnsiteLLM):
     """
