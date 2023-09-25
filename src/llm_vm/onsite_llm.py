@@ -1,22 +1,18 @@
-import abc
 from abc import ABC,abstractmethod
 import sys
 import openai
 import math
+from ctransformers import AutoModelForCausalLM
 from transformers import (
     AutoModelForMaskedLM,
     AutoModelForSeq2SeqLM,
     AutoTokenizer,
-    BertTokenizer,
     OPTForCausalLM,
     BloomForCausalLM,
-    LlamaTokenizer,
-    LlamaForCausalLM,
     GPTNeoForCausalLM,
     GPTNeoXForCausalLM,
     LlamaForCausalLM,
     LlamaTokenizer,
-    GPT2Tokenizer,
     DataCollatorForLanguageModeling,
     TrainingArguments,
     Trainer)
@@ -30,23 +26,28 @@ import torch
 
 __private_key_value_models_map =  {}
 # []   {
-#         "opt": Small_Local_OPT,
-#         "bloom": Small_Local_Bloom,
-#         "neo": Small_Local_Neo,
-#         "llama": Small_Local_LLama,
-#         "pythia": Small_Local_Pythia,
+#         "opt": SmallLocalOpt,
+#         "bloom": SmallLocalBloom,
+#         "neo": SmallLocalNeo,
+#         "llama2": SmallLocalLLama,
 #         "gpt": GPT3,
-#         "chat_gpt": Chat_GPT,
-#         "flan" : Small_Local_Flan_T5,
-#         "pythia" : Small_Local_Pythia,
+#         "chat_gpt": ChatGPT,
+#         "flan" : SmallLocalFlanT5,
+#         "pythia" : SmallLocalPythia,
 #         }
+
+# Check available devices
+if torch.cuda.device_count() > 1:
+    device = [f"cuda:{i}" for i in range(torch.cuda.device_count())]  # List of available GPUs
+else:  # If only one GPU is available, use cuda:0, else use CPU
+    device = "cuda:0" if torch.cuda.is_available() else "cpu"
 
 def RegisterModelClass(name):
     def regClass(cls):
-        __private_key_value_models_map[name]=cls 
+        __private_key_value_models_map[name]=cls
     return regClass
 
-model_keys_registered = __private_key_value_models_map.keys()        
+model_keys_registered = __private_key_value_models_map.keys()
 # Dictionary of models to be loaded in ModelConfig
 def load_model_closure(model_name):
     models = __private_key_value_models_map
@@ -78,7 +79,7 @@ class FinetuningDataset(torch.utils.data.Dataset):
     def __getitem__(self, idx):
         return self.dataset[idx]
 
-class Base_Onsite_LLM(ABC):
+class BaseOnsiteLLM(ABC):
     def __init__(self,model_uri=None,tokenizer_kw_args={},model_kw_args={}):
         if model_uri != None :
             self.model_uri= model_uri
@@ -87,6 +88,16 @@ class Base_Onsite_LLM(ABC):
         self.model_name : str = self.model_uri.split('/')[-1] # our default for deriving model name
         self.model=self.model_loader(**model_kw_args)
         self.tokenizer=self.tokenizer_loader(**tokenizer_kw_args)
+
+        # Move the model to the specified device(s)
+        if isinstance(device, list):
+            # If multiple GPUs are available, use DataParallel to parallelize the model
+            self.model = torch.nn.DataParallel(self.model, device_ids=[i for i in range(len(device))])
+            self.model.to(device[0])  # Move model to the first GPU in the list
+            print(f"`{self.model_uri}` loaded on {len(device)} GPUs.", file=sys.stderr)
+        else:
+            self.model.to(device)  # Move model to the selected device (single GPU or CPU)
+            print(f"`{self.model_uri}` loaded on {device}.", file=sys.stderr)
 
     @property
     @abstractmethod
@@ -124,10 +135,14 @@ class Base_Onsite_LLM(ABC):
             str: LLM Generated Response
 
         Example:
-           >>> Small_Local_OPT.generate("How long does it take for an apple to grow?")
+           >>> SmallLocalOpt.generate("How long does it take for an apple to grow?")
            I think it takes about a week for the apple to grow.
         """
-        inputs=self.tokenizer(prompt,return_tensors="pt")
+        if isinstance(device, list):
+            # If multiple GPUs are available, use first one
+            inputs = self.tokenizer(prompt, return_tensors="pt").to(device[0])
+        else:
+            inputs = self.tokenizer(prompt, return_tensors="pt").to(device)
         generate_ids=self.model.generate(inputs.input_ids,max_length=max_length)
         resp= self.tokenizer.batch_decode(generate_ids,skip_special_tokens=True,clean_up_tokenization_spaces=False)[0]
         # need to drop the len(prompt) prefix with these sequences generally
@@ -192,7 +207,7 @@ this factorization isn't necessarily the greatest, nor should it be viewed
 as likely being more general, aside from covering hugging face transformers
 """
 @RegisterModelClass("pythia")
-class Small_Local_Pythia(Base_Onsite_LLM):
+class SmallLocalPythia(BaseOnsiteLLM):
     """
     This is a class for ElutherAI's Pythia-70m LLM
 
@@ -217,7 +232,7 @@ class Small_Local_Pythia(Base_Onsite_LLM):
 
 
 @RegisterModelClass("opt")
-class Small_Local_OPT(Base_Onsite_LLM):
+class SmallLocalOpt(BaseOnsiteLLM):
 
     """
     This is a class for Facebook's OPT-350m LLM
@@ -239,7 +254,7 @@ class Small_Local_OPT(Base_Onsite_LLM):
         return AutoTokenizer.from_pretrained(self.model_uri)
 
 @RegisterModelClass("bloom")
-class Small_Local_Bloom(Base_Onsite_LLM):
+class SmallLocalBloom(BaseOnsiteLLM):
 
     """
     This is a class for BigScience's bloom-560 LLM
@@ -262,7 +277,7 @@ class Small_Local_Bloom(Base_Onsite_LLM):
         return AutoTokenizer.from_pretrained(self.model_uri)
 
 @RegisterModelClass("neo")
-class Small_Local_Neo(Base_Onsite_LLM):
+class SmallLocalNeo(BaseOnsiteLLM):
 
     """
 
@@ -281,33 +296,52 @@ class Small_Local_Neo(Base_Onsite_LLM):
     def model_loader(self):
         return GPTNeoForCausalLM.from_pretrained(self.model_uri)
     def tokenizer_loader(self):
-        return GPT2Tokenizer.from_pretrained(self.model_uri)
+        return AutoTokenizer.from_pretrained(self.model_uri)
 
-@RegisterModelClass("llama")
-class Small_Local_OpenLLama(Base_Onsite_LLM):
-
+@RegisterModelClass("quantized-llama")
+class Quantized_Llama(BaseOnsiteLLM):
     """
-    This is a class for Openlm-Research's open_llama-3b LLM
+    Class for running quantized Llama instances that use GGML
 
     Attributes:
         model_uri (str): Hugging Face Endpoint for LLM
-        tokenizer (AutoTokenizer): Tokenizer from Transformer's library
-        model (LLM): The large language model
+        model (LLM): The large language model. CTransformers includes its own tokenizer in the model
 
     Methods:
+        __init__: Takes the same parameters as the base class, except it looks to see if there is a specific quantization you want to use
+        Quantized weights can be found (here)[https://huggingface.co/TheBloke/LLaMa-7B-GGML#provided-files]
         model_loader: Loads the LLM into memory
-        tokenizer_loader: Loads the tokenizer into memory
+        tokenizer_loader: Does nothing. CTransformers includes its own tokenizer so this is unnecessary
         generate: Generates a response from a given prompt with the loaded LLM and tokenizer
     """
-    model_uri="openlm-research/open_llama_3b_v2"
+
+    model_uri="TheBloke/LLaMa-7B-GGML"
+
+    def __init__(self,model_uri=None,tokenizer_kw_args={},model_kw_args={}):
+        # Pop because we don't want to pass model_file onto the super class.
+        self.model_file = model_kw_args.pop('model_file', None)
+        if self.model_file is None:
+        #     # Set default to smallest quantization available
+            self.model_file = "llama-7b.ggmlv3.q2_K.bin"
+        super().__init__(model_uri, tokenizer_kw_args, model_kw_args)
+
 
     def model_loader(self):
-        return LlamaForCausalLM.from_pretrained(self.model_uri)
+        # This file specifically is the smallest model.
+        return AutoModelForCausalLM.from_pretrained(self.model_uri, model_file=self.model_file)
+
+    # CTransformers loads its tokenizer in the model, so this function is unnecessary
     def tokenizer_loader(self):
-        return LlamaTokenizer.from_pretrained(self.model_uri)
+        return
+
+    def generate(self, prompt, max_length=100, **kwargs):
+        inputs = self.model.tokenize(prompt)
+        generated_tokens = self.model.generate(inputs)
+        resp = (self.model.detokenize(generated_tokens))
+        return resp
 
 @RegisterModelClass("llama2")
-class Small_Local_LLama(Base_Onsite_LLM):
+class SmallLocalLLama(BaseOnsiteLLM):
 
     """
     This is a class for Meta's llama-7b LLM
@@ -330,7 +364,7 @@ class Small_Local_LLama(Base_Onsite_LLM):
         return LlamaTokenizer.from_pretrained(self.model_uri)
 
 @RegisterModelClass("flan")# our yummiest model based on similarity to food
-class Small_Local_Flan_T5(Base_Onsite_LLM):
+class SmallLocalFlanT5(BaseOnsiteLLM):
 
     """
     This is a class for Google's flan-t5 LLM
@@ -353,7 +387,7 @@ class Small_Local_Flan_T5(Base_Onsite_LLM):
         return AutoTokenizer.from_pretrained(self.model_uri)
 
 @RegisterModelClass("bert")
-class Small_Local_BERT(Base_Onsite_LLM):
+class SmallLocalBERT(BaseOnsiteLLM):
 
     """
     This is a class for BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding
@@ -374,7 +408,7 @@ class Small_Local_BERT(Base_Onsite_LLM):
     def model_loader(self):
         return AutoModelForMaskedLM.from_pretrained(self.model_uri)
     def tokenizer_loader(self):
-        return BertTokenizer.from_pretrained(self.model_uri)
+        return AutoTokenizer.from_pretrained(self.model_uri)
 @RegisterModelClass("gpt")
 class GPT3:
 
@@ -398,7 +432,7 @@ class GPT3:
             str: LLM Generated Response
 
         Example:
-            >>> Small_Local_OPT.generate("How long does it take for an apple to grow?")
+            >>> SmallLocalOpt.generate("How long does it take for an apple to grow?")
             It typically takes about 100-200 days...
         """
 
@@ -406,10 +440,10 @@ class GPT3:
         return ans['choices'][0]['text']
 
 
-    def finetune(self, dataset, optimizer, c_id):
+    def finetune(self, dataset, optimizer, c_id, small_model_filename=None):
         old_model = optimizer.storage.get_model(c_id)
         training_file = create_jsonl_file(dataset)
-        upload_response = openai.File.create(file=training_file, purpose="fine-tune")
+        upload_response = openai.File.create(file=training_file, purpose="fine-tune", model="gpt-3.5-turbo-0613")
         training_file.close()
         fine_tuning_job = openai.FineTune.create(training_file= upload_response.id)
 
@@ -434,7 +468,7 @@ class GPT3:
             openai.Model.delete(old_model)
 
 @RegisterModelClass("chat_gpt")
-class Chat_GPT:
+class ChatGPT:
     """
     This is a class for openAI's gpt-3.5-turbo LLM
 
@@ -455,7 +489,7 @@ class Chat_GPT:
             str: LLM Generated Response
 
         Example:
-            >>> Small_Local_OPT.generate("How long does it take for an apple to grow?")
+            >>> SmallLocalOpt.generate("How long does it take for an apple to grow?")
             It typically takes about 100-200 days...
         """
         cur_prompt = [{'role': "system", 'content' : prompt}]
@@ -465,9 +499,9 @@ class Chat_GPT:
             **kwargs)
         return ans['choices'][0]['message']['content']
 
-    def finetune(self, dataset, optimizer, c_id):
+    def finetune(self, dataset, optimizer, c_id, small_model_filename=None):
         print("fine tuning isn't supported by OpenAI on this model", file=sys.stderr)
-        exit()
+        raise Exception("fine tuning isn't supported by OpenAI on this model")
         # old_model = optimizer.storage.get_model(c_id)
         # training_file = create_jsonl_file(dataset)
         # upload_response = openai.File.create(file=training_file, purpose="fine-tune")

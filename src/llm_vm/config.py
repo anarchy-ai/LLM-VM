@@ -6,27 +6,7 @@ from dynaconf import Dynaconf
 from xdg import XDG_CONFIG_HOME
 from llm_vm.onsite_llm import model_keys_registered
 from llm_vm.data_path import project_root
-
-# Parse CLI arguments
-parser = argparse.ArgumentParser()
-parser.add_argument('-b', '--big_model', type=str, help='Big LLM Model.')
-parser.add_argument('-p', '--port', type=int,      help='Port Number.')
-parser.add_argument('-s', '--small_model',type=str,help='Small LLM Model.')
-parser.add_argument('-H', '--host', type=str,      help='Host Address.')
-parser.add_argument('-K', '--openai_key',type=str,help='OpenAI api key')
-args = parser.parse_args()
-
-# Set the CLI argument values to environment variables if they are present
-if args.big_model is not None:
-    os.environ['LLM_VM_BIG_MODEL'] = args.big_model
-if args.port is not None:
-    os.environ['LLM_VM_PORT'] = str(args.port)
-if args.small_model is not None:
-    os.environ['LLM_VM_SMALL_MODEL'] = args.small_model
-if args.host is not None:
-    os.environ['LLM_VM_HOST'] = args.host
-if "openai_api_key" in args:
-    os.environ['LLM_VM_OPENAI_API_KEY'] = args.openai_api_key
+from ipaddress import ip_address
 
 
 # project_root = os.path.abspath(os.getcwd())
@@ -72,22 +52,19 @@ if settings.openai_api_key is None and (isOpenAIModel(settings.small_model) or i
     print("LLM_VM_OPEN_AI_API,if you wish to use their models. Exiting", file=sys.stderr)
     exit()
 
-# check args.host is a valid IP address
-pattern = r'^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$'
-if not re.match(pattern, settings.host):
-    print("Invalid IP address. Reverting to the default host, 127.0.0.1", file=sys.stderr)
+# check settings.host is a valid IP address
+def isValidIP(ip):
+    try:
+        # if object created IP is valid
+        tmp = ip_address(ip)
+        return True
+    except ValueError:
+        return False
+
+if isValidIP(settings.host) is False:
+    print("Invalid IP4/IP6 address. Reverting to the default host: 127.0.0.1", file=sys.stderr)
     settings.host = '127.0.0.1'
-else:
-    # validates each number in the IP address is between 0-255
-    octets = settings.host.split('.')
-    valid_ip = True
-    for octet in octets:
-        if not 0 <= int(octet) <= 255:
-            valid_ip = False
-            break
-    if not valid_ip:
-        print("Invalid IP address range. Reverting to the default host, 127.0.0.1", file=sys.stderr)
-        settings.host = '127.0.0.1'
+
 
 
 assert settings.big_model in MODELS_AVAILABLE, f"{settings.big_model} is not a valid Model selection for Big LLM Model"

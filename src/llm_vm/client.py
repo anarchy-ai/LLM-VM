@@ -13,12 +13,12 @@ if conf.settings.big_model is None:
 else:
     default_big_model= conf.settings.big_model
 
-if conf.settings.small_model is not  None:
+if conf.settings.small_model is None:
     default_small_model= "pythia"
-else:    
+else:
     default_small_model = conf.settings.small_model
 
-    
+
 
 
 class Client:
@@ -72,7 +72,7 @@ class Client:
         # load the optimizer into object memory for use by the complete function
         self.optimizer = LocalOptimizer(MIN_TRAIN_EXS=2,openai_key=None, call_big=self.CALL_BIG, call_small= CALL_SMALL,
                                         big_model = self.teacher, small_model = self.student)
-        self.rebel_agent = None # only initialized on first use 
+        self.rebel_agent = None # only initialized on first use
 
     # These functions allow for proper initialization of the optimizer
     def CALL_BIG(self, prompt, max_len=256, **kwargs):
@@ -80,7 +80,7 @@ class Client:
         return self.teacher.generate(prompt, max_len,**kwargs)
 
     def complete(self, prompt,
-                 context,
+                 context = "", # TODO: change back to static_context because otherwise 
                  openai_key = None,
                  finetune=False,
                  data_synthesis = False,
@@ -93,7 +93,7 @@ class Client:
 
         Parameters:
             prompt (str): Prompt to send to LLM for generation
-            context (str): Context to send to the LLM for generation
+            context (str): Unchanging context to send to the LLM for generation.  Defaults to "" and doesn't do fine-tuning.
             finetune (bool): Boolean value that begins fine tuning when set to True
             data_synthesis (bool): Boolean value to determine whether data should be synthesized for fine-tuning or not
             temperature (float): An analog
@@ -103,7 +103,7 @@ class Client:
             str: LLM Generated Response
 
         Example:
-           >>> Small_Local_OPT.generate("How long does it take for an apple to grow?)
+           >>> SmallLocalOpt.generate("How long does it take for an apple to grow?)
            How long does it take for an apple tree to grow?
         """
         static_context = context
@@ -149,7 +149,7 @@ class Client:
             return  {"status":0, "resp":"Issue with OpenAI key"}
 
         self.optimizer.openai_key = openai.api_key
-        # self.agent.set_api_key(openai.api_key,"OPENAI_API_KEY") # 
+        # self.agent.set_api_key(openai.api_key,"OPENAI_API_KEY") #
         if os.getenv("OPENAI_API_KEY") is None and use_rebel_agent==True :
             print("warning: you need OPENAI_API_KEY environment variable for ", file=sys.stderr)
 
@@ -164,4 +164,3 @@ class Client:
 
     def load_finetune(self, model_filename=None):
         self.teacher.load_finetune(model_filename)
-

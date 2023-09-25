@@ -39,7 +39,10 @@ def generate_hash(input_string):
 def asyncStart(foo):
     t = [None, None]
     def new_thread():
-        t[0] = foo()
+        if callable(foo):
+            t[0] = foo()
+        else:
+            t[0] = lambda x: x
     t[1] = threading.Thread(target=new_thread)
     t[1].start()
     return t
@@ -49,7 +52,7 @@ def asyncAwait(t):
     return t[0]
 
 
-class local_ephemeral:
+class LocalEphemeral:
 
     def __init__(self):
         self.training_store = {}
@@ -171,7 +174,7 @@ class HostedOptimizer(Optimizer):
 
 
 class LocalOptimizer(Optimizer):
-    def __init__(self, storage=local_ephemeral(), MIN_TRAIN_EXS = 1, MAX_TRAIN_EXS = 2000, call_small = None , call_big = None , big_model = None, small_model = None, openai_key=""):
+    def __init__(self, storage=LocalEphemeral(), MIN_TRAIN_EXS = 1, MAX_TRAIN_EXS = 2000, call_small = None , call_big = None , big_model = None, small_model = None, openai_key="", variance=0.87, num_examples=50):
         self.storage = storage
         self.MIN_TRAIN_EXS = MIN_TRAIN_EXS
         self.MAX_TRAIN_EXS = MAX_TRAIN_EXS
@@ -180,10 +183,10 @@ class LocalOptimizer(Optimizer):
         self.big_model = big_model
         self.small_model = small_model
         self.openai_key = openai_key
-        self.data_synthesizer = data_synthesis.DataSynthesis(0.87, 50)
+        self.data_synthesizer = data_synthesis.DataSynthesis(variance, num_examples)
 
     def complete(self, stable_context, dynamic_prompt, data_synthesis = False, finetune = False, regex = None, type = None, choices = None, **kwargs):
-        
+
         openai.api_key = self.openai_key
         completion, train = self.complete_delay_train(stable_context, dynamic_prompt, run_data_synthesis=data_synthesis, regex = regex, choices = choices, type = type, **kwargs)
         if finetune:
@@ -281,7 +284,7 @@ class LocalOptimizer(Optimizer):
 
             else:
                 _, succeed_train = asyncAwait(best_completion_promise)
-            
+
 
 
         def succeed_train_closure(use_completion = None):
@@ -306,5 +309,3 @@ def create_jsonl_file(data_list):
         out.write(json.dumps({'prompt': a, 'completion': b}) + "\n")
     out.seek(0)
     return out
-
-

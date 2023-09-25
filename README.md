@@ -117,6 +117,8 @@ edit in place.
 
 This will install both the library and test-server.  
 
+And for installing dev dependencies, use `pip3 install -e ."[dev]"`
+
 #### One Last Step, almost there!
 If you're using one of the OpenAI models, you will need to set the `LLM_VM_OPENAI_API_KEY` environment
 variable with your API key. 
@@ -204,18 +206,17 @@ and follow the command prompt instructions.
 
 ## 🩷 Contributing 🩷
 
-We welcome contributors!  The best way to get started is to join our active [discord community](https://discord.gg/YmNvCAk6W6).  Otherwise here are some ways to contribute and get paid:
+We welcome contributors!  To get started is to join our active [discord community](https://discord.anarchy.ai).  Otherwise here are some ways to contribute and get paid:
 
 ### Jobs
 
 - We're always looking for serious hackers.  Prove that you can build and creatively solve hard problems and reach out! 
-- The easiest way to secure a job/internship with us is to submit a pull request that closes a ticket.
-- The second easiest is to submit good tickets.
-- Otherwise, to apply directly: https://forms.gle/bUWDKW3cwZ8n6qsU8
+- The easiest way to secure a job/internship with us is to submit pull requests that closes tickets.
+- Then you can apply directly here https://forms.gle/bUWDKW3cwZ8n6qsU8
 
 ### Bounty
 
-Some tickets we'll pay you for closing! Look at the ticket labels to see how much the bounty is.  Note we can't guarantee that if you close a ticket we can pay you (only if you are from a non-US sanctioned country), and it is up to you to reach out and provide bank details. 
+Some tickets we'll pay you for closing! Look at the ticket labels to see how much the bounty is.  To get started, [join the discord and read the guide](https://discord.com/channels/1075227138766147656/1147542772824408074)
 
 ## 🙏 Acknowledgements 🙏
 
@@ -233,22 +234,22 @@ Some tickets we'll pay you for closing! Look at the ticket labels to see how muc
 - **Carter Schonwald** - Community Engineering Leader 
   - GitHub: [@cartazio](https://github.com/cartazio)
   - LinkedIn: [@carter-schonwald](https://www.linkedin.com/in/carter-schonwald-aa178132/)
- 
-- **Andrew Nelson** - Basilisk Trainer
-  - GitHub: [@ajn2004](https://github.com/ajn2004)
-  - LinkedIn: [@ajnelsnyc](https://www.linkedin.com/in/ajnelsnyc/)
- 
-- **Kyle Wild** - Undoomer
-  - GitHub: [@dorkitude](https://github.com/dorkitude)
-  - LinkedIn: [@kylewild](https://www.linkedin.com/in/kylewild/)
 
-- **Victor Odede** - Fearless Contributor
+- **Victor Odede** - Undoomer
   - GitHub: [@VictorOdede](https://github.com/VictorOdede)
   - LinkedIn: [@victor-odede](https://www.linkedin.com/in/victor-odede-aaa907114/)
+ 
+- **Kyle Wild** - Fearless Contributor
+  - GitHub: [@dorkitude](https://github.com/dorkitude)
+  - LinkedIn: [@kylewild](https://www.linkedin.com/in/kylewild/)
 
 - **Aarushi Banerjee** - Fearless Contributor
   - GitHub: [@AB3000](https://github.com/AB3000)
   - LinkedIn: [@ab99](https://www.linkedin.com/in/ab99/)
+
+- **Andrew Nelson** - Fearless Contributor
+  - GitHub: [@ajn2004](https://github.com/ajn2004)
+  - LinkedIn: [@ajnelsnyc](https://www.linkedin.com/in/ajnelsnyc/)
     
 ## License
 
