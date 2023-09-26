@@ -38,6 +38,7 @@ class GenerativeCompletion(Completion):
     def __init__(self, generator, *generator_args):
         """
         Parameters: 
+        -----------
         
         generator (Callable[[Transformers, ...generator_args], None]): Generator function to be used on the complete
         *generator_args (Any): Generator arguments (without model)
