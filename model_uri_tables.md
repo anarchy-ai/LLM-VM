@@ -1,5 +1,3 @@
-
-
 #### Neo Model 
 | URI | Model Params | Checkpoint file size | Is Default?
 |-----|-------------|----------------------|-------------------
@@ -11,6 +9,7 @@
 #### Bloom Model  
 
 | URI | Model Params | Checkpoint file size | Is Default?
+
 |-----|-------------|-----------------------|------------------
 | bigscience/bloom-560m | 560m | 1.12 GB | ✅
 | bigscience/bloom-1b7/ | 1.7B | 3.4GB   | ❌

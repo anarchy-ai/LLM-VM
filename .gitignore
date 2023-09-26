@@ -16,3 +16,5 @@ dist
 /finetuned_models/
 settings.toml
 *.pkl
+
+.idea/

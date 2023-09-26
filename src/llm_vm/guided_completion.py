@@ -1,36 +1,76 @@
-import outlines.models as models 
+import outlines.models as models
 import outlines.text.generate as generate
 import torch
 from lark import Lark, Transformer, v_args
 from lark.indenter import PythonIndenter
-from transformers import (AutoModelForCausalLM, LogitsProcessorList, LogitsProcessor)
+from transformers import (AutoModelForCausalLM, LogitsProcessorList, LogitsProcessor, AutoTokenizer)
 import re
 from abc import ABC,abstractmethod
 
 model = models.transformers("gpt2")
 
-#this class is called when optimize.complete is called with the regex parameter
-class RegexCompletion:
-    def complete(prompt,regex):
-        guided = generate.regex(model,regex)(prompt)
-        return guided
 
-#this class is called when optimize.complete is called with the choices parameter
-class ChoicesCompletion:
-    def complete(prompt,choices):
-        guided = generate.choice(model,choices)(prompt)
-        return guided
-    
-#this class is called with optimize.complete is caled with the type parameter
-class TypeCompletion:
-    def complete(prompt,type):
-        if type != "float" and type != "integer":
+class Completion(ABC):
+    """
+    A class used to generate completions when optimize.complete is called
+    """
+
+    @abstractmethod
+    def complete(self, prompt):
+        pass
+
+    @staticmethod
+    def create(regex, type, choices, grammar_type, *, default=None):
+        completion = default
+        if regex is not None:
+            completion = GenerativeCompletion.regex_completion(regex)
+        elif type is not None:
+            completion = GenerativeCompletion.type_completion(type)
+        elif choices is not None:
+            completion = GenerativeCompletion.choices_completion(choices)
+        elif grammar_type is not None:
+            tokenizer = AutoTokenizer.from_pretrained("gpt2-medium", padding_side='left')
+            completion = GrammarCompletion("gpt2-medium", tokenizer)
+        return completion
+
+
+class GenerativeCompletion(Completion):
+    def __init__(self, generator, *generator_args):
+        """
+        Parameters: 
+        -----------
+        
+        generator (Callable[[Transformers, ...generator_args], None]): Generator function to be used on the complete
+        *generator_args (Any): Generator arguments (without model)
+        
+        """
+        self.generator = generator
+        self.generator_args = generator_args
+
+    def complete(self, prompt):
+        return self.generator(model, *self.generator_args)(prompt)
+
+    @staticmethod
+    def regex_completion(regex):
+        return GenerativeCompletion(generate.regex, regex)
+
+    @staticmethod
+    def choices_completion(choices):
+        return GenerativeCompletion(generate.choice, choices)
+
+    @staticmethod
+    def type_completion(type_name):
+        if type_name not in ["float", "integer"]:
             raise Exception("type must be float or integer")
-        guided = getattr(generate,type)(model)(prompt)
-        return guided
-    
-class GrammarCompletion:
-    def __init__(self, model_uri, tokenizer):
+        return GenerativeCompletion(getattr(generate, type_name))
+
+    @staticmethod
+    def response_completion():
+        return GenerativeCompletion(lambda _: (lambda x: x['response']))
+
+
+class GrammarCompletion(Completion):
+    def __init__(self, model_uri, tokenizer, grammar_type='python'):
         # Initialize the GrammarCompletion class with a model URI and tokenizer
         self.model_identifier = model_uri
         self.tokenizer = tokenizer
@@ -39,8 +79,7 @@ class GrammarCompletion:
         self.model = AutoModelForCausalLM.from_pretrained(self.model_identifier)
         print(f"{self.model_identifier} model is ready for use on {self.model.device}", flush=True)
         
-        # Define supported grammar types 
-        self.supported_grammar = ["python", "json"]
+        self.constraint = GrammarConstraint.create(grammar_type, model_uri, tokenizer)
 
         # Initialize dict to store terminal symbols and their corresponding token mappings
         self.terminals_tokens_map = {}
@@ -49,51 +88,28 @@ class GrammarCompletion:
     def eos_token_id(self):
         return self.model.config.eos_token_id
     
-    def complete(self, prompt, grammar_type='python', **model_kwargs):
+    def complete(self, prompt, **model_kwargs):
         # Check if the specified grammar type is supported
-        if grammar_type.lower() not in self.supported_grammar:
-            raise ValueError(f'{grammar_type} is not supported. The only valid grammar types are {self.supported_grammar}')
 
         # Encode the input prompt
         token_ids = self.tokenizer(prompt, return_tensors='pt')
         input_len = len(token_ids['input_ids'][-1])
 
-        if grammar_type.lower() == 'python':
-            # For Python grammar, we create a PythonConstraint instance and parse the grammar
-            python_constraint = PythonConstraint(self.model_identifier, self.tokenizer)
+        # Construct terminal tokens mapping if it's not yet initialized
+        if len(self.terminals_tokens_map) == 0:
+            terminal_regex_map = self.constraint.parse_grammar()
+            for k, v in terminal_regex_map.items():
+                matching_tokens = self.constraint.construct_filter_set(v)
+                self.terminals_tokens_map[k] = matching_tokens
 
-            # Construct terminal tokens mapping if it's not yet initialized
-            if(len(self.terminals_tokens_map) == 0):
-                terminal_regex_map = python_constraint.parse_grammar()
-                for k, v in terminal_regex_map.items():
-                    matching_tokens = python_constraint.construct_filter_set(v)
-                    self.terminals_tokens_map[k] = matching_tokens
-                
-                # Add end-of-sequence token mapping
-                self.terminals_tokens_map['$END'] = [(self.tokenizer.decode(self.eos_token_id), self.eos_token_id)]
+            # Add end-of-sequence token mapping
+            self.terminals_tokens_map['$END'] = [(self.tokenizer.decode(self.eos_token_id), self.eos_token_id)]
 
-            # Initialize the LogitsProcessorList for processing sequence logits and append GrammarLogitsProcessor instance
-            logits_processor = LogitsProcessorList()
-            logits_processor.append(GrammarLogitsProcessor(python_constraint, self.terminals_tokens_map))
-        elif grammar_type.lower() == 'json':
-            # For JSON grammar, we create a JSONConstraint instance and parse the grammar
-            json_constraint = JSONConstraint(self.model_identifier, self.tokenizer)
+        # Initialize the LogitsProcessorList for processing sequence logits and append GrammarLogitsProcessor instance
+        logits_processor = LogitsProcessorList()
+        logits_processor.append(GrammarLogitsProcessor(self.constraint, self.terminals_tokens_map))
 
-            # Construct terminal tokens mapping if it's not yet initialized
-            if(len(self.terminals_tokens_map) == 0):
-                terminal_regex_map = json_constraint.parse_grammar()
-                for k, v in terminal_regex_map.items():
-                    matching_tokens = json_constraint.construct_filter_set(v)
-                    self.terminals_tokens_map[k] = matching_tokens
-                
-                # Add end-of-sequence token mapping
-                self.terminals_tokens_map['$END'] = [(self.tokenizer.decode(self.eos_token_id), self.eos_token_id)]
-
-            # Initialize the LogitsProcessorList for processing sequence logits and append GrammarLogitsProcessor instance
-            logits_processor = LogitsProcessorList()
-            logits_processor.append(GrammarLogitsProcessor(json_constraint, self.terminals_tokens_map))
-
-        model_kwargs["do_sample"] =  model_kwargs["temperature"] > 0
+        model_kwargs["do_sample"] = model_kwargs["temperature"] > 0
         model_kwargs["output_scores"] = True
         model_kwargs["return_dict_in_generate"] = True
         model_kwargs["logits_processor"] = logits_processor
@@ -118,6 +134,23 @@ class GrammarConstraint(ABC):
     @abstractmethod
     def construct_filter_set(self, expression):
         pass
+
+    @abstractmethod
+    def parse_grammar(self):
+        pass
+
+    @staticmethod
+    def create(grammar_type, model_uri, tokenizer):
+        grammar_type = grammar_type.lower()
+        grammars = {
+            'python': PythonConstraint,
+            'json': JSONConstraint,
+        }
+
+        if grammar_type not in grammars.keys():
+            raise ValueError(f'{grammar_type} is not supported. The only valid grammar types are {grammars.keys()}')
+
+        return grammars[grammar_type](model_uri, tokenizer)
 
 
 class PythonConstraint(GrammarConstraint): 
