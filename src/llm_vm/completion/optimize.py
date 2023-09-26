@@ -11,11 +11,10 @@ import abc
 import requests
 import hashlib
 import pickle
-from llm_vm.guided_completion import RegexCompletion, ChoicesCompletion, TypeCompletion, GrammarCompletion
+from llm_vm.guided_completion import Completion
 #we need to package-ify so this works
 import llm_vm.completion.data_synthesis as data_synthesis
 import inspect
-from transformers import AutoTokenizer
 
 
 job_id = None # we want to be able to cancel a fine_tune if you kill the program
@@ -235,10 +234,11 @@ class LocalOptimizer(Optimizer):
                     }) if c_id is None else c_id
         c_id = generate_hash(c_id_repr)
         completion = None
+        completion_model = Completion.create(regex, type, choices, grammar_type)
 
         model = self.storage.get_model(c_id)
         # this gives us the model_id
-        if model is not None and regex is None and type is None and choices is None:
+        if model is not None and completion_model is None:
             print("Using the new model:", model, flush=True, file=sys.stderr)
             completion = self.call_small(prompt = dynamic_prompt.strip(), model=model, **kwargs)
 
@@ -248,16 +248,8 @@ class LocalOptimizer(Optimizer):
         succeed_train = None
         if len(training_exs) < self.MAX_TRAIN_EXS:
             def promiseCompletion():
-                if regex is not None:
-                    best_completion = RegexCompletion.complete(prompt,regex)
-                elif type is not None:
-                    best_completion = TypeCompletion.complete(prompt,type)
-                elif choices is not None:
-                    best_completion = ChoicesCompletion.complete(prompt,choices)
-                elif grammar_type is not None:
-                    tokenizer = AutoTokenizer.from_pretrained("gpt2-medium", padding_side='left')
-                    constraint_model = GrammarCompletion("gpt2-medium", tokenizer)
-                    best_completion = constraint_model.complete(prompt, grammar_type=grammar_type)
+                if completion_model is not None:
+                    best_completion = completion_model.complete(prompt)
                 else:
                     best_completion = self.call_big(prompt, **kwargs)
 
@@ -272,7 +264,7 @@ class LocalOptimizer(Optimizer):
                         if len(self.storage.get_data(c_id)) < min_examples_for_synthesis:
                             print("Data synthesis is not available right now, need more examples in storage.", file=sys.stderr)
                         else:
-                            for j in self.data_synthesizer.data_synthesis(self,prompt,best_completion,openai_key=self.openai_key, regex = regex, type = type, choices = choices, **kwargs):
+                            for j in self.data_synthesizer.data_synthesis(self,prompt,best_completion,openai_key=self.openai_key, completion=completion_model, **kwargs):
                                 self.storage.add_example(c_id, j)
                     training_exs = self.storage.get_data(c_id)
                     print(training_exs, file=sys.stderr)
