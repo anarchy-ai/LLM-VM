@@ -200,7 +200,7 @@ Here are some default model's details:
 
 
 For some other choices of memory usage and parameter count in each model family, check out the 
-tables in [model_uri_tables](./model_uri_tables.md)
+tables [here](./model_uri_tables.md).
 
 
 ### 🛠 Tool Usage
