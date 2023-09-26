@@ -188,6 +188,16 @@ response = client.complete(prompt = 'What is Anarchy?', context = '')
 print(response)
 # Anarchy is a political philosophy that advocates no government...
 ```
+Here are some default model's details:
+| Name | Model_Uri | Model params | Checkpoint file size |
+|---|---|---|---|
+| Neo | EleutherAI/gpt-neo-1.3B | 1.3B | 5.31 GB |
+| Bloom | bigscience/bloom-560m | 1.7B | 1.12 GB |
+| Open Llama | openlm-research/open_llama_3b_v2 | 3B | 6.85 GB |
+| OPT | facebook/opt-350m | 350m | 622 MB |
+
+
+
 
 For some other choices of memory usage and parameter count in each model family, check out the 
 tables in [model_uri_tables](./model_uri_tables.md)
