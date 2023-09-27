@@ -551,16 +551,20 @@ class QuantLLMGPTQ:
                 "You can write any text here, it serves as an input for the quantization process."
             )]
 
+        # quantization config
         quantize_config = BaseQuantizeConfig(
             bits=bits,
             group_size=128,  
             desc_act=False,  
         )
 
+        # load un-quantized model
         model = AutoGPTQForCausalLM.from_pretrained(self.model_uri, quantize_config)
 
+        # quantize the model
         model.quantize(examples)
-
+        
+        # save quantized model
         model.save_quantized(self.quantized_model_uri)
 
         self.q_model = AutoGPTQForCausalLM.from_quantized(self.quantized_model_uri, device=self.device)
