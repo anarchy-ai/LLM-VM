@@ -200,7 +200,7 @@ class BaseOnsiteLLM(ABC):
 
 
     def finetune_immediately(self):
-        finetune()()
+        self.finetune()()
 
 """
 this factorization isn't necessarily the greatest, nor should it be viewed
