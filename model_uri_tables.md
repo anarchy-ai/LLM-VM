@@ -1,4 +1,6 @@
 
+These models are example, always look directly at the associated hugging face 
+repos for more details. 
 
 #### Neo Model 
 | URI | Model Params | Checkpoint file size | Is Default?
@@ -17,14 +19,6 @@
 | bigscience/bloom-3b | 3B           | 6.01 GB     | ❌
 | bigscience/bloom-7b1 | 7.1B         | 14 GB |    ❌
 
-
-#### Open Llama
-
-| URI | Model Params | Checkpoint file size | Is Default?
-|-------|-------------|---------------------|------------------
-| openlm-research/open_llama_3b_v2 | 3B  | 6.85 GB | ✅
-| openlm-research/open_llama_7b_v2  | 7B | 13 GB   | ❌
-| openlm-research/open_llama_13b | 13B | 26 GB   | ❌
 
 
 

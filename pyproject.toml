@@ -31,6 +31,8 @@ dependencies = [
     "en_core_web_md @ https://github.com/explosion/spacy-models/releases/download/en_core_web_md-3.6.0/en_core_web_md-3.6.0-py3-none-any.whl",
     "gradio>=3.42.0",  # Specify the latest version of gradio
     "backoff>=2.2.1",
+    "docarray>=0.38",
+    "beartype >= 0.16.2"
 ]
 
 [project.optional-dependencies]
