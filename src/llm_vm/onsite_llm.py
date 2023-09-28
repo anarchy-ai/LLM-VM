@@ -122,7 +122,7 @@ class BaseOnsiteLLM(ABC):
         self.model.load_state_dict(torch.load(os.path.join(model_path_default,"finetuned_models", self.model_name, model_filename)))
 
 
-    def generate(self,prompt,max_length=100, *tokenizer_kwargs, **generation_kwargs): # both tokenizer and model take kwargs :(
+    def generate(self,prompt,max_length=100, tokenizer_kwargs={}, generation_kwargs={}): # both tokenizer and model take kwargs :(
         """
         This function uses the class's llm and tokenizer to generate a response given a user's prompt
 
@@ -140,10 +140,10 @@ class BaseOnsiteLLM(ABC):
         """
         if isinstance(device, list):
             # If multiple GPUs are available, use first one
-            inputs = self.tokenizer(prompt, return_tensors="pt", *tokenizer_kwargs).to(device[0])
+            inputs = self.tokenizer(prompt, return_tensors="pt", **tokenizer_kwargs).to(device[0])
         else:
             inputs = self.tokenizer(prompt, return_tensors="pt").to(device)
-        generate_ids=self.model.generate(inputs.input_ids,max_length=max_length, **generation_kwargs)
+        generate_ids=self.model.generate(inputs.input_ids, max_length=max_length, **generation_kwargs)
         resp= self.tokenizer.batch_decode(generate_ids,skip_special_tokens=True,clean_up_tokenization_spaces=False)[0]
         # need to drop the len(prompt) prefix with these sequences generally
         # because they include the prompt.
@@ -497,7 +497,7 @@ class BaseCtransformers(BaseOnsiteLLM):
     
     Methods:
         generate: Generates a response from given prompt
-          
+
     """
     def __init__(self, model_uri=None, model_kwargs={}):
         if model_uri != None :
