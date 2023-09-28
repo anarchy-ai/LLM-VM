@@ -80,11 +80,11 @@ class FinetuningDataset(torch.utils.data.Dataset):
         return self.dataset[idx]
 
 class BaseOnsiteLLM(ABC):
-    def __init__(self,model_uri=None,tokenizer_kw_args={},model_kw_args={}):
+    def __init__(self,model_uri=None, tokenizer_kw_args={}, model_kw_args={}):
         if model_uri != None :
             self.model_uri= model_uri
         if model_uri is None and self.model_uri is None:
-            raise ValueError('A very specific bad thing happened.')
+            raise ValueError('model_uri not found')
         self.model_name : str = self.model_uri.split('/')[-1] # our default for deriving model name
         self.model=self.model_loader(**model_kw_args)
         self.tokenizer=self.tokenizer_loader(**tokenizer_kw_args)
@@ -122,7 +122,7 @@ class BaseOnsiteLLM(ABC):
         self.model.load_state_dict(torch.load(os.path.join(model_path_default,"finetuned_models", self.model_name, model_filename)))
 
 
-    def generate(self,prompt,max_length=100,**kwargs): # both tokenizer and model take kwargs :(
+    def generate(self,prompt,max_length=100, *tokenizer_kwargs, **generation_kwargs): # both tokenizer and model take kwargs :(
         """
         This function uses the class's llm and tokenizer to generate a response given a user's prompt
 
@@ -140,10 +140,10 @@ class BaseOnsiteLLM(ABC):
         """
         if isinstance(device, list):
             # If multiple GPUs are available, use first one
-            inputs = self.tokenizer(prompt, return_tensors="pt").to(device[0])
+            inputs = self.tokenizer(prompt, return_tensors="pt", *tokenizer_kwargs).to(device[0])
         else:
             inputs = self.tokenizer(prompt, return_tensors="pt").to(device)
-        generate_ids=self.model.generate(inputs.input_ids,max_length=max_length)
+        generate_ids=self.model.generate(inputs.input_ids,max_length=max_length, **generation_kwargs)
         resp= self.tokenizer.batch_decode(generate_ids,skip_special_tokens=True,clean_up_tokenization_spaces=False)[0]
         # need to drop the len(prompt) prefix with these sequences generally
         # because they include the prompt.
@@ -297,48 +297,6 @@ class SmallLocalNeo(BaseOnsiteLLM):
         return GPTNeoForCausalLM.from_pretrained(self.model_uri)
     def tokenizer_loader(self):
         return AutoTokenizer.from_pretrained(self.model_uri)
-
-@RegisterModelClass("quantized-llama")
-class Quantized_Llama(BaseOnsiteLLM):
-    """
-    Class for running quantized Llama instances that use GGML
-
-    Attributes:
-        model_uri (str): Hugging Face Endpoint for LLM
-        model (LLM): The large language model. CTransformers includes its own tokenizer in the model
-
-    Methods:
-        __init__: Takes the same parameters as the base class, except it looks to see if there is a specific quantization you want to use
-        Quantized weights can be found (here)[https://huggingface.co/TheBloke/LLaMa-7B-GGML#provided-files]
-        model_loader: Loads the LLM into memory
-        tokenizer_loader: Does nothing. CTransformers includes its own tokenizer so this is unnecessary
-        generate: Generates a response from a given prompt with the loaded LLM and tokenizer
-    """
-
-    model_uri="TheBloke/LLaMa-7B-GGML"
-
-    def __init__(self,model_uri=None,tokenizer_kw_args={},model_kw_args={}):
-        # Pop because we don't want to pass model_file onto the super class.
-        self.model_file = model_kw_args.pop('model_file', None)
-        if self.model_file is None:
-        #     # Set default to smallest quantization available
-            self.model_file = "llama-7b.ggmlv3.q2_K.bin"
-        super().__init__(model_uri, tokenizer_kw_args, model_kw_args)
-
-
-    def model_loader(self):
-        # This file specifically is the smallest model.
-        return AutoModelForCausalLM.from_pretrained(self.model_uri, model_file=self.model_file)
-
-    # CTransformers loads its tokenizer in the model, so this function is unnecessary
-    def tokenizer_loader(self):
-        return
-
-    def generate(self, prompt, max_length=100, **kwargs):
-        inputs = self.model.tokenize(prompt)
-        generated_tokens = self.model.generate(inputs)
-        resp = (self.model.detokenize(generated_tokens))
-        return resp
 
 @RegisterModelClass("llama2")
 class SmallLocalLLama(BaseOnsiteLLM):
@@ -528,22 +486,55 @@ class ChatGPT:
         # if old_model is not None:
         #     openai.Model.delete(old_model)
 
-class BaseCtransformers(ABC):
-    def __init__(self, model_uri=None, model_file=None, *tokenizer_kwargs):
-        self.model_uri = model_uri
-        self.model_file = model_file
-        self.model = None
 
-    def _model_loader(self):
+class BaseCtransformers(BaseOnsiteLLM):
+    """
+    Base Class for running Ctransformers/GGML models
+
+    Attributes:
+        model_uri (str): Hugging Face Endpoint for LLM
+        model_kwargs (dict): Keyword arguments for loading the LLM
+    
+    Methods:
+        generate: Generates a response from given prompt
+          
+    """
+    def __init__(self, model_uri=None, model_kwargs={}):
+        if model_uri != None :
+            self.model_uri= model_uri
+        else: 
+            raise ValueError("model_uri not found")
+
+        self.model_file = model_kwargs.pop('model_file', None)
+        self.model = self.model_loader(*model_kwargs)
+
+    def load_finetune(self, model_filename):
+            raise Exception("Finetuning not supported for Ctransformers/GGML.")
+        
+    def generate(self, prompt, *generate_kwargs):  
+        input_ids = self.model.tokenize(prompt)
+        response = self.model.generate(input_ids, *generate_kwargs)
+        return self.model.detokenize(response)
+    
+    def finetune(self, data, optimizer, c_id, model_filename=None   ):
+        raise Exception("Finetuning not supported for Ctransformers/GGML.")
+
+
+@RegisterModelClass("quantized-llama")
+class Quantized_Llama(BaseCtransformers):
+    """
+    Class for running quantized Llama instance
+
+    Methods:
+        model_loader: Loads the LLM into memory
+    """
+
+    model_uri="TheBloke/LLaMa-7B-GGML"
+
+    def model_loader(self):
         if self.model_file is not None:
             return AutoModelForCausalLM.from_pretrained(self.model_uri, model_file=self.model_file)
         else:
             return AutoModelForCausalLM.from_pretrained(self.model_uri)
-        
-    def generate(self, prompt, *model_kwargs):
-        self.model = self._model_loader()
-        input_ids = self.model.tokenize(prompt)
-        response = self.model.generate(input_ids, model_kwargs)
-        return self.model.detokenize(response)
 
-
+ 
