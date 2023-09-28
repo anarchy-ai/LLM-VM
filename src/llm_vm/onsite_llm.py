@@ -29,7 +29,6 @@ __private_key_value_models_map =  {}
 #         "opt": SmallLocalOpt,
 #         "bloom": SmallLocalBloom,
 #         "neo": SmallLocalNeo,
-#         "llama": SmallLocalOpenLLama,
 #         "llama2": SmallLocalLLama,
 #         "gpt": GPT3,
 #         "chat_gpt": ChatGPT,
@@ -201,7 +200,7 @@ class BaseOnsiteLLM(ABC):
 
 
     def finetune_immediately(self):
-        finetune()()
+        self.finetune()()
 
 """
 this factorization isn't necessarily the greatest, nor should it be viewed
@@ -546,7 +545,7 @@ class ChatGPT:
             **kwargs)
         return ans['choices'][0]['message']['content']
 
-    def finetune(self, dataset, optimizer, c_id):
+    def finetune(self, dataset, optimizer, c_id, small_model_filename=None):
         print("fine tuning isn't supported by OpenAI on this model", file=sys.stderr)
         raise Exception("fine tuning isn't supported by OpenAI on this model")
         # old_model = optimizer.storage.get_model(c_id)
