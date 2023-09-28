@@ -13,12 +13,28 @@ if conf.settings.big_model is None:
 else:
     default_big_model= conf.settings.big_model
 
-if conf.settings.small_model is not  None:
+if conf.settings.small_model is None:
     default_small_model= "pythia"
 else:
     default_small_model = conf.settings.small_model
 
+# Builds the client to facilitate easy use.
+def client_build(type = "inference", openai_key = None, big_model = default_big_model, small_model =default_small_model,big_model_config={},small_model_config={}):
+    if type == "inference":
+        return Simple_Inference_Client(big_model, big_model_config, openai_key)
+    else:
+        return Client(big_model, small_model, big_model_config, small_model_config)
+    
+# Shoe-in for simple inference. Allows for traditional initialization of the client or dynamic initialization for rapid inference without agents.
+class Simple_Inference_Client:
+    def __init__(self, model = default_big_model, model_config = {}, openai_key = None):
+        self.model = load_model_closure(model)(**model_config)
+        openai.api_key = openai_key
 
+    def complete(self, prompt, max_len=256, **kwargs):
+        return self.model.generate(prompt, max_len,**kwargs)
+
+        
 
 
 class Client:
