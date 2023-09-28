@@ -222,10 +222,11 @@ class SmallLocalPythia(BaseOnsiteLLM):
         tokenizer_loader: Loads the tokenizer into memory
         generate: Generates a response from a given prompt with the loaded LLM and tokenizer
     """
-    # def __init__(self,**kwargs):
-    #     # self.model_uri =
-    #     super().__init__(kwargs) ## this line is required
-    model_uri = "EleutherAI/pythia-70m-deduped"
+    def __init__(self, model_uri="EleutherAI/pythia-70m-deduped", model_file="pythia-70m-deduped", **kwargs):
+        super().__init__(**kwargs)
+        self.model_uri = model_uri
+        self.model_file = model_file
+
     def model_loader(self):
         return GPTNeoXForCausalLM.from_pretrained(self.model_uri)
     def tokenizer_loader(self):
@@ -248,7 +249,11 @@ class SmallLocalOpt(BaseOnsiteLLM):
         tokenizer_loader: Loads the tokenizer into memory
         generate: Generates a response from a given prompt with the loaded LLM and tokenizer
     """
-    model_uri="facebook/opt-350m"
+    def __init__(self, model_uri="facebook/opt-350m", model_file="opt-350m", **kwargs):
+        super().__init__(**kwargs)
+        self.model_uri = model_uri
+        self.model_file = model_file
+
     def model_loader(self):
         return OPTForCausalLM.from_pretrained(self.model_uri)
     def tokenizer_loader(self):
@@ -270,7 +275,10 @@ class SmallLocalBloom(BaseOnsiteLLM):
         tokenizer_loader: Loads the tokenizer into memory
         generate: Generates a response from a given prompt with the loaded LLM and tokenizer
     """
-    model_uri="bigscience/bloom-560m"
+    def __init__(self, model_uri="bigscience/bloom-560m", model_file="bloom-560m", **kwargs):
+        super().__init__(**kwargs)
+        self.model_uri = model_uri
+        self.model_file = model_file
 
     def model_loader(self):
         return BloomForCausalLM.from_pretrained(self.model_uri)
@@ -292,7 +300,11 @@ class SmallLocalNeo(BaseOnsiteLLM):
         tokenizer_loader: Loads the tokenizer into memory
         generate: Generates a response from a given prompt with the loaded LLM and tokenizer
     """
-    model_uri="EleutherAI/gpt-neo-1.3B"
+    
+    def __init__(self, model_uri="EleutherAI/gpt-neo-1.3B", model_file="gpt-neo-1.3B", **kwargs):
+        super().__init__(**kwargs)
+        self.model_uri = model_uri
+        self.model_file = model_file
 
     def model_loader(self):
         return GPTNeoForCausalLM.from_pretrained(self.model_uri)
@@ -315,7 +327,11 @@ class SmallLocalOpenLLama(BaseOnsiteLLM):
         tokenizer_loader: Loads the tokenizer into memory
         generate: Generates a response from a given prompt with the loaded LLM and tokenizer
     """
-    model_uri="openlm-research/open_llama_3b_v2"
+
+    def __init__(self, model_uri="openlm-research/open_llama_3b_v2", model_file="open_llama_3b_v2", **kwargs):
+        super().__init__(**kwargs)
+        self.model_uri = model_uri
+        self.model_file = model_file
 
     def model_loader(self):
         return LlamaForCausalLM.from_pretrained(self.model_uri)
@@ -339,16 +355,11 @@ class Quantized_Llama(BaseOnsiteLLM):
         generate: Generates a response from a given prompt with the loaded LLM and tokenizer
     """
 
-    model_uri="TheBloke/LLaMa-7B-GGML"
-
-    def __init__(self,model_uri=None,tokenizer_kw_args={},model_kw_args={}):
-        # Pop because we don't want to pass model_file onto the super class.
-        self.model_file = model_kw_args.pop('model_file', None)
-        if self.model_file is None:
-        #     # Set default to smallest quantization available
-            self.model_file = "llama-7b.ggmlv3.q2_K.bin"
-        super().__init__(model_uri, tokenizer_kw_args, model_kw_args)
-
+    def __init__(self, model_uri="TheBloke/LLaMa-7B-GGML", model_file="llama-7b.ggmlv3.q2_K.bin", **kwargs):
+        super().__init__(**kwargs)
+        self.model_file = kwargs.pop('model_file', None)
+        self.model_uri = model_uri
+        self.model_file = model_file
 
     def model_loader(self):
         # This file specifically is the smallest model.
@@ -380,14 +391,18 @@ class SmallLocalLLama(BaseOnsiteLLM):
         tokenizer_loader: Loads the tokenizer into memory
         generate: Generates a response from a given prompt with the loaded LLM and tokenizer
     """
-    model_uri="meta-llama/Llama-2-7b"
+
+    def __init__(self, model_uri="meta-llama/Llama-2-7b", model_file="Llama-2-7b", **kwargs):
+        super().__init__(**kwargs)
+        self.model_uri = model_uri
+        self.model_file = model_file
 
     def model_loader(self):
         return LlamaForCausalLM.from_pretrained(self.model_uri)
     def tokenizer_loader(self):
         return LlamaTokenizer.from_pretrained(self.model_uri)
 
-@RegisterModelClass("flan")# our yummiest model based on similarity to food
+@RegisterModelClass("flan")
 class SmallLocalFlanT5(BaseOnsiteLLM):
 
     """
@@ -404,7 +419,11 @@ class SmallLocalFlanT5(BaseOnsiteLLM):
         generate: Generates a response from a given prompt with the loaded LLM and tokenizer
     """
 
-    model_uri="google/flan-t5-small"
+    def __init__(self, model_uri="google/flan-t5-small", model_file="flan-t5-small", **kwargs):
+        super().__init__(**kwargs)
+        self.model_uri = model_uri
+        self.model_file = model_file
+        
     def model_loader(self):
         return AutoModelForSeq2SeqLM.from_pretrained(self.model_uri)
     def tokenizer_loader(self):
@@ -428,7 +447,11 @@ class SmallLocalBERT(BaseOnsiteLLM):
         generate: Generates a response from a given prompt with the loaded LLM and tokenizer
     """
 
-    model_uri = "bert-base-cased"
+    def __init__(self, model_uri="bert-base-uncased", model_file="bert-base-uncased", **kwargs):
+        super().__init__(**kwargs)
+        self.model_uri = model_uri
+        self.model_file = model_file
+        
     def model_loader(self):
         return AutoModelForMaskedLM.from_pretrained(self.model_uri)
     def tokenizer_loader(self):
