@@ -487,12 +487,12 @@ class ChatGPT:
         #     openai.Model.delete(old_model)
 
 
-class BaseCtransformers(BaseOnsiteLLM):
+class BaseCtransformersLLM(ABC):
     """
     Base Class for running Ctransformers/GGML models
 
     Attributes:
-        model_uri (str): Hugging Face Endpoint for LLM
+        model_uri (str): Ctransformers uri for LLM
         model_kwargs (dict): Keyword arguments for loading the LLM
     
     Methods:
@@ -508,8 +508,23 @@ class BaseCtransformers(BaseOnsiteLLM):
         self.model_file = model_kwargs.pop('model_file', None)
         self.model = self.model_loader(*model_kwargs)
 
+    @property
+    @abstractmethod
+    def model_uri(self):
+        pass
+
+    @model_uri.setter
+    def model_uri(self,val):
+        self.model_uri=val 
+        
     def load_finetune(self, model_filename):
             raise Exception("Finetuning not supported for Ctransformers/GGML.")
+    
+    def model_loader(self):
+        if self.model_file is not None:
+            return AutoModelForCausalLM.from_pretrained(self.model_uri, model_file=self.model_file)
+        else:
+            return AutoModelForCausalLM.from_pretrained(self.model_uri)
         
     def generate(self, prompt, *generate_kwargs):  
         input_ids = self.model.tokenize(prompt)
@@ -521,7 +536,7 @@ class BaseCtransformers(BaseOnsiteLLM):
 
 
 @RegisterModelClass("quantized-llama")
-class Quantized_Llama(BaseCtransformers):
+class Quantized_Llama(BaseCtransformersLLM):
     """
     Class for running quantized Llama instance
 
@@ -531,10 +546,6 @@ class Quantized_Llama(BaseCtransformers):
 
     model_uri="TheBloke/LLaMa-7B-GGML"
 
-    def model_loader(self):
-        if self.model_file is not None:
-            return AutoModelForCausalLM.from_pretrained(self.model_uri, model_file=self.model_file)
-        else:
-            return AutoModelForCausalLM.from_pretrained(self.model_uri)
+
 
  
