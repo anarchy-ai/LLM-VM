@@ -527,3 +527,23 @@ class ChatGPT:
         # optimizer.storage.set_training_in_progress(c_id, False)
         # if old_model is not None:
         #     openai.Model.delete(old_model)
+
+class BaseCtransformers(ABC):
+    def __init__(self, model_uri=None, model_file=None, *tokenizer_kwargs):
+        self.model_uri = model_uri
+        self.model_file = model_file
+        self.model = None
+
+    def _model_loader(self):
+        if self.model_file is not None:
+            return AutoModelForCausalLM.from_pretrained(self.model_uri, model_file=self.model_file)
+        else:
+            return AutoModelForCausalLM.from_pretrained(self.model_uri)
+        
+    def generate(self, prompt, *model_kwargs):
+        self.model = self._model_loader()
+        input_ids = self.model.tokenize(prompt)
+        response = self.model.generate(input_ids, model_kwargs)
+        return self.model.detokenize(response)
+
+
