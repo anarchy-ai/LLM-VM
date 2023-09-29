@@ -487,7 +487,7 @@ class ChatGPT:
         #     openai.Model.delete(old_model)
 
 
-class BaseCtransformersLLM(ABC):
+class BaseCtransformersLLM(BaseOnsiteLLM):
     """
     Base Class for running Ctransformers/GGML models
 
@@ -496,26 +496,31 @@ class BaseCtransformersLLM(ABC):
         model_kwargs (dict): Keyword arguments for loading the LLM
     
     Methods:
+        model_loader: Loads specified model from Ctransformers
         generate: Generates a response from given prompt
 
     """
-    def __init__(self, model_uri=None, model_kwargs={}):
-        if model_uri != None :
-            self.model_uri= model_uri
-        else: 
-            raise ValueError("model_uri not found")
 
-        self.model_file = model_kwargs.pop('model_file', None)
-        self.model = self.model_loader(*model_kwargs)
+    def __init__(self, **model_kwargs):
+        self.__model_uri = None
+        self.__model_file = None
+        self.model = self.model_loader(**model_kwargs)
 
     @property
-    @abstractmethod
+    def model_file(self):
+        return self.__model_file
+
+    @model_file.setter
+    def model_file(self,val):
+        self.__model_file=val 
+
+    @property
     def model_uri(self):
-        pass
+        return self.__model_uri
 
     @model_uri.setter
     def model_uri(self,val):
-        self.model_uri=val 
+        self.__model_uri=val 
         
     def load_finetune(self, model_filename):
             raise Exception("Finetuning not supported for Ctransformers/GGML.")
@@ -531,7 +536,7 @@ class BaseCtransformersLLM(ABC):
         response = self.model.generate(input_ids, *generate_kwargs)
         return self.model.detokenize(response)
     
-    def finetune(self, data, optimizer, c_id, model_filename=None   ):
+    def finetune(self, data, optimizer, c_id, model_filename=None):
         raise Exception("Finetuning not supported for Ctransformers/GGML.")
 
 
@@ -545,7 +550,5 @@ class Quantized_Llama(BaseCtransformersLLM):
     """
 
     model_uri="TheBloke/LLaMa-7B-GGML"
-
-
-
+    model_file="llama-7b.ggmlv3.q2_K.bin"
  
