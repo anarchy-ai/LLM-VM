@@ -545,8 +545,9 @@ class Quantized_Llama(BaseCtransformersLLM):
     """
     Class for running quantized Llama instance
 
-    Methods:
-        model_loader: Loads the LLM into memory
+    Properties:
+        model_uri: Ctransformers uri for LLM
+        model_file: gguf or bin file for repos with multiple files
     """
 
     model_uri="TheBloke/LLaMa-7B-GGML"
