@@ -527,9 +527,9 @@ class BaseCtransformersLLM(BaseOnsiteLLM):
     
     def model_loader(self):
         if self.model_file is not None:
-            return AutoModelForCausalLM.from_pretrained(self.model_uri, model_file=self.model_file)
+            return AutoModelForCausalLM.from_pretrained(self.__model_uri, model_file=self.__model_file)
         else:
-            return AutoModelForCausalLM.from_pretrained(self.model_uri)
+            return AutoModelForCausalLM.from_pretrained(self.__model_uri)
         
     def generate(self, prompt, *generate_kwargs):  
         input_ids = self.model.tokenize(prompt)
