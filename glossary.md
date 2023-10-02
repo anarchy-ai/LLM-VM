@@ -61,16 +61,21 @@ Researchers and developers continually work to mitigate and reduce hallucination
 **Quantization**: a process of reducing the precision or bit-width of numerical values, typically weights and activations, used in a neural network model. This involves representing the original high-precision floating-point values with a limited set of discrete values, often integers.
 It makes neural network models more memory-efficient and computationally faster during inference, without significantly compromising their performance.Quantization is particularly valuable for deploying models on resource-constrained devices like mobile phones, IoT devices, and edge computing devices.
 
-### Pruning and sparsity
+### Pruning and Sparsity
 
 **Pruning:** is a technique used to remove certain connections (weights) or neurons from a neural network while retaining its general structure and functionality. These connections or neurons are often identified based on their low importance or contribution to the network's overall performance.
-Purpose: The main purpose of pruning is to reduce the size of a neural network model, thereby decreasing memory usage and computational requirements during inference. Smaller models are more efficient and suitable for deployment on resource-constrained devices.
-Methods: Various methods and criteria can be used for pruning, including magnitude-based pruning (removing small-weight connections), sensitivity analysis, and iterative pruning. Pruning can be applied to different layers or parts of a neural network, depending on the specific goals of model compression and optimization.
+
+- **Purpose:** The main purpose of pruning is to reduce the size of a neural network model, thereby decreasing memory usage and computational requirements during inference. Smaller models are more efficient and suitable for deployment on resource-constrained devices.
+
+- **Methods:** Various methods and criteria can be used for pruning, including magnitude-based pruning (removing small-weight connections), sensitivity analysis, and iterative pruning. Pruning can be applied to different layers or parts of a neural network, depending on the specific goals of model compression and optimization.
+
 **Sparsity:** refers to the property of having many of the elements or parameters in a neural network set to zero. A sparse neural network contains a significant portion of zero-valued parameters, resulting in a more compact representation.
-Purpose: Introducing sparsity into a neural network is often an outcome of pruning, but it can also be achieved through other techniques. Sparse models consume less memory and require fewer computations, making them suitable for deployment in scenarios where computational resources are limited.
-Benefits: Sparse neural networks can have improved inference speed, reduced memory footprint, and decreased energy consumption, which is advantageous for edge devices, mobile applications, and real-time systems.
-Sparsity Techniques: Besides pruning, techniques like weight regularization with sparsity-inducing penalties (e.g., L1 regularization), structured sparsity, and quantization can be used to induce sparsity in neural network models.
-Transfer learning
+
+- **Purpose:** Introducing sparsity into a neural network is often an outcome of pruning, but it can also be achieved through other techniques. Sparse models consume less memory and require fewer computations, making them suitable for deployment in scenarios where computational resources are limited.
+
+- **Benefits:** Sparse neural networks can have improved inference speed, reduced memory footprint, and decreased energy consumption, which is advantageous for edge devices, mobile applications, and real-time systems.
+
+- **Sparsity Techniques:** Besides pruning, techniques like weight regularization with sparsity-inducing penalties (e.g., L1 regularization), structured sparsity, and quantization can be used to induce sparsity in neural network models.
 
 ### Distributed learning
 
