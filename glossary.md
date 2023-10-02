@@ -35,3 +35,43 @@ Large Language Models, often referred to as "LLMs," are a class of artificial in
 Large Language Models represent a significant milestone in natural language processing and continue to drive advancements in AI-driven language understanding and generation.
 
 > Note: While LLMs offer transformative capabilities, their ethical use and potential biases must be carefully considered to ensure responsible AI deployment.
+
+### Hallucination
+
+**Hallucination:** A phenomenon where the model generates text or responses that contain information or details that are not based on factual data or reality. It occurs when the model produces information that is fabricated, imagined, or fictional rather than being grounded in accurate information from its training data or the real world.
+
+**Causes of Hallucination:**
+
+1. Biases in the training data.
+2. Limitations in the model's understanding of context.
+3. The model's tendency to generate creative but incorrect information.
+
+Researchers and developers continually work to mitigate and reduce hallucination in LLMs to make them more reliable and trustworthy in their outputs.
+
+### Transfer learning
+
+**Transfer learning** is a machine learning technique that reuses a pretrained model's knowledge on one task to enhance performance on a related task. It's a time-efficient way to improve models, particularly when data for the target task is limited.
+
+### Knowledge distillation
+
+**Knowledge distillation:** a process where a smaller or more efficient model (the "student") is trained to replicate the behavior and predictions of a larger, more complex model (the "teacher"). Advantage: more computationally efficient and suitable for deployment in resource-constrained environments.
+
+### Quantization
+
+**Quantization**: a process of reducing the precision or bit-width of numerical values, typically weights and activations, used in a neural network model. This involves representing the original high-precision floating-point values with a limited set of discrete values, often integers.
+It makes neural network models more memory-efficient and computationally faster during inference, without significantly compromising their performance.Quantization is particularly valuable for deploying models on resource-constrained devices like mobile phones, IoT devices, and edge computing devices.
+
+### Pruning and sparsity
+
+**Pruning:** is a technique used to remove certain connections (weights) or neurons from a neural network while retaining its general structure and functionality. These connections or neurons are often identified based on their low importance or contribution to the network's overall performance.
+Purpose: The main purpose of pruning is to reduce the size of a neural network model, thereby decreasing memory usage and computational requirements during inference. Smaller models are more efficient and suitable for deployment on resource-constrained devices.
+Methods: Various methods and criteria can be used for pruning, including magnitude-based pruning (removing small-weight connections), sensitivity analysis, and iterative pruning. Pruning can be applied to different layers or parts of a neural network, depending on the specific goals of model compression and optimization.
+**Sparsity:** refers to the property of having many of the elements or parameters in a neural network set to zero. A sparse neural network contains a significant portion of zero-valued parameters, resulting in a more compact representation.
+Purpose: Introducing sparsity into a neural network is often an outcome of pruning, but it can also be achieved through other techniques. Sparse models consume less memory and require fewer computations, making them suitable for deployment in scenarios where computational resources are limited.
+Benefits: Sparse neural networks can have improved inference speed, reduced memory footprint, and decreased energy consumption, which is advantageous for edge devices, mobile applications, and real-time systems.
+Sparsity Techniques: Besides pruning, techniques like weight regularization with sparsity-inducing penalties (e.g., L1 regularization), structured sparsity, and quantization can be used to induce sparsity in neural network models.
+Transfer learning
+
+### Distributed learning
+
+**Distributed learning**, also known as distributed machine learning, refers to the practice of training machine learning models across multiple computing devices or nodes in a distributed computing environment. The goal of distributed learning is to leverage the computational power and resources of multiple machines to accelerate the training process and handle larger datasets and more complex models.
