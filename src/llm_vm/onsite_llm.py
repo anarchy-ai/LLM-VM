@@ -501,10 +501,13 @@ class BaseCtransformersLLM(BaseOnsiteLLM):
 
     """
 
-    def __init__(self, **model_kwargs):
+    def __init__(self, with_GPU=False, **model_kwargs):
         self.__model_uri = None
         self.__model_file = None
-        self.model = self.model_loader(**model_kwargs)
+        if with_GPU:
+            self.model = self.gpu_model_loader(**model_kwargs)
+        else:
+            self.model = self.model_loader(**model_kwargs)
 
     @property
     def model_file(self):
@@ -530,6 +533,12 @@ class BaseCtransformersLLM(BaseOnsiteLLM):
             return AutoModelForCausalLM.from_pretrained(self.__model_uri, model_file=self.__model_file)
         else:
             return AutoModelForCausalLM.from_pretrained(self.__model_uri)
+        
+    def gpu_model_loader(self):
+        if self.model_file is not None:
+            return AutoModelForCausalLM.from_pretrained(self.__model_uri, model_file=self.__model_file, gpu_layers=50)
+        else:
+            return AutoModelForCausalLM.from_pretrained(self.__model_uri, gpu_layers=50)
         
     def generate(self, prompt, *generate_kwargs):  
         input_ids = self.model.tokenize(prompt)
