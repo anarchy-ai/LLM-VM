@@ -527,18 +527,41 @@ class BaseCtransformersLLM(BaseOnsiteLLM):
         
     def load_finetune(self, model_filename):
             raise Exception("Finetuning not supported for Ctransformers/GGML.")
+
+    def _get_model_layers(self):
+        pass
+
+    def _get_model_size(self):
+        pass    
     
-    def model_loader(self):
+    def model_loader(self, **kwargs):
+        if 'model_file' in kwargs:
+            del kwargs['model_file']
+
         if self.model_file is not None:
-            return AutoModelForCausalLM.from_pretrained(self.__model_uri, model_file=self.__model_file)
+            return AutoModelForCausalLM.from_pretrained(self.__model_uri, model_file=self.__model_file, **kwargs)
         else:
-            return AutoModelForCausalLM.from_pretrained(self.__model_uri)
+            return AutoModelForCausalLM.from_pretrained(self.__model_uri, **kwargs)
         
-    def gpu_model_loader(self):
-        if self.model_file is not None:
-            return AutoModelForCausalLM.from_pretrained(self.__model_uri, model_file=self.__model_file, gpu_layers=50)
-        else:
-            return AutoModelForCausalLM.from_pretrained(self.__model_uri, gpu_layers=50)
+    def gpu_model_loader(self, vram=0, **kwargs):
+        if 'model_file' in kwargs:
+            del kwargs['model_file']
+
+        if vram > 0:
+            model_size = self._get_model_size()
+            model_layers = self._get_model_layers()
+
+            size_per_layer = model_size // model_layers
+            offload_layers = vram // size_per_layer
+            if offload_layers > model_layers:
+                offload_layers = model_layers
+
+            if self.model_file is not None:
+                return AutoModelForCausalLM.from_pretrained(self.__model_uri, model_file=self.__model_file, gpu_layers=offload_layers, **kwargs)
+            else:
+                return AutoModelForCausalLM.from_pretrained(self.__model_uri, gpu_layers=offload_layers, **kwargs)
+        else: 
+            raise ValueError("Expected VRAM to be greater than 0.")
         
     def generate(self, prompt, *generate_kwargs):  
         input_ids = self.model.tokenize(prompt)
