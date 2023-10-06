@@ -572,16 +572,98 @@ class BaseCtransformersLLM(BaseOnsiteLLM):
         raise Exception("Finetuning not supported for Ctransformers/GGML.")
 
 
-@RegisterModelClass("quantized-llama")
-class Quantized_Llama(BaseCtransformersLLM):
+@RegisterModelClass("quantized-llama2-7b-base")
+class Base_Llama2_7b_Q4(BaseCtransformersLLM):
     """
-    Class for running quantized Llama instance
+    Class for running quantized Llama 2 7b base model instance
 
     Properties:
         model_uri: Ctransformers uri for LLM
         model_file: gguf or bin file for repos with multiple files
     """
 
-    model_uri="TheBloke/LLaMa-7B-GGML"
-    model_file="llama-7b.ggmlv3.q2_K.bin"
+    model_uri="TheBloke/Llama-2-7B-GGML"
+    model_file="llama-2-7b.ggmlv3.q4_K_M.bin"
+
+@RegisterModelClass("quantized-llama2-13b-base")
+
+class Base_Llama2_13b_Q4(BaseCtransformersLLM):
+    """
+    Class for running quantized Llama 2 13b base model instance
+
+    Properties:
+        model_uri: Ctransformers uri for LLM
+        model_file: gguf or bin file for repos with multiple files
+    """
+
+    model_uri="TheBloke/Llama-2-13B-GGML"
+    model_file="llama-2-13b.ggmlv3.q4_K_M.bin"
+
+
+@RegisterModelClass("llama2-7b-chat-Q4")
+class Chat_Llama2_7b_Q4(BaseCtransformersLLM):
+    """
+    Class for running Llama2-7b-Chat model instance
+
+    Properties:
+        model_uri: Ctransformers uri for LLM
+        model_file: gguf or bin file for repos with multiple files
+    """
+
+    model_uri="TheBloke/Llama-2-7B-Chat-GGML"
+    model_file="llama-2-7b-chat.Q4_K_M.gguf"
+
+@RegisterModelClass("llama2-7b-chat-Q6")
+class Chat_Llama2_7b_Q6(BaseCtransformersLLM):
+    """
+    Class for running Llama2-7b-Chat model instance
+
+    Properties:
+        model_uri: Ctransformers uri for LLM
+        model_file: gguf or bin file for repos with multiple files
+    """
+
+    model_uri="TheBloke/Llama-2-7B-Chat-GGML"
+    model_file="llama-2-7b-chat.Q6_K.gguf"
  
+
+@RegisterModelClass("llama2-13b-chat-Q4")
+class Chat_Llama2_13b_Q4(BaseCtransformersLLM):
+    """
+    Class for running Llama2-13b-Chat model instance
+
+    Properties:
+        model_uri: Ctransformers uri for LLM
+        model_file: gguf or bin file for repos with multiple files
+    """
+
+    model_uri="TheBloke/Llama-2-13B-Chat-GGML"
+    model_file="llama-2-13b-chat.Q4_K_M.gguf"
+
+
+@RegisterModelClass("llama2-13b-chat-Q6")
+class Chat_Llama2_13b_Q6(BaseCtransformersLLM):
+    """
+    Class for running Llama2-13b-Chat model instance
+
+    Properties:
+        model_uri: Ctransformers uri for LLM
+        model_file: gguf or bin file for repos with multiple files
+    """
+
+    model_uri="TheBloke/Llama-2-13B-Chat-GGML"
+    model_file="llama-2-13b-chat.Q6_K.gguf"
+
+
+@RegisterModelClass("llama2-7b-32k-Q4")
+class Chat_Llama2_13b_Q6(BaseCtransformersLLM):
+    """
+    Class for running Llama2-7b-32k-Instruct model instance
+
+    Properties:
+        model_uri: Ctransformers uri for LLM
+        model_file: gguf or bin file for repos with multiple files
+    """
+
+    model_uri="TheBloke/Llama-2-7B-32K-Instruct-GGML"
+    model_file="llama-2-7b-32k-instruct.ggmlv3.q4_1.bin"
