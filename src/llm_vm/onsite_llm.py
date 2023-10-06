@@ -22,6 +22,8 @@ import tempfile
 import json
 import os
 import torch
+from peft import get_peft_config, LoraConfig
+from trl import SFTTrainer
 
 
 __private_key_value_models_map =  {}
@@ -198,9 +200,67 @@ class BaseOnsiteLLM(ABC):
             return math.exp(eval_results['eval_loss']) #perplexity is the metric we use for finetuning measurement
         return asynctune
 
-
     def finetune_immediately(self):
         self.finetune()()
+
+    def lora_finetune(self, data, optimizer, c_id, model_filename=None):
+        def asynctune():
+            old_model = optimizer.storage.get_model(c_id)
+            if old_model is not None:
+                self.model.load_state_dict(torch.load(old_model))
+            untokenized_final_dataset = []
+            for prompt,response in data:
+                untokenized_final_dataset.append(prompt + response)
+            tokenized_final_dataset = map(self.tokenizer,untokenized_final_dataset)
+            self.tokenizer.pad_token = self.tokenizer.eos_token
+            data_collator = DataCollatorForLanguageModeling(tokenizer=self.tokenizer, mlm=False)
+            optimizer.storage.set_training_in_progress(c_id, True)
+            training_args = TrainingArguments(
+                output_dir=os.path.join(model_path_default,"finetuned_models",),
+                evaluation_strategy="epoch",
+                learning_rate=2e-5,
+                per_device_train_batch_size = 1,
+                per_device_eval_batch_size = 1,
+                num_train_epochs=5,
+                weight_decay=0.01,
+                report_to= "none",
+            )
+            test_set = FinetuningDataset(tokenized_final_dataset,len(untokenized_final_dataset))
+
+            peft_config = LoraConfig(
+                r=16,
+                lora_alpha=32,
+                lora_dropout=0.05,
+                bias="none",
+                task_type="CAUSAL_LM",
+            )
+            
+            trainer = SFTTrainer(
+                self.model,
+                args=training_args,
+                train_dataset=test_set,
+                eval_dataset=test_set,
+                data_collator=data_collator,
+                peft_config=peft_config
+            )
+            os.makedirs(os.path.join(model_path_default,"finetuned_models", self.model_name), exist_ok=True)
+            if tokenized_final_dataset:
+                trainer.train()
+                eval_results = trainer.evaluate()
+            optimizer.storage.set_training_in_progress(c_id, False)
+
+            if os.name == "nt":
+                timestamp = datetime.now().strftime('%Y-%m-%dT%H-%M-%S')
+            else:
+                timestamp = datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
+            new_model = os.path.join(model_path_default,"finetuned_models",self.model_name, timestamp + '_' + self.model_name + ".pt" ) if model_filename is None else os.path.join(model_path_default,"finetuned_models",model_filename)
+            open(new_model,"a")
+            torch.save(self.model.state_dict(), new_model) # the model in memory is different now
+            self.model_name = self.model_name + "_ft_"+  timestamp
+            optimizer.storage.set_model(c_id, new_model)
+            return math.exp(eval_results['eval_loss']) #perplexity is the metric we use for finetuning measurement
+        return asynctune
+
 
 """
 this factorization isn't necessarily the greatest, nor should it be viewed
