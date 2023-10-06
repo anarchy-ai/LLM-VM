@@ -80,11 +80,11 @@ class FinetuningDataset(torch.utils.data.Dataset):
         return self.dataset[idx]
 
 class BaseOnsiteLLM(ABC):
-    def __init__(self,model_uri=None,tokenizer_kw_args={},model_kw_args={}):
+    def __init__(self,model_uri=None, tokenizer_kw_args={}, model_kw_args={}):
         if model_uri != None :
             self.model_uri= model_uri
         if model_uri is None and self.model_uri is None:
-            raise ValueError('A very specific bad thing happened.')
+            raise ValueError('model_uri not found')
         self.model_name : str = self.model_uri.split('/')[-1] # our default for deriving model name
         self.model=self.model_loader(**model_kw_args)
         self.tokenizer=self.tokenizer_loader(**tokenizer_kw_args)
@@ -122,7 +122,7 @@ class BaseOnsiteLLM(ABC):
         self.model.load_state_dict(torch.load(os.path.join(model_path_default,"finetuned_models", self.model_name, model_filename)))
 
 
-    def generate(self,prompt,max_length=100,**kwargs): # both tokenizer and model take kwargs :(
+    def generate(self,prompt,max_length=100, tokenizer_kwargs={}, generation_kwargs={}): # both tokenizer and model take kwargs :(
         """
         This function uses the class's llm and tokenizer to generate a response given a user's prompt
 
@@ -140,10 +140,10 @@ class BaseOnsiteLLM(ABC):
         """
         if isinstance(device, list):
             # If multiple GPUs are available, use first one
-            inputs = self.tokenizer(prompt, return_tensors="pt").to(device[0])
+            inputs = self.tokenizer(prompt, return_tensors="pt", **tokenizer_kwargs).to(device[0])
         else:
             inputs = self.tokenizer(prompt, return_tensors="pt").to(device)
-        generate_ids=self.model.generate(inputs.input_ids,max_length=max_length)
+        generate_ids=self.model.generate(inputs.input_ids, max_length=max_length, **generation_kwargs)
         resp= self.tokenizer.batch_decode(generate_ids,skip_special_tokens=True,clean_up_tokenization_spaces=False)[0]
         # need to drop the len(prompt) prefix with these sequences generally
         # because they include the prompt.
@@ -297,48 +297,6 @@ class SmallLocalNeo(BaseOnsiteLLM):
         return GPTNeoForCausalLM.from_pretrained(self.model_uri)
     def tokenizer_loader(self):
         return AutoTokenizer.from_pretrained(self.model_uri)
-
-@RegisterModelClass("quantized-llama")
-class Quantized_Llama(BaseOnsiteLLM):
-    """
-    Class for running quantized Llama instances that use GGML
-
-    Attributes:
-        model_uri (str): Hugging Face Endpoint for LLM
-        model (LLM): The large language model. CTransformers includes its own tokenizer in the model
-
-    Methods:
-        __init__: Takes the same parameters as the base class, except it looks to see if there is a specific quantization you want to use
-        Quantized weights can be found (here)[https://huggingface.co/TheBloke/LLaMa-7B-GGML#provided-files]
-        model_loader: Loads the LLM into memory
-        tokenizer_loader: Does nothing. CTransformers includes its own tokenizer so this is unnecessary
-        generate: Generates a response from a given prompt with the loaded LLM and tokenizer
-    """
-
-    model_uri="TheBloke/LLaMa-7B-GGML"
-
-    def __init__(self,model_uri=None,tokenizer_kw_args={},model_kw_args={}):
-        # Pop because we don't want to pass model_file onto the super class.
-        self.model_file = model_kw_args.pop('model_file', None)
-        if self.model_file is None:
-        #     # Set default to smallest quantization available
-            self.model_file = "llama-7b.ggmlv3.q2_K.bin"
-        super().__init__(model_uri, tokenizer_kw_args, model_kw_args)
-
-
-    def model_loader(self):
-        # This file specifically is the smallest model.
-        return AutoModelForCausalLM.from_pretrained(self.model_uri, model_file=self.model_file)
-
-    # CTransformers loads its tokenizer in the model, so this function is unnecessary
-    def tokenizer_loader(self):
-        return
-
-    def generate(self, prompt, max_length=100, **kwargs):
-        inputs = self.model.tokenize(prompt)
-        generated_tokens = self.model.generate(inputs)
-        resp = (self.model.detokenize(generated_tokens))
-        return resp
 
 @RegisterModelClass("llama2")
 class SmallLocalLLama(BaseOnsiteLLM):
@@ -527,3 +485,185 @@ class ChatGPT:
         # optimizer.storage.set_training_in_progress(c_id, False)
         # if old_model is not None:
         #     openai.Model.delete(old_model)
+
+
+class BaseCtransformersLLM(BaseOnsiteLLM):
+    """
+    Base Class for running Ctransformers/GGML models
+
+    Attributes:
+        model_uri (str): Ctransformers uri for LLM
+        model_kwargs (dict): Keyword arguments for loading the LLM
+    
+    Methods:
+        model_loader: Loads specified model from Ctransformers
+        generate: Generates a response from given prompt
+
+    """
+
+    def __init__(self, with_GPU=False, **model_kwargs):
+        self.__model_uri = None
+        self.__model_file = None
+        if with_GPU:
+            self.model = self.gpu_model_loader(**model_kwargs)
+        else:
+            self.model = self.model_loader(**model_kwargs)
+
+    @property
+    def model_file(self):
+        return self.__model_file
+
+    @model_file.setter
+    def model_file(self,val):
+        self.__model_file=val 
+
+    @property
+    def model_uri(self):
+        return self.__model_uri
+
+    @model_uri.setter
+    def model_uri(self,val):
+        self.__model_uri=val 
+        
+    def load_finetune(self, model_filename):
+            raise Exception("Finetuning not supported for Ctransformers/GGML.")
+
+    def _get_model_layers(self):
+        pass
+
+    def _get_model_size(self):
+        pass    
+    
+    def model_loader(self, **kwargs):
+        if 'model_file' in kwargs:
+            del kwargs['model_file']
+
+        if self.model_file is not None:
+            return AutoModelForCausalLM.from_pretrained(self.__model_uri, model_file=self.__model_file, **kwargs)
+        else:
+            return AutoModelForCausalLM.from_pretrained(self.__model_uri, **kwargs)
+        
+    def gpu_model_loader(self, vram=0, **kwargs):
+        if 'model_file' in kwargs:
+            del kwargs['model_file']
+
+        if vram > 0:
+            model_size = self._get_model_size()
+            model_layers = self._get_model_layers()
+
+            size_per_layer = model_size // model_layers
+            offload_layers = vram // size_per_layer
+            if offload_layers > model_layers:
+                offload_layers = model_layers
+
+            if self.model_file is not None:
+                return AutoModelForCausalLM.from_pretrained(self.__model_uri, model_file=self.__model_file, gpu_layers=offload_layers, **kwargs)
+            else:
+                return AutoModelForCausalLM.from_pretrained(self.__model_uri, gpu_layers=offload_layers, **kwargs)
+        else: 
+            raise ValueError("Expected VRAM to be greater than 0.")
+        
+    def generate(self, prompt, *generate_kwargs):  
+        input_ids = self.model.tokenize(prompt)
+        response = self.model.generate(input_ids, *generate_kwargs)
+        return self.model.detokenize(response)
+    
+    def finetune(self, data, optimizer, c_id, model_filename=None):
+        raise Exception("Finetuning not supported for Ctransformers/GGML.")
+
+
+@RegisterModelClass("quantized-llama2-7b-base")
+class Base_Llama2_7b_Q4(BaseCtransformersLLM):
+    """
+    Class for running quantized Llama 2 7b base model instance
+
+    Properties:
+        model_uri: Ctransformers uri for LLM
+        model_file: gguf or bin file for repos with multiple files
+    """
+
+    model_uri="TheBloke/Llama-2-7B-GGML"
+    model_file="llama-2-7b.ggmlv3.q4_K_M.bin"
+
+@RegisterModelClass("quantized-llama2-13b-base")
+
+class Base_Llama2_13b_Q4(BaseCtransformersLLM):
+    """
+    Class for running quantized Llama 2 13b base model instance
+
+    Properties:
+        model_uri: Ctransformers uri for LLM
+        model_file: gguf or bin file for repos with multiple files
+    """
+
+    model_uri="TheBloke/Llama-2-13B-GGML"
+    model_file="llama-2-13b.ggmlv3.q4_K_M.bin"
+
+
+@RegisterModelClass("llama2-7b-chat-Q4")
+class Chat_Llama2_7b_Q4(BaseCtransformersLLM):
+    """
+    Class for running Llama2-7b-Chat model instance
+
+    Properties:
+        model_uri: Ctransformers uri for LLM
+        model_file: gguf or bin file for repos with multiple files
+    """
+
+    model_uri="TheBloke/Llama-2-7B-Chat-GGML"
+    model_file="llama-2-7b-chat.Q4_K_M.gguf"
+
+@RegisterModelClass("llama2-7b-chat-Q6")
+class Chat_Llama2_7b_Q6(BaseCtransformersLLM):
+    """
+    Class for running Llama2-7b-Chat model instance
+
+    Properties:
+        model_uri: Ctransformers uri for LLM
+        model_file: gguf or bin file for repos with multiple files
+    """
+
+    model_uri="TheBloke/Llama-2-7B-Chat-GGML"
+    model_file="llama-2-7b-chat.Q6_K.gguf"
+ 
+
+@RegisterModelClass("llama2-13b-chat-Q4")
+class Chat_Llama2_13b_Q4(BaseCtransformersLLM):
+    """
+    Class for running Llama2-13b-Chat model instance
+
+    Properties:
+        model_uri: Ctransformers uri for LLM
+        model_file: gguf or bin file for repos with multiple files
+    """
+
+    model_uri="TheBloke/Llama-2-13B-Chat-GGML"
+    model_file="llama-2-13b-chat.Q4_K_M.gguf"
+
+
+@RegisterModelClass("llama2-13b-chat-Q6")
+class Chat_Llama2_13b_Q6(BaseCtransformersLLM):
+    """
+    Class for running Llama2-13b-Chat model instance
+
+    Properties:
+        model_uri: Ctransformers uri for LLM
+        model_file: gguf or bin file for repos with multiple files
+    """
+
+    model_uri="TheBloke/Llama-2-13B-Chat-GGML"
+    model_file="llama-2-13b-chat.Q6_K.gguf"
+
+
+@RegisterModelClass("llama2-7b-32k-Q4")
+class Chat_Llama2_13b_Q6(BaseCtransformersLLM):
+    """
+    Class for running Llama2-7b-32k-Instruct model instance
+
+    Properties:
+        model_uri: Ctransformers uri for LLM
+        model_file: gguf or bin file for repos with multiple files
+    """
+
+    model_uri="TheBloke/Llama-2-7B-32K-Instruct-GGML"
+    model_file="llama-2-7b-32k-instruct.ggmlv3.q4_1.bin"
