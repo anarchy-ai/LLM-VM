@@ -23,7 +23,7 @@ import tempfile
 import json
 import os
 import torch
-from peft import get_peft_config, LoraConfig
+from peft import get_peft_model, LoraConfig, prepare_model_for_kbit_training
 from trl import SFTTrainer
 
 
@@ -201,11 +201,9 @@ class BaseOnsiteLLM(ABC):
             return math.exp(eval_results['eval_loss']) #perplexity is the metric we use for finetuning measurement
         return asynctune
 
-    def finetune_immediately(self):
-        self.finetune()()
 
     def lora_finetune(self, data, optimizer, c_id, model_filename=None):
-        def asynclora():
+        def async_lora():
             old_model = optimizer.storage.get_model(c_id)
             if old_model is not None:
                 self.model.load_state_dict(torch.load(old_model))
@@ -260,16 +258,94 @@ class BaseOnsiteLLM(ABC):
             self.model_name = self.model_name + "_ft_"+  timestamp
             optimizer.storage.set_model(c_id, new_model)
             return math.exp(eval_results['eval_loss']) #perplexity is the metric we use for finetuning measurement
-        return asynclora
+        return async_lora
     
     def quantize_model(self, bits=4):
-        if bits == 4:
-            q_model = AutoModelForCausalLM.from_pretrained(self.model_uri, load_in_4bit=True)
-        elif bits == 8:
-            q_model = AutoModelForCausalLM.from_pretrained(self.model_uri, load_in_8bit=True)
+        if self.model.is_quantizable():
+            q4_config = BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_use_double_quant=True, bnb_4bit_quant_type='nf4', bnb_4bit_compute_dtype=torch.bfloat16)
+            q8_config = BitsAndBytesConfig(load_in_8bit=True, bnb_4bit_compute_dtype=torch.bfloat16)
+            
+            if bits == 4:
+                q_model = AutoModelForCausalLM.from_pretrained(self.model_uri, quantization_config=q4_config)
+            elif bits == 8:
+                q_model = AutoModelForCausalLM.from_pretrained(self.model_uri, quantization_config=q8_config)
+            else:
+                raise ValueError("Only 4-bit and 8-bit quantization supported")
+            return q_model
         else:
-            raise ValueError("Only 4-bit and 8-bit quantization supported")
-        return q_model
+            raise NotImplementedError(f"{self.model} cannot be quantized")
+
+
+    def qlora_finetune(self, data, optimizer, c_id, model_filename=None):
+        def async_qlora():
+            old_model = optimizer.storage.get_model(c_id)
+            if old_model is not None:
+                self.model.load_state_dict(torch.load(old_model))
+            untokenized_final_dataset = []
+            for prompt,response in data:
+                untokenized_final_dataset.append(prompt + response)
+            tokenized_final_dataset = map(self.tokenizer,untokenized_final_dataset)
+            self.tokenizer.pad_token = self.tokenizer.eos_token
+            data_collator = DataCollatorForLanguageModeling(tokenizer=self.tokenizer, mlm=False)
+            optimizer.storage.set_training_in_progress(c_id, True)
+            training_args = TrainingArguments(
+                output_dir=os.path.join(model_path_default,"finetuned_models",),
+                evaluation_strategy="epoch",
+                per_device_train_batch_size=1,
+                gradient_accumulation_steps=4,
+                warmup_steps=2,
+                max_steps=10,
+                learning_rate=2e-4,
+                fp16=True,
+                logging_steps=1,
+                optim="paged_adamw_8bit"
+            )
+            test_set = FinetuningDataset(tokenized_final_dataset,len(untokenized_final_dataset))
+            
+            self.model.gradient_checkpointing_enable()
+            self.model = prepare_model_for_kbit_training(self.model)
+            config = LoraConfig(
+                r=8, 
+                lora_alpha=32, 
+                target_modules=["query_key_value"], 
+                lora_dropout=0.05, 
+                bias="none", 
+                task_type="CAUSAL_LM"
+            )
+            self.model = get_peft_model(self.model, config)
+            trainer = Trainer(
+                self.model,
+                args=training_args,
+                train_dataset=test_set,
+                eval_dataset=test_set,
+                data_collator=data_collator,
+            )
+            os.makedirs(os.path.join(model_path_default,"finetuned_models", self.model_name), exist_ok=True)
+            if tokenized_final_dataset:
+                trainer.train()
+                eval_results = trainer.evaluate()
+            optimizer.storage.set_training_in_progress(c_id, False)
+
+            if os.name == "nt":
+                timestamp = datetime.now().strftime('%Y-%m-%dT%H-%M-%S')
+            else:
+                timestamp = datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
+            new_model = os.path.join(model_path_default,"finetuned_models",self.model_name, timestamp + '_' + self.model_name + ".pt" ) if model_filename is None else os.path.join(model_path_default,"finetuned_models",model_filename)
+            open(new_model,"a")
+            torch.save(self.model.state_dict(), new_model) # the model in memory is different now
+            self.model_name = self.model_name + "_ft_"+  timestamp
+            optimizer.storage.set_model(c_id, new_model)
+            return math.exp(eval_results['eval_loss']) #perplexity is the metric we use for finetuning measurement
+        return async_qlora
+    
+    def finetune_immediately(self):
+        self.finetune()()
+
+    def lora_finetune_immediately(self):
+        self.lora_finetune()()
+
+    def qlora_finetune_immediately(self):
+        self.qlora_finetune()()
 
 
 
