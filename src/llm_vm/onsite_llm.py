@@ -514,6 +514,7 @@ class SmallLocalBERT(BaseOnsiteLLM):
         return AutoModelForMaskedLM.from_pretrained(self.model_uri)
     def tokenizer_loader(self):
         return AutoTokenizer.from_pretrained(self.model_uri)
+
 @RegisterModelClass("gpt")
 class GPT3:
 
@@ -571,6 +572,46 @@ class GPT3:
         optimizer.storage.set_training_in_progress(c_id, False)
         if old_model is not None:
             openai.Model.delete(old_model)
+
+
+@RegisterModelClass("gpt4")
+class GPT4:
+    """
+    This is a class for openAI's gpt-4 LLM
+
+    Methods:
+        generate: Generates a response from a given prompt through OpenAI's endpoint
+    """
+
+    def generate(self, prompt, max_length=100, **kwargs):
+        """
+        This function uses openAI's API to generate a response from the prompt using the GPT-4 model
+
+        Parameters:
+            prompt (str): Prompt to send to LLM
+            max_length (int): Optional parameter limiting response length
+
+
+        Returns:
+            str: LLM Generated Response
+
+        Example:
+            >>> GPT4.generate("How long does it take for an apple to grow?")
+            It typically takes about 100-200 days...
+        """
+
+        cur_prompt = [{'role': "system", 'content': prompt}]
+        ans = openai.ChatCompletion.create(
+            messages=cur_prompt,
+            model="gpt-4",
+            **kwargs)
+
+        return ans['choices'][0]['message']['content']
+
+    def finetune(self, dataset, optimizer, c_id, small_model_filename=None):
+        print("fine tuning isn't supported by OpenAI on this model", file=sys.stderr)
+        raise Exception("fine tuning isn't supported by OpenAI on this model")
+
 
 @RegisterModelClass("chat_gpt")
 class ChatGPT:
