@@ -15,7 +15,8 @@ from transformers import (
     LlamaTokenizer,
     DataCollatorForLanguageModeling,
     TrainingArguments,
-    Trainer)
+    Trainer,
+    BitsAndBytesConfig)
 import time
 from datetime import datetime
 import tempfile
@@ -204,7 +205,7 @@ class BaseOnsiteLLM(ABC):
         self.finetune()()
 
     def lora_finetune(self, data, optimizer, c_id, model_filename=None):
-        def asynctune():
+        def asynclora():
             old_model = optimizer.storage.get_model(c_id)
             if old_model is not None:
                 self.model.load_state_dict(torch.load(old_model))
@@ -259,7 +260,17 @@ class BaseOnsiteLLM(ABC):
             self.model_name = self.model_name + "_ft_"+  timestamp
             optimizer.storage.set_model(c_id, new_model)
             return math.exp(eval_results['eval_loss']) #perplexity is the metric we use for finetuning measurement
-        return asynctune
+        return asynclora
+    
+    def quantize_model(self, bits=4):
+        if bits == 4:
+            q_model = AutoModelForCausalLM.from_pretrained(self.model_uri, load_in_4bit=True)
+        elif bits == 8:
+            q_model = AutoModelForCausalLM.from_pretrained(self.model_uri, load_in_8bit=True)
+        else:
+            raise ValueError("Only 4-bit and 8-bit quantization supported")
+        return q_model
+
 
 
 """
