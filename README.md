@@ -196,7 +196,7 @@ Here are some default model's details:
 | OPT | `facebook/opt-350m` | 350m | 622 MB |
 
 For some other choices of memory usage and parameter count in each model family, check out the 
-tables [here](./model_uri_tables.md).
+tables [model_uri_tables](./model_uri_tables.md).
 
 
 ### 🛠 Tool Usage
