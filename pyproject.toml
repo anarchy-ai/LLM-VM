@@ -2,13 +2,12 @@
 name = "llm_vm"
 version = "0.1.0"
 description = "Taming LLMs to do whatever you want"
-authors = [
-    {name = "Anarchy Team", email = "matt@anarchy.ai"},
-]
+authors = [{ name = "Anarchy Team", email = "matt@anarchy.ai" }]
 
 requires-python = ">=3.10" # this could be lower if need be
 readme = "README.md"
-license = {text = "MIT"}
+license = { text = "MIT" }
+
 dependencies = [
     "dynaconf>=3.2.0",
     "openai>=0.27.6",
@@ -29,15 +28,12 @@ dependencies = [
     "spacy>=3.5.3",
     "outlines>=0.0.1",
     "en_core_web_md @ https://github.com/explosion/spacy-models/releases/download/en_core_web_md-3.6.0/en_core_web_md-3.6.0-py3-none-any.whl",
-    "gradio>=3.42.0",  # Specify the latest version of gradio
+    "gradio>=3.42.0",                                                                                                                          # Specify the latest version of gradio
     "backoff>=2.2.1",
 ]
 
 [project.optional-dependencies]
-dev = [
-    "black>=23.7.0",
-    "mypy>=1.5.1",
-]
+dev = ["black>=23.7.0", "mypy>=1.5.1"]
 
 # todo: https://setuptools.pypa.io/en/latest/userguide/datafiles.html 
 
@@ -54,6 +50,7 @@ llm_vm_run_agent_flat = "llm_vm.agents.FLAT.agent:flat_main"
 [build-system]
 requires = ["setuptools>=61", "wheel"]
 build-backend = "setuptools.build_meta"
+
 [tool.setuptools]
 include-package-data = true
 
@@ -61,7 +58,9 @@ include-package-data = true
 where = ["src"] # this is the default i think
 
 [tool.setuptools.package-data]
-llm_vm = ["*.toml"] # note how the left hand side, the key, needs to be the package name/namespace
+llm_vm = [
+    "*.toml",
+] # note how the left hand side, the key, needs to be the package name/namespace
 
 # lets maybe try pytest # question all of this 
 [tool.pytest.ini_options]
@@ -76,21 +75,25 @@ python_files = "*.py"
 # python_functions = "*_check"
 
 [tool.mypy]
-exclude = ['venv', '.venv','src/llm_vm/agents'] # agents is complicated
+exclude = ['venv', '.venv', 'src/llm_vm/agents'] # agents is complicated
 
 # these are strawman configs
 [tool.black]
 line-length = 140
-target-version = ["py37"] # what does this do?
+target-version = ["py310"] # what does this do?
 skip-string-normalization = true
-
+exclude = '''
+(
+  /(
+    \.mypy_cache
+  )/
+)
+'''
 
 [tool.poetry]
 # does poetry make sense as a tool to use?
 # ... this is also the default anyways
-packages = [
-    { include = "llm_vm", from = "src" },
-]
+packages = [{ include = "llm_vm", from = "src" }]
 name = "llm_vm"
 version = "0.0.1"
 description = "Taming LLMs to do whatever you want"

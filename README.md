@@ -93,6 +93,8 @@ Use ```bash > python3 --version ``` to check what version you are on.
 
 To upgrade your python, either create a new python env using ```bash > conda create -n myenv python=3.10 ``` or go to https://www.python.org/downloads/ to download the latest version.
 
+     If you plan on running the setup steps below, a proper python version will be installed for you
+
 
 #### System Requirements
 
@@ -108,16 +110,8 @@ To install the LLM-VM you simply need to download this repository and install it
 ```bash
 > git clone https://github.com/anarchy-ai/LLM-VM.git
 > cd LLM-VM
-> pip3 install .
+> ./setup.sh
 ```
-#### Developer Setup
-the best way to test run code while writing a patch is to use 
-`pip3 install --editable .`, which will expose the code as a library you can 
-edit in place.
-
-This will install both the library and test-server.  
-
-And for installing dev dependencies, use `pip3 install -e ."[dev]"`
 
 #### One Last Step, almost there!
 If you're using one of the OpenAI models, you will need to set the `LLM_VM_OPENAI_API_KEY` environment
