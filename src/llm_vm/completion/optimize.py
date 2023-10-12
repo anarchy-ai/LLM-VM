@@ -258,7 +258,7 @@ class LocalOptimizer(Optimizer):
                     train_completion = best_completion if use_completion is None else use_completion
                     new_datapoint = (dynamic_prompt.strip(), train_completion)
                     self.storage.add_example(c_id, new_datapoint)
-                    small_model_filename = kwargs.get("small_model_filename", None)
+                    small_model_filename = kwargs.get("small_model_filepath", None)
 
                     if run_data_synthesis:
                         if len(self.storage.get_data(c_id)) < min_examples_for_synthesis:
