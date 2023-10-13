@@ -1,6 +1,6 @@
 ### 🏃‍♀️ Running Standalone
 
-After you have installed (as above), you now have an anarchy server which provides an completion API (using flask).
+After you have installed it (as above), you now have an anarchy server that provides a completion API (using Flask).
 
 ```bash
 > cd LLM-VM
@@ -14,22 +14,22 @@ This will start a flask server at https://localhost:3002/ and will create an end
 
 ### Submitting a Request
 
-The package defaults to using chatGPT as the big model that we use for completion, and GPT3 is the small model that we use for fine tuning. These can be adjusted in src/llm_vm/completion/config.json.
+The package defaults to using chatGPT as the big model that we use for completion, and GPT3 is the small model that we use for fine-tuning. These can be adjusted in src/llm_vm/completion/config.json.
 
-#### Request Paramaters
+#### Request Parameters
 - `prompt`: String - The natural language query that is passed to the LLM
-- `context`: String - The context for the prompt. We fine tune models with respect to the context window. Can be empty
-- `openai_key`: String - your personal open.ai key. You can generate one [here](https://platform.openai.com/account/api-keys)
+- `context`: String - The context for the prompt. We fine-tune models with respect to the context window. Can be empty
+- `openai_key`: String - your open.ai key. You can generate one [here](https://platform.openai.com/account/api-keys)
 - `temperature`?: Number - The temperature of the model. A higher temperature offers a more diverse range of answers, but a higher chance of straying from the context. 
 - `finetune`?: Boolean - True if you want to finetune the model and False if not.
 - `data_synthesis`?: Boolean - True if you want to finetune the model and False if not.
 - `stoptoken`?: String or Array of String - Sequence of tokens that will stop generation and return the result up to and before the sequence provided.
 - `tools`?: JSON Array
-	- `description`: String - description of what the tool does.
-	- `url`: String: Endpoint - of the tool you want to use
-	- `dynamic_params`: JSON {"key":"value"} - Parameters that change with each api call, like a stock ticker symbol you are interested in
-	- `method`: String - GET/POST
-	- `static_params`: JSON {"key":"value"} - Parameters that are the same for every api call, like the token or API key
+    - `description`: String - description of what the tool does.
+    - `url`: String: Endpoint - of the tool you want to use
+    - `dynamic_params`: JSON {"key": "value"} - Parameters that change with each API call, like a stock ticker symbol you are interested in
+    - `method`: String - GET/POST
+    - `static_params`: JSON {"key": "value"} - Parameters that are the same for every API call, like the token or API key
 
 
 #### Submitting a Request to the LLM
@@ -38,8 +38,8 @@ Post requests can be sent to this endpoint `http://localhost:3002/v1/complete` i
 
 ```
 {
-    "prompt":"What is 2+2",
-    "context":"Answer the math problem with just a number.",
+    "prompt": "What is 2+2",
+    "context": "Answer the math problem with just a number.",
     "openai_key": <OPENAI-KEY>,
     "temperature":0,
     "finetune": true,
@@ -59,18 +59,18 @@ If no `temperature`, `finetune`, or `data_synthesis` are provided, these values 
 
 #### Submitting a Request to the REBEL Agent
 
-An agent is an algorithm that uses the LLM in a way to increase its reasoning capabilities such as allowing the use of outside tools or allowing the LLM to answer compositional questions. To use the REBEL (REcursion Based Extensible Llm) endpoint with tools, add a tool in the following way. We have used the finnhub api to get stocks data as an example.
+An agent is an algorithm that uses the LLM in a way to increase its reasoning capabilities such as allowing the use of outside tools or allowing the LLM to answer compositional questions. To use the REBEL (REcursion Based Extensible Llm) endpoint with tools, add a tool in the following way. We have used the finnhub API to get stock data as an example.
 
 Post requests can be sent to this endpoint `http://localhost:3002/v1/complete` with the tools optional parameter:
 ```
 {
-    "prompt":"What is the price of apple stock?",
+    "prompt": "What is the price of apple stock?",
     "context":"",
     "tools":[{
-        "description":"Find the current price of a stock.",
-        "url":"https://finnhub.io/api/v1/quote",
+        "description": "Find the current price of a stock.",
+        "url": "https://finnhub.io/api/v1/quote",
         "dynamic_params":{"symbol": "the symbol of the stock"},
-        "method":"GET",
+        "method": "GET",
         "static_params":{"token":<Finnhub Key>}
     }],
     "openai_key": <OpenAI Key>,

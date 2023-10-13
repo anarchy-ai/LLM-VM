@@ -46,7 +46,7 @@ By doing all these things in one spot in an opinionated way, the LLM-VM can prop
 
 ### 🤌 Why use the Anarchy LLM-VM?
 
-In line with Anarchy's mission, the LLM-VM strives to support open-source models. By utilizing open-source models and running them locally you achieve a number of benefits:
+In line with Anarchy's mission, the LLM-VM strives to support open-source models. By utilizing open-source models and running them locally you achieve several benefits:
 
 * **Speed up your AGI development 🚀:** *With AnarchyAI, one interface is all you need to interact with the latest LLMs available.*
   
@@ -98,9 +98,9 @@ To upgrade your python, either create a new python env using ```bash > conda cre
 
 #### System Requirements
 
-Different models have different system requirements. Limiting factors on most systems will likely be RAM, but many functions will work at even 16 GB of ram. 
+Different models have different system requirements. Limiting factors on most systems will likely be RAM, but many functions will work at even 16 GB of RAM. 
 
-That said, always lookup information about the models you're using, they all have different sizes and requirements 
+That said, always lookup the information about the models you're using, they all have different sizes and requirements 
 in memory and compute resources. 
 
 ### 👨‍💻 Installation
@@ -127,7 +127,7 @@ Our LLM-VM gets you working directly with popular LLMs locally in just 3 lines. 
 # import our client
 from llm_vm.client import Client
 
-# Select which LLM you want to use, here we have OpenAI's 
+# Select which LLM you want to use, here we have OpenAI 
 client = Client(big_model = 'chat_gpt')
 
 # Put in your prompt and go!
@@ -154,7 +154,7 @@ print(response)
 ### 😎 Supported Models
 Select from the following models
 ```python
-Supported_Models = ['chat_gpt','gpt','neo','llama','bloom','opt','pythia']
+Supported_Models = ['chat_gpt', 'gpt',' neo', 'llama', 'bloom', 'opt', 'pythia']
 ```
 
 
@@ -166,7 +166,7 @@ with LLMs accessible to everyone, but if you have the memory required, larger pa
 will perform far better!
 
 for example, if you want to use a large and small neo model  for your teacher and student, and you 
-have enough ram:
+have enough RAM:
 
 
 ```python
@@ -205,7 +205,7 @@ We welcome contributors!  To get started is to join our active [discord communit
 ### Jobs
 
 - We're always looking for serious hackers.  Prove that you can build and creatively solve hard problems and reach out! 
-- The easiest way to secure a job/internship with us is to submit pull requests that closes tickets.
+- The easiest way to secure a job/internship with us is to submit pull requests that close tickets.
 - Then you can apply directly here https://forms.gle/bUWDKW3cwZ8n6qsU8
 
 ### Bounty
