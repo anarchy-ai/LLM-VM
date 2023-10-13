@@ -49,28 +49,12 @@ class DataSynthesis:
         return datapoints
     
     @backoff.on_exception(backoff.expo, openai.error.RateLimitError)
-    def generate_example(
-        self, 
-        optimizer, 
-        final_prompt, 
-        openai_key, 
-        example_delim="<END>", 
-        max_length=1000, 
-        temperature=1, # temperature 1 ideal for generating examples (default is 0)
-        completion=None, 
-        **kwargs
-        ):
+    def generate_example(self, optimizer, final_prompt, openai_key, example_delim="<END>", max_length=1000, temperature=1, completion=None, **kwargs):
         openai.api_key = openai_key
         kwargs.update({"temperature":temperature})
-
-        response = optimizer.big_model.generate(
-            final_prompt, 
-            max_length=max_length, 
-            **kwargs
-            )
-
         the_tuple = None
 
+        response = optimizer.big_model.generate(final_prompt, max_length=max_length, **kwargs)
         if completion is None:
             completion = GenerativeCompletion.response_completion()
 
