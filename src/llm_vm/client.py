@@ -63,6 +63,8 @@ class Client:
         Example:
             >>> client = Client(big_model = 'neo')
         """
+        self.big_model = big_model
+        self.small_model = small_model 
         self.teacher = load_model_closure(big_model)(**big_model_config)
         self.student = load_model_closure(small_model)(**small_model_config)
 
@@ -126,7 +128,9 @@ class Client:
         dynamic_prompt = prompt
         use_rebel_agent = False
 
-        kwargs.update({"temperature":temperature})
+        if self.big_model == 'chat_gpt' or self.small_model == 'gpt':
+            kwargs.update({"temperature":temperature})
+
 
         if openai_key is not None:
             self.openai_key = openai_key
