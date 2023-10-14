@@ -112,6 +112,15 @@ To install the LLM-VM you simply need to download this repository and install it
 > cd LLM-VM
 > ./setup.sh
 ```
+Alternatively you can do this:
+
+```bash
+> git clone https://github.com/anarchy-ai/LLM-VM.git
+> cd LLM-VM
+> python -m venv <name>
+> source llm/bin/activate
+> python -m pip install -e ."[dev]"
+```
 
 #### One Last Step, almost there!
 If you're using one of the OpenAI models, you will need to set the `LLM_VM_OPENAI_API_KEY` environment
