@@ -128,7 +128,7 @@ class Client:
         dynamic_prompt = prompt
         use_rebel_agent = False
 
-        if self.big_model == 'chat_gpt' or self.small_model == 'gpt':
+        if self.big_model == 'chat_gpt' or self.big_model == 'gpt':
             kwargs.update({"temperature":temperature})
 
 
