@@ -10,7 +10,16 @@ Anybody can submit PRs!  *Anybody.*  We *want* to accept them all, but simply ca
 
 3. Check out the open issues that are [good for beginners](https://github.com/anarchy-ai/LLM-VM/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22).  Pick one and comment on it, and write in #engineering that you are interested in it.  You can't be assigned it quite yet - you need to become a full contributor first (#roles-and-levels)!
 
-4. When you are ready to finally commit, you'll have to make a pull request by forking the code.  Mention the ticket number your pull request addresses in the issue.  Write "Closes #136"
+4. When you are ready to finally commit, you'll have to make a [pull request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request?platform=mac) by forking the code.  Mention the ticket number your pull request addresses in the issue.  Write "Closes #136".
+
+5. Once you have forked the project you need to clone your fork, and create a branch for your work and push:
+
+```
+* git clone <your-fork>
+* cd <you-fork>
+* git checkout -b <branch-name>
+* git push --set-upstream origin <branch-name>
+```
 
 5. Join the weekly ticket triage on Monday to learn more about the issues and speak to me directly!
 
