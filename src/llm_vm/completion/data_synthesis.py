@@ -31,7 +31,7 @@ class DataSynthesis:
         ----------
         - List: A list of tuples containing the QA pairs to be used for fine-tuning.
         """
-        
+
         if os.path.isfile(conf.settings.data_gen_file):
             new_file = open(conf.settings.data_gen_file,"rb")
             return list(pickle.load(new_file))
@@ -40,7 +40,7 @@ class DataSynthesis:
         final_prompt = "Generate 1 json similar to the one below. \n" + final_prompt
 
         while len(datapoints) < self.examples_to_generate:
-            datapoint = self.generate_example(final_prompt, openai_key, completion=completion)
+            datapoint = self.generate_example(optimizer, final_prompt, openai_key, completion=completion, **kwargs)
             time.sleep(5)
             datapoints.append(datapoint)
             print(datapoint)
@@ -49,12 +49,12 @@ class DataSynthesis:
         return datapoints
     
     @backoff.on_exception(backoff.expo, openai.error.RateLimitError)
-    def generate_example(self, final_prompt, openai_key, example_delim="<END>", model="gpt-4", max_tokens=1000, temperature=1, completion=None):
+    def generate_example(self, optimizer, final_prompt, openai_key, example_delim="<END>", max_length=1000, temperature=1, completion=None, **kwargs):
         openai.api_key = openai_key
-        cur_prompt = [{'role': "system", 'content': final_prompt}]
+        kwargs.update({"temperature":temperature})
         the_tuple = None
 
-        response = openai.ChatCompletion.create(messages=cur_prompt, model=model, max_tokens=max_tokens, temperature=temperature)['choices'][0]['message']['content']
+        response = optimizer.big_model.generate(final_prompt, max_length=max_length, **kwargs)
         if completion is None:
             completion = GenerativeCompletion.response_completion()
 
