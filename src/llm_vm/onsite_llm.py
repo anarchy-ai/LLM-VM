@@ -542,7 +542,7 @@ class GPT3:
             It typically takes about 100-200 days...
         """
 
-        ans = openai.Completion.create(prompt= prompt, model="text-davinci-003", **kwargs)
+        ans = openai.Completion.create(prompt= prompt, model="text-davinci-003", max_tokens=max_length, **kwargs)
         return ans['choices'][0]['text']
 
 
@@ -642,6 +642,7 @@ class ChatGPT:
         ans = openai.ChatCompletion.create(
             messages=cur_prompt,
             model="gpt-3.5-turbo-0301",
+            max_tokens=max_length,
             **kwargs)
         return ans['choices'][0]['message']['content']
 
