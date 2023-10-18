@@ -5,7 +5,10 @@ from llm_vm.onsite_llm import load_model_closure
 from llm_vm.agents.REBEL import agent
 from llm_vm.completion.optimize import LocalOptimizer
 import llm_vm.config as conf
+from llm_vm.vector_db import PineconeDB
 import os
+import PyPDF2
+from sentence_transformers import SentenceTransformer
 
 
 if conf.settings.big_model is None:
@@ -34,7 +37,6 @@ class Simple_Inference_Client:
     def complete(self, prompt, max_len=256, **kwargs):
         return self.model.generate(prompt, max_len,**kwargs)
 
-        
 
 
 class Client:
@@ -65,6 +67,8 @@ class Client:
         """
         self.teacher = load_model_closure(big_model)(**big_model_config)
         self.student = load_model_closure(small_model)(**small_model_config)
+        self.vector_db = None
+        self.emb_model = None
 
         ## FIXME, do something like $HOME/.llm_vm/finetuned_models/
         if os.path.isdir("finetuned_models") == False:
@@ -180,3 +184,119 @@ class Client:
 
     def load_finetune(self, model_filename=None):
         self.teacher.load_finetune(model_filename)
+
+    def set_pinecone_db(self, api_key, env_name):
+        self.vector_db = PineconeDB(api_key, env_name)
+        self.emb_model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
+
+    def _pdf_loader(self, pdf_file_path):
+
+        try:
+        # Open the PDF file in read-binary mode
+            with open(pdf_file_path, 'rb') as pdf_file:
+                pdf_reader = PyPDF2.PdfFileReader(pdf_file)
+
+                pdf_text = ''
+                
+                for page_num in range(pdf_reader.numPages):
+                    page = pdf_reader.getPage(page_num)
+                    pdf_text += page.extractText()
+                
+                pdf_file.close()
+                
+                return pdf_text
+        
+        except Exception as e:
+            # Handle exceptions, such as file not found or invalid PDF format
+            print(f"Error: {e}")
+            return None
+        
+    def create_pinecone_index(self, **kwargs):
+        self.vector_db.create_index(**kwargs)
+
+    def store_pdf(self, pdf_file_path, chunk_size=1024, **kwargs):
+        text = self._pdf_loader(pdf_file_path)
+        chunks = [text[i:i+chunk_size] for i in range(0, len(text), chunk_size)]
+        embeddings = [self.emb_model.encode(chunk) for chunk in chunks]
+        kwargs["vector"] = embeddings
+        self.vector_db.upsert(**kwargs)
+
+    def RAG_complete(self, prompt,
+                 context = "",
+                 openai_key = None,
+                 finetune=False,
+                 data_synthesis = False,
+                 temperature=0,
+                 stoptoken = None,
+                 tools = None,
+                 query_kwargs = {},
+                 **kwargs):
+        
+        prompt_embeddings = self.emb_model.encode(prompt)
+        query_kwargs["vector"] = prompt_embeddings
+        if "top_k" not in query_kwargs:
+            query_kwargs["top_k"] = 5
+
+        topk_vecs = self.vector_db.query(**query_kwargs)
+
+        decoded_vecs = self.emb_model.decode(topk_vecs)
+
+        prompt = decoded_vecs + "/n" + prompt
+
+        static_context = context
+        dynamic_prompt = prompt
+        use_rebel_agent = False
+
+        kwargs.update({"temperature":temperature})
+
+        if openai_key is not None:
+            self.openai_key = openai_key
+
+        if stoptoken is not None:
+            kwargs.update({"stop":stoptoken})
+
+        if tools is not None:
+            if type(tools) != list:
+                return Exception("Wrong data type for tools. Should be a list")
+            else:
+                final_tools=[]
+                for i in tools:
+                    temp_tool_dict = {}
+                    temp_args_dict = {}
+                    temp_tool_dict.update({"description":i["description"]})
+                    temp_tool_dict.update({"dynamic_params":i["dynamic_params"]})
+                    temp_tool_dict.update({"method":i["method"]})
+                    temp_args_dict.update({"url":i["url"]})
+                    temp_args_dict.update({"params":{}})
+                    for j in i["static_params"].keys():
+                        temp_args_dict["params"].update({j:i["static_params"][j]})
+                    for k in i["dynamic_params"].keys():
+                        temp_args_dict["params"].update({k:"{"+k+"}"})
+                    temp_tool_dict.update({"args":temp_args_dict})
+                    final_tools.append(temp_tool_dict)
+                if self.rebel_agent is None:
+                    self.rebel_agent = agent.Agent("", [], verbose=1) # initialize only if tools registered
+                self.rebel_agent.set_tools(final_tools)
+                use_rebel_agent = True
+
+        try:
+            if openai_key is not None:
+                openai.api_key = self.openai_key
+        except:
+            return  {"status":0, "resp":"Issue with OpenAI key"}
+
+        self.optimizer.openai_key = openai.api_key
+        # self.agent.set_api_key(openai.api_key,"OPENAI_API_KEY") #
+        if os.getenv("OPENAI_API_KEY") is None and use_rebel_agent==True :
+            print("warning: you need OPENAI_API_KEY environment variable for ", file=sys.stderr)
+
+        try:
+            if not use_rebel_agent:
+                completion = self.optimizer.complete(static_context,dynamic_prompt,data_synthesis=data_synthesis,finetune = finetune, **kwargs)
+            else:
+                completion = self.rebel_agent.run(static_context+dynamic_prompt,[])[0]
+        except Exception as e:
+            return {"status":0, "resp": str(e)}
+        return {"completion":completion, "status": 200}
+
+        
