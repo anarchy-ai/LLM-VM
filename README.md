@@ -141,8 +141,8 @@ print(response)
 # import our client
 from llm_vm.client import Client
 
-# Select the LlaMA model
-client = Client(big_model = 'llama')
+# Select the LlaMA 2 model
+client = Client(big_model = 'llama2')
 
 # Put in your prompt and go!
 response = client.complete(prompt = 'What is Anarchy?', context = '')
@@ -154,7 +154,8 @@ print(response)
 ### 😎 Supported Models
 Select from the following models
 ```python
-Supported_Models = ['chat_gpt', 'gpt',' neo', 'llama', 'bloom', 'opt', 'pythia']
+
+Supported_Models = ['chat_gpt','gpt','neo','llama2','bloom','opt','pythia']
 ```
 
 
@@ -220,18 +221,17 @@ Some tickets we'll pay you for closing! Look at the ticket labels to see how muc
   - Twitter: [@mmirman](https://twitter.com/mmirman)
   - Website: [mirman.com](https://www.mirman.com)
 
-- **Abhigya Sodani** - Research Intern
-  - GitHub: [@abhigya-sodani](https://github.com/abhigya-sodani)
-  - LinkedIn: [@abhigya-sodani](https://www.linkedin.com/in/abhigya-sodani-405918160/)
- 
-
-- **Carter Schonwald** - Community Engineering Leader 
-  - GitHub: [@cartazio](https://github.com/cartazio)
-  - LinkedIn: [@carter-schonwald](https://www.linkedin.com/in/carter-schonwald-aa178132/)
-
 - **Victor Odede** - Undoomer
   - GitHub: [@VictorOdede](https://github.com/VictorOdede)
   - LinkedIn: [@victor-odede](https://www.linkedin.com/in/victor-odede-aaa907114/)
+
+- **Abhigya Sodani** - Research Intern
+  - GitHub: [@abhigya-sodani](https://github.com/abhigya-sodani)
+  - LinkedIn: [@abhigya-sodani](https://www.linkedin.com/in/abhigya-sodani-405918160/)
+
+- **Carter Schonwald** - Fearless Contributor
+  - GitHub: [@cartazio](https://github.com/cartazio)
+  - LinkedIn: [@carter-schonwald](https://www.linkedin.com/in/carter-schonwald-aa178132/)
  
 - **Kyle Wild** - Fearless Contributor
   - GitHub: [@dorkitude](https://github.com/dorkitude)
