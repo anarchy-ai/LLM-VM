@@ -26,7 +26,6 @@ import torch
 from peft import get_peft_model, LoraConfig, prepare_model_for_kbit_training
 from trl import SFTTrainer
 from sentence_transformers import SentenceTransformer
-from .vector_db import PineconeDB 
 
 
 
@@ -145,45 +144,6 @@ class BaseOnsiteLLM(ABC):
            I think it takes about a week for the apple to grow.
         """
 
-
-        if isinstance(device, list):
-            # If multiple GPUs are available, use first one
-            inputs = self.tokenizer(prompt, return_tensors="pt", **tokenizer_kwargs).to(device[0])
-        else:
-            inputs = self.tokenizer(prompt, return_tensors="pt").to(device)
-        generate_ids=self.model.generate(inputs.input_ids, max_length=max_length, **generation_kwargs)
-        resp= self.tokenizer.batch_decode(generate_ids,skip_special_tokens=True,clean_up_tokenization_spaces=False)[0]
-        # need to drop the len(prompt) prefix with these sequences generally
-        # because they include the prompt.
-        return resp[len(prompt):]
-    
-    def RAG_generate(self, prompt, vector_store, max_length=100, vector_search_kwargs = {}, tokenizer_kwargs={}, generation_kwargs={}):
-        """
-        This function uses the class's llm, vector store and tokenizer to generate a response given a user's prompt
-
-        Parameters:
-            vector_store(class): An instance of the vector DB class
-            prompt (str): Prompt to send to LLM
-            max_length (int): Optional parameter limiting response length
-
-        Returns:
-            str: LLM Generated Response
-
-        Example:
-           >>> SmallLocalOpt.generate("How long does it take for an apple to grow?")
-           I think it takes about a week for the apple to grow.
-        """
-        emb_model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
-        prompt_embeddings = emb_model.encode(prompt)
-        vector_search_kwargs["vector"] = prompt_embeddings
-        if "top_k" not in vector_search_kwargs:
-            vector_search_kwargs["top_k"] = 5
-
-        topk_vecs = vector_store.query(**vector_search_kwargs)
-
-        decoded_vecs = emb_model.decode(topk_vecs)
-
-        prompt = decoded_vecs + prompt
 
         if isinstance(device, list):
             # If multiple GPUs are available, use first one
