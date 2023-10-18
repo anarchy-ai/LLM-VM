@@ -141,8 +141,8 @@ print(response)
 # import our client
 from llm_vm.client import Client
 
-# Select the LlaMA model
-client = Client(big_model = 'llama')
+# Select the LlaMA 2 model
+client = Client(big_model = 'llama2')
 
 # Put in your prompt and go!
 response = client.complete(prompt = 'What is Anarchy?', context = '')
@@ -154,7 +154,7 @@ print(response)
 ### 😎 Supported Models
 Select from the following models
 ```python
-Supported_Models = ['chat_gpt','gpt','neo','llama','bloom','opt','pythia']
+Supported_Models = ['chat_gpt','gpt','neo','llama2','bloom','opt','pythia']
 ```
 
 
