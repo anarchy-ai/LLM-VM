@@ -2,7 +2,7 @@ from abc import ABC,abstractmethod
 import sys
 import openai
 import math
-from transformers import AutoModelForCausalLM
+from ctransformers import AutoModelForCausalLM
 from transformers import (
     AutoModelForMaskedLM,
     AutoModelForSeq2SeqLM,
