@@ -32,6 +32,7 @@ dependencies = [
     "backoff>=2.2.1",
     "peft>=0.5.0",
     "trl>=0.7.2",
+    "pinecone-client>=2.2.4"
 ]
 
 [project.optional-dependencies]
