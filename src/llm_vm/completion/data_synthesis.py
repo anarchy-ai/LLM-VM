@@ -56,14 +56,23 @@ class DataSynthesis:
 
         response = openai.ChatCompletion.create(messages=cur_prompt, model=model, max_tokens=max_tokens, temperature=temperature)['choices'][0]['message']['content']
         if completion is None:
-            completion = GenerativeCompletion.response_completion()
-
-        try:
-            the_data = json.loads(response.replace("\n", ""))
-            prompt = the_data["prompt"]
-            response = completion.complete(prompt)
-            the_tuple = (prompt, response+example_delim)
-        except:
-            pass
-
+            completion = self.call_big(prompt, model=model, max_tokens=max_tokens, temperature=temperature)
+            try:
+                the_data = json.loads(response.replace("\n", ""))
+                prompt = the_data["prompt"]
+                oai_message = [{'role': "system", 'content': "You are a helpful assistant"}, {'role': "user", 'content': prompt}]
+                completion_response = openai.ChatCompletion.create(messages=oai_message, model=model, max_tokens=max_tokens, temperature=temperature)['choices'][0]['message']['content']
+                the_tuple = (prompt, completion_response+example_delim)
+            except Exception as e:
+                raise Exception(f"An error has ocurred: ${e}")
+                      
+        else:
+            try:
+                the_data = json.loads(response.replace("\n", ""))
+                prompt = the_data["prompt"]
+                completion_response = completion.complete(prompt)
+                the_tuple = (prompt, completion_response+example_delim)
+            except Exception as e:
+                raise Exception(f"An error has ocurred: ${e}")
+            
         return the_tuple
