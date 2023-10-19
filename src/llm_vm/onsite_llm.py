@@ -25,6 +25,8 @@ import os
 import torch
 from peft import get_peft_model, LoraConfig, prepare_model_for_kbit_training
 from trl import SFTTrainer
+from sentence_transformers import SentenceTransformer
+
 
 
 __private_key_value_models_map =  {}
@@ -141,6 +143,8 @@ class BaseOnsiteLLM(ABC):
            >>> SmallLocalOpt.generate("How long does it take for an apple to grow?")
            I think it takes about a week for the apple to grow.
         """
+
+
         if isinstance(device, list):
             # If multiple GPUs are available, use first one
             inputs = self.tokenizer(prompt, return_tensors="pt", **tokenizer_kwargs).to(device[0])
