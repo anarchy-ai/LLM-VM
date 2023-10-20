@@ -213,6 +213,72 @@ We welcome contributors!  To get started is to join our active [discord communit
 
 Some tickets we'll pay you for closing! Look at the ticket labels to see how much the bounty is.  To get started, [join the discord and read the guide](https://discord.com/channels/1075227138766147656/1147542772824408074)
 
+## 🚀 Anarchy LLM-VM Terminology and Explanations 🚀 ##
+
+To make it easier for developers to understand the Anarchy LLM-VM and its features, we've created this terminology guide to explain some of the new words and concepts introduced in the readme.
+
+### Anarchy LLM-VM
+
+The Anarchy LLM-VM stands for Anarchy's Language Model Virtual Machine. It is an optimized backend for running Language Model Models (LLMs) with a wide range of features and tools.
+
+### AGI (Artificial General Intelligence)
+
+AGI refers to Artificial General Intelligence, which is a type of AI that possesses human-like intelligence and can perform a wide range of tasks, similar to a human being.
+
+### API Key
+
+An API key is a unique code that allows access to certain services, like the OpenAI models. You need to set your OpenAI API key to use OpenAI models with the Anarchy LLM-VM.
+
+### Batching
+
+Batching refers to the process of grouping multiple tasks or requests together to optimize efficiency.
+
+### Stateful Memory
+
+Stateful memory enables the LLM-VM to remember a user's conversation history and respond accordingly.
+
+### Agents
+
+Agents in the Anarchy LLM-VM, such as FLAT and REBEL, are tools that facilitate interactions with the LLMs and other components.
+
+### Inference Optimization
+
+Inference optimization involves enhancing the speed and efficiency of the LLM-VM's decision-making process.
+
+### Task Auto-Optimization
+
+Task auto-optimization analyzes repetitive tasks and uses techniques like student-teacher distillation and data synthesis to improve results.
+
+### HTTP Endpoints
+
+HTTP endpoints are standalone servers provided by the Anarchy LLM-VM to handle completion requests.
+
+### Web Playground
+
+A web playground is a feature that allows you to test the Anarchy LLM-VM and its outputs directly from a web browser.
+
+### Load-Balancing and Orchestration
+
+Load-balancing and orchestration features enable the LLM-VM to optimize the utilization of multiple LLMs or providers to balance uptime and costs.
+
+### Output Templating
+
+Output templating allows you to format LLM responses according to specific templates and variables.
+
+### Supported Models
+
+Anarchy LLM-VM supports various LLM models, including 'chat_gpt', 'gpt', 'neo', 'llama2', 'bloom', 'opt', and 'pythia'.
+
+### Python Environment
+
+To run the Anarchy LLM-VM, you need a Python environment with a version of Python greater than or equal to 3.10.
+
+### System Requirements
+
+Different LLM models have varying system requirements, mainly related to RAM and compute resources. Ensure that your system meets the requirements of the specific LLM you're using.
+
+If you have any questions or need further clarification, feel free to reach out to the Anarchy community.
+
 ## 🙏 Acknowledgements 🙏
 
 - **Matthew Mirman** - CEO
