@@ -400,7 +400,6 @@ class SmallLocalOpenPlatypus(BaseOnsiteLLM):
 
 @RegisterModelClass("llama")
 class SmallLocalOpenLLama(BaseOnsiteLLM):
-
     """
     This is a class for Openlm-Research's open_llama-3b LLM
 
