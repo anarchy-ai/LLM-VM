@@ -158,7 +158,6 @@ function install_deps() {
 function setup_pyenv() {
     echo_step "Setting up Pyenv"
 
-    pyenv_init_shim="$(pyenv init --path)"
     shell_profile=~/.zshrc
     case $(basename "$SHELL") in
         bash)
@@ -242,4 +241,4 @@ skip_or_run setup_direnv "direnv"
 skip_or_run setup_pip "pip"
 skip_or_run install_deps "deps"
 echo_warn "Congratulations - your local setup is complete!\n\nPlease reload your shell..."
-# reload_shell
+# reload_shel
