@@ -2,8 +2,8 @@ import sys
 from dotenv import load_dotenv
 import os
 import openai
-import data_synthesis
-from optimize import *
+import llm_vm.completion.data_synthesis
+from llm_vm.completion.optimize import *
 from llm_vm.client import Client
 
 client = Client(big_model='gpt', small_model='neo')

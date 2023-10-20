@@ -46,7 +46,7 @@ By doing all these things in one spot in an opinionated way, the LLM-VM can prop
 
 ### 🤌 Why use the Anarchy LLM-VM?
 
-In line with Anarchy's mission, the LLM-VM strives to support open-source models. By utilizing open-source models and running them locally you achieve a number of benefits:
+In line with Anarchy's mission, the LLM-VM strives to support open-source models. By utilizing open-source models and running them locally you achieve several benefits:
 
 * **Speed up your AGI development 🚀:** *With AnarchyAI, one interface is all you need to interact with the latest LLMs available.*
   
@@ -93,12 +93,14 @@ Use ```bash > python3 --version ``` to check what version you are on.
 
 To upgrade your python, either create a new python env using ```bash > conda create -n myenv python=3.10 ``` or go to https://www.python.org/downloads/ to download the latest version.
 
+     If you plan on running the setup steps below, a proper python version will be installed for you
+
 
 #### System Requirements
 
-Different models have different system requirements. Limiting factors on most systems will likely be RAM, but many functions will work at even 16 GB of ram. 
+Different models have different system requirements. Limiting factors on most systems will likely be RAM, but many functions will work at even 16 GB of RAM. 
 
-That said, always lookup information about the models you're using, they all have different sizes and requirements 
+That said, always lookup the information about the models you're using, they all have different sizes and requirements 
 in memory and compute resources. 
 
 ### 👨‍💻 Installation
@@ -108,16 +110,8 @@ To install the LLM-VM you simply need to download this repository and install it
 ```bash
 > git clone https://github.com/anarchy-ai/LLM-VM.git
 > cd LLM-VM
-> pip3 install .
+> ./setup.sh
 ```
-#### Developer Setup
-the best way to test run code while writing a patch is to use 
-`pip3 install --editable .`, which will expose the code as a library you can 
-edit in place.
-
-This will install both the library and test-server.  
-
-And for installing dev dependencies, use `pip3 install -e ."[dev]"`
 
 #### One Last Step, almost there!
 If you're using one of the OpenAI models, you will need to set the `LLM_VM_OPENAI_API_KEY` environment
@@ -133,7 +127,7 @@ Our LLM-VM gets you working directly with popular LLMs locally in just 3 lines. 
 # import our client
 from llm_vm.client import Client
 
-# Select which LLM you want to use, here we have OpenAI's 
+# Select which LLM you want to use, here we have OpenAI 
 client = Client(big_model = 'chat_gpt')
 
 # Put in your prompt and go!
@@ -147,8 +141,8 @@ print(response)
 # import our client
 from llm_vm.client import Client
 
-# Select the LlaMA model
-client = Client(big_model = 'llama')
+# Select the LlaMA 2 model
+client = Client(big_model = 'llama2')
 
 # Put in your prompt and go!
 response = client.complete(prompt = 'What is Anarchy?', context = '')
@@ -160,7 +154,8 @@ print(response)
 ### 😎 Supported Models
 Select from the following models
 ```python
-Supported_Models = ['chat_gpt','gpt','neo','llama','bloom','opt','pythia']
+
+Supported_Models = ['chat_gpt','gpt','neo','llama2','bloom','opt','pythia']
 ```
 
 
@@ -172,7 +167,7 @@ with LLMs accessible to everyone, but if you have the memory required, larger pa
 will perform far better!
 
 for example, if you want to use a large and small neo model  for your teacher and student, and you 
-have enough ram:
+have enough RAM:
 
 
 ```python
@@ -211,7 +206,7 @@ We welcome contributors!  To get started is to join our active [discord communit
 ### Jobs
 
 - We're always looking for serious hackers.  Prove that you can build and creatively solve hard problems and reach out! 
-- The easiest way to secure a job/internship with us is to submit pull requests that closes tickets.
+- The easiest way to secure a job/internship with us is to submit pull requests that close tickets.
 - Then you can apply directly here https://forms.gle/bUWDKW3cwZ8n6qsU8
 
 ### Bounty
@@ -226,18 +221,17 @@ Some tickets we'll pay you for closing! Look at the ticket labels to see how muc
   - Twitter: [@mmirman](https://twitter.com/mmirman)
   - Website: [mirman.com](https://www.mirman.com)
 
-- **Abhigya Sodani** - Research Intern
-  - GitHub: [@abhigya-sodani](https://github.com/abhigya-sodani)
-  - LinkedIn: [@abhigya-sodani](https://www.linkedin.com/in/abhigya-sodani-405918160/)
- 
-
-- **Carter Schonwald** - Community Engineering Leader 
-  - GitHub: [@cartazio](https://github.com/cartazio)
-  - LinkedIn: [@carter-schonwald](https://www.linkedin.com/in/carter-schonwald-aa178132/)
-
 - **Victor Odede** - Undoomer
   - GitHub: [@VictorOdede](https://github.com/VictorOdede)
   - LinkedIn: [@victor-odede](https://www.linkedin.com/in/victor-odede-aaa907114/)
+
+- **Abhigya Sodani** - Research Intern
+  - GitHub: [@abhigya-sodani](https://github.com/abhigya-sodani)
+  - LinkedIn: [@abhigya-sodani](https://www.linkedin.com/in/abhigya-sodani-405918160/)
+
+- **Carter Schonwald** - Fearless Contributor
+  - GitHub: [@cartazio](https://github.com/cartazio)
+  - LinkedIn: [@carter-schonwald](https://www.linkedin.com/in/carter-schonwald-aa178132/)
  
 - **Kyle Wild** - Fearless Contributor
   - GitHub: [@dorkitude](https://github.com/dorkitude)

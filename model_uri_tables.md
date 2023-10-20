@@ -11,11 +11,11 @@
 #### Bloom Model  
 
 | URI | Model Params | Checkpoint file size | Is Default?
-|-----|-------------|-----------------------|------------------
-| bigscience/bloom-560m | 1.7B | 1.12 GB | ✅
-| bigscience/bloom-1b7/ | 1.7B | 3.4GB   | ❌
-| bigscience/bloom-3b | 3B | 6.01 GB     | ❌
-| bigscience/bloom-7b1 | 7.1B | 14 GB |    ❌
+|-----|--------------|-----------------------|------------------
+| bigscience/bloom-560m | 560m         | 1.12 GB | ✅
+| bigscience/bloom-1b7/ | 1.7B         | 3.4GB   | ❌
+| bigscience/bloom-3b | 3B           | 6.01 GB     | ❌
+| bigscience/bloom-7b1 | 7.1B         | 14 GB |    ❌
 
 
 #### Open Llama
