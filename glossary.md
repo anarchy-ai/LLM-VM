@@ -14,12 +14,12 @@ Large Language Models, often referred to as "LLMs," are a class of artificial in
 
 **Prompt:** refers to the input or query provided to the model to elicit a response or generate text. The prompt is a text-based instruction or question that serves as a starting point for the LLM to generate a coherent and contextually relevant response.
 
-**Transfer learning** is a machine learning technique that reuses a pretrained model's knowledge on one task to enhance performance on a related task. It's a time-efficient way to improve models, particularly when data for the target task is limited.
+**Transfer learning** is a machine learning technique that reuses a pre-trained model's knowledge on one task to enhance performance on a related task. It's a time-efficient way to improve models, particularly when data for the target task is limited.
 
-**Knowledge distillation:** a process where a smaller or more efficient model (the "student") is trained to replicate the behavior and predictions of a larger, more complex model (the "teacher"). Advantage: more computationally efficient and suitable for deployment in resource-constrained environments.
+**Knowledge distillation:** a process where a smaller or more efficient model (the "student") is trained to replicate the behaviour and predictions of a larger, more complex model (the "teacher"). Advantage: more computationally efficient and suitable for deployment in resource-constrained environments.
 
 **Quantization**: a process of reducing the precision or bit-width of numerical values, typically weights and activations, used in a neural network model. This involves representing the original high-precision floating-point values with a limited set of discrete values, often integers.
-It makes neural network models more memory-efficient and computationally faster during inference, without significantly compromising their performance.Quantization is particularly valuable for deploying models on resource-constrained devices like mobile phones, IoT devices, and edge computing devices.
+It makes neural network models more memory-efficient and computationally faster during inference, without significantly compromising their performance. Quantization is particularly valuable for deploying models on resource-constrained devices like mobile phones, IoT devices, and edge computing devices.
 
 **Distributed learning**, also known as distributed machine learning, refers to the practice of training machine learning models across multiple computing devices or nodes in a distributed computing environment. The goal of distributed learning is to leverage the computational power and resources of multiple machines to accelerate the training process and handle larger datasets and more complex models.
 
@@ -49,4 +49,62 @@ It makes neural network models more memory-efficient and computationally faster 
     2. Limitations in the model's understanding of context.
     3. The model's tendency to generate creative but incorrect information.
 
-Researchers and developers continually work to mitigate and reduce hallucination in LLMs to make them more reliable and trustworthy in their outputs.
+Researchers and developers continually work to mitigate and reduce hallucinations in LLMs to make them more reliable and trustworthy in their outputs.
+
+### AGI (Artificial General Intelligence)
+
+AGI refers to Artificial General Intelligence, which is a type of AI that possesses human-like intelligence and can perform a wide range of tasks, similar to a human being.
+
+### API Key
+
+An API key is a unique code that allows access to certain services, like the OpenAI models. You need to set your OpenAI API key to use OpenAI models with the Anarchy LLM-VM.
+
+### Batching
+
+Batching refers to the process of grouping multiple tasks or requests together to optimize efficiency.
+
+### Stateful Memory
+
+Stateful memory enables the LLM-VM to remember a user's conversation history and respond accordingly.
+
+### Agents
+
+Agents in the Anarchy LLM-VM, such as FLAT and REBEL, are tools that facilitate interactions with the LLMs and other components.
+
+### Inference Optimization
+
+Inference optimization involves enhancing the speed and efficiency of the LLM-VM's decision-making process.
+
+### Task Auto-Optimization
+
+Task auto-optimization analyzes repetitive tasks and uses techniques like student-teacher distillation and data synthesis to improve results.
+
+### HTTP Endpoints
+
+HTTP endpoints are standalone servers provided by the Anarchy LLM-VM to handle completion requests.
+
+### Web Playground
+
+A web playground is a feature that allows you to test the Anarchy LLM-VM and its outputs directly from a web browser.
+
+### Load-balancing and Orchestration
+
+Load-balancing and orchestration features enable the LLM-VM to optimize the utilization of multiple LLMs or providers to balance uptime and costs.
+
+### Output Templating
+
+Output templating allows you to format LLM responses according to specific templates and variables.
+
+### Supported Models
+
+Anarchy LLM-VM supports various LLM models, including 'chat_gpt', 'gpt', 'neo', 'llama2', 'bloom', 'opt', and 'pythia'.
+
+### Python Environment
+
+To run the Anarchy LLM-VM, you need a Python environment with a version of Python greater than or equal to 3.10.
+
+### System Requirements
+
+Different LLM models have varying system requirements, mainly related to RAM and compute resources. Ensure that your system meets the requirements of the specific LLM you're using.
+
+If you have any questions or need further clarification, feel free to reach out to the Anarchy community.
