@@ -33,6 +33,7 @@ dependencies = [
     "peft>=0.5.0",
     "trl>=0.7.2",
     "pinecone-client>=2.2.4"
+    "scalene>=1.5.31.1"
 ]
 
 [project.optional-dependencies]
