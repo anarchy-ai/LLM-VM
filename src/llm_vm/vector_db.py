@@ -1,5 +1,7 @@
 import pinecone
+from scalene import profile
 
+@profile
 class PineconeDB:
     def __init__(self, api_key, pinecone_env):
         self.pinecone = pinecone
