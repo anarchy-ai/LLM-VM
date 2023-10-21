@@ -53,11 +53,39 @@ Researchers and developers continually work to mitigate and reduce hallucination
 
 ### AGI (Artificial General Intelligence)
 
-AGI refers to Artificial General Intelligence, which is a type of AI that possesses human-like intelligence and can perform a wide range of tasks, similar to a human being.
+AGI refers to Artificial General Intelligence, which is a type of AI that possesses human-like intelligence and can perform a wide range of tasks, similar to a human being. 
+
+-**Generalization:** AGI systems can apply their knowledge and skills to a wide variety of tasks and adapt to new, unforeseen challenges. They don't need to be explicitly programmed for each task they encounter.
+
+-**Learning:** AGI can learn from experience, just like humans. It can accumulate knowledge and improve its performance over time.
+
+-**Reasoning and Problem Solving:** AGI can understand complex problems, break them down into smaller components, and find solutions. It can also handle abstract reasoning and critical thinking.
+
+-**Natural Language Understanding:** AGI can comprehend and generate human language in a way that goes beyond simple language translation or text generation. It can engage in meaningful conversations, understand context, and express creativity.
+
+-**Autonomy:** AGI systems have a degree of autonomy, allowing them to make decisions independently, plan actions, and carry them out.
+
+-**Common Sense:** AGI should have a basic understanding of common-sense reasoning, enabling it to navigate the world in a manner consistent with human intuition.
+
+-**Self-Improvement:** Ideally, AGI can improve itself, leading to what's known as a "singularity" where it rapidly evolves and surpasses human intelligence.
 
 ### API Key
 
 An API key is a unique code that allows access to certain services, like the OpenAI models. You need to set your OpenAI API key to use OpenAI models with the Anarchy LLM-VM.
+
+-**Access Control:** API Keys are primarily used for access control. They ensure that only authorized applications or users can interact with a particular API or service. Without a valid API Key, access is denied.
+
+-**Unique Identifier:** Each API Key is a unique string of characters. It serves as an identifier for the application or user making the API requests. This uniqueness helps in tracking and managing access.
+
+-**Authorization:** When you include an API Key in your API request, it informs the service that you have permission to access its functionality. Authorization checks are typically performed based on the provided API Key.
+
+-**Security:** API Keys help enhance the security of an API. They prevent unauthorized access and protect sensitive data and resources. It's essential to keep your API Key confidential to avoid misuse.
+
+-**Usage Tracking:** API providers can monitor the usage of their services by tracking which API Keys are making requests. This tracking helps in analyzing usage patterns and ensuring fair usage.
+
+-**Rate Limiting:** Many APIs implement rate limiting, which restricts the number of requests that can be made in a specific time frame. API Keys are used to enforce these limits on a per-key basis.
+
+-**Authentication:** API Keys are a form of authentication. They provide a simple way to authenticate an application or user without the need for complex username-password combinations.
 
 ### Batching
 
