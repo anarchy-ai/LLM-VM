@@ -59,7 +59,7 @@ class DataSynthesis:
             try:
                 the_data = json.loads(response.replace("\n", ""))
                 prompt = the_data["prompt"]
-                completion_response = self.optimizer.call_big(prompt, model=model, max_tokens=max_tokens, temperature=temperature)
+                completion_response = self.optimizer.call_big(prompt, max_tokens=max_tokens, temperature=temperature)
                 the_tuple = (prompt, completion_response+example_delim)
             except Exception as e:
                 raise Exception(f"An error has ocurred: ${e}")
