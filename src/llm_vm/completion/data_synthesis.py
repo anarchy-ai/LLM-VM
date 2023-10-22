@@ -37,10 +37,10 @@ class DataSynthesis:
             return list(pickle.load(new_file))
         datapoints = []
         final_prompt = '{"prompt": "' +prompt+'"  , "response": "' +response+'" }'
-        final_prompt = "Generate 1 json similar to the one below. \n" + final_prompt
+        final_prompt = "Generate 1 json similar to the one below. \n" + json.dumps(final_prompt)
 
         while len(datapoints) < self.examples_to_generate:
-            datapoint = self.generate_example(final_prompt, openai_key, completion=completion)
+            datapoint = self.generate_example(final_prompt, openai_key, completion=completion, **kwargs)
             time.sleep(5)
             datapoints.append(datapoint)
             print(datapoint)
@@ -49,17 +49,17 @@ class DataSynthesis:
         return datapoints
     
     @backoff.on_exception(backoff.expo, openai.error.RateLimitError)
-    def generate_example(self, final_prompt, openai_key, example_delim="<END>", model="gpt-4", max_tokens=1000, temperature=1, completion=None):
+    def generate_example(self, final_prompt, openai_key, example_delim="<END>", model="gpt-4", max_tokens=1000, temperature=1.0, completion=None, **kwargs):
         openai.api_key = openai_key
         cur_prompt = [{'role': "system", 'content': final_prompt}]
         the_tuple = None
 
-        response = openai.ChatCompletion.create(messages=cur_prompt, model=model, max_tokens=max_tokens, temperature=temperature)['choices'][0]['message']['content']
+        response = openai.ChatCompletion.create(messages=cur_prompt, model=model, max_tokens=max_tokens, temperature=temperature, **kwargs)['choices'][0]['message']['content']
         if completion is None:
             try:
                 the_data = json.loads(response.replace("\n", ""))
                 prompt = the_data["prompt"]
-                completion_response = self.optimizer.call_big(prompt, max_tokens=max_tokens)
+                completion_response = self.optimizer.call_big(prompt, max_tokens=max_tokens, temperature=temperature)
                 the_tuple = (prompt, completion_response+example_delim)
             except Exception as e:
                 raise Exception(f"An error has ocurred: ${e}")
@@ -68,7 +68,7 @@ class DataSynthesis:
             try:
                 the_data = json.loads(response.replace("\n", ""))
                 prompt = the_data["prompt"]
-                completion_response = completion.complete(prompt)
+                completion_response = completion.complete(prompt, temperature=temperature, **kwargs)
                 the_tuple = (prompt, completion_response+example_delim)
             except Exception as e:
                 raise Exception(f"An error has ocurred: ${e}")
