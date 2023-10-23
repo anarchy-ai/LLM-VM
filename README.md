@@ -93,7 +93,7 @@ Use ```bash > python3 --version ``` to check what version you are on.
 
 To upgrade your python, either create a new python env using ```bash > conda create -n myenv python=3.10 ``` or go to https://www.python.org/downloads/ to download the latest version.
 
-     If you plan on running the setup steps below, a proper python version will be installed for you
+     If you plan on running the setup steps below, a proper Python version will be installed for you
 
 
 #### System Requirements
@@ -206,12 +206,12 @@ We welcome contributors!  To get started is to join our active [discord communit
 ### Jobs
 
 - We're always looking for serious hackers.  Prove that you can build and creatively solve hard problems and reach out! 
-- The easiest way to secure a job/internship with us is to submit pull requests that close tickets.
-- Then you can apply directly here https://forms.gle/bUWDKW3cwZ8n6qsU8
+- The easiest way to secure a job/internship with us is to submit pull requests that address or resolve open issues.
+- Then, you can apply directly here https://forms.gle/bUWDKW3cwZ8n6qsU8
 
 ### Bounty
 
-Some tickets we'll pay you for closing! Look at the ticket labels to see how much the bounty is.  To get started, [join the discord and read the guide](https://discord.com/channels/1075227138766147656/1147542772824408074)
+We offer bounties for closing specific tickets! Look at the ticket labels to see how much the bounty is.  To get started, [join the discord and read the guide](https://discord.com/channels/1075227138766147656/1147542772824408074)
 
 ## 🙏 Acknowledgements 🙏
 
