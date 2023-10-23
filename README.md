@@ -120,8 +120,8 @@ If you are on Linux you should do this:
 ```bash
 > git clone https://github.com/anarchy-ai/LLM-VM.git
 > cd LLM-VM
-> python -m venv <name>
-> source llm/bin/activate
+> python -m venv anarchyai
+> source anarchyai/bin/activate
 > python -m pip install -e ."[dev]"
 ```
 
