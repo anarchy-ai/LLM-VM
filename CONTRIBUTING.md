@@ -21,7 +21,7 @@ Anybody can submit PRs!  *Anybody.*  We *want* to accept them all, but simply ca
 * git push --set-upstream origin <branch-name>
 ```
 
-5. Join the weekly ticket triage on Monday to learn more about the issues and speak to me directly!
+6. Join the weekly ticket triage on Monday to learn more about the issues and speak to me directly!
 
 
 # Bounty Program
