@@ -31,7 +31,7 @@ class DataSynthesis:
         ----------
         - List: A list of tuples containing the QA pairs to be used for fine-tuning.
         """
-        
+        self.optimizer = optimizer
         if os.path.isfile(conf.settings.data_gen_file):
             new_file = open(conf.settings.data_gen_file,"rb")
             return list(pickle.load(new_file))
@@ -56,12 +56,10 @@ class DataSynthesis:
 
         response = openai.ChatCompletion.create(messages=cur_prompt, model=model, max_tokens=max_tokens, temperature=temperature)['choices'][0]['message']['content']
         if completion is None:
-            completion = self.call_big(prompt, model=model, max_tokens=max_tokens, temperature=temperature)
             try:
                 the_data = json.loads(response.replace("\n", ""))
                 prompt = the_data["prompt"]
-                oai_message = [{'role': "system", 'content': "You are a helpful assistant"}, {'role': "user", 'content': prompt}]
-                completion_response = openai.ChatCompletion.create(messages=oai_message, model=model, max_tokens=max_tokens, temperature=temperature)['choices'][0]['message']['content']
+                completion_response = self.optimizer.call_big(prompt, max_tokens=max_tokens)
                 the_tuple = (prompt, completion_response+example_delim)
             except Exception as e:
                 raise Exception(f"An error has ocurred: ${e}")
