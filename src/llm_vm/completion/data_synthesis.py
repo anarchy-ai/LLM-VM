@@ -36,14 +36,11 @@ class DataSynthesis:
             new_file = open(conf.settings.data_gen_file,"rb")
             return list(pickle.load(new_file))
         datapoints = []
-        final_prompt = '{"prompt": "' +prompt+'"  , "response": "' +response+'" }'
-        final_prompt = "Generate 1 json similar to the one below. \n" + final_prompt
-
-        while len(datapoints) < self.examples_to_generate:
-            datapoint = self.generate_example(final_prompt, openai_key, completion=completion)
-            time.sleep(5)
-            datapoints.append(datapoint)
-            print(datapoint)
+        final_prompt = '{"prompt": "' + prompt +'"  , "response": "' +response+'" }'
+        final_prompt = "Generate {self.examples_to_generate} json similar to the one below and separate each json using a new line. \n" + final_prompt
+        datapoints = self.generate_example(final_prompt, openai_key, completion=completion)
+        if len(datapoints) > self.examples_to_generate:
+            datapoints = datapoints[:self.examples_to_generate]
         new_file = open(conf.settings.data_gen_file,"wb")
         pickle.dump(datapoints,new_file)
         return datapoints
@@ -55,14 +52,25 @@ class DataSynthesis:
         the_tuple = None
 
         response = openai.ChatCompletion.create(messages=cur_prompt, model=model, max_tokens=max_tokens, temperature=temperature)['choices'][0]['message']['content']
+        print(response)
+        the_data = response.split("\n")
+        json_list = []
+        for data in the_data:
+            idx = data.index('{')
+            json_data = data[idx:]
+            json_list.append(json_data)
+        print(json_list) 
+        # the_data = json.loads(response.replace("\n", ""))
+        print(the_data)
         if completion is None:
             try:
                 the_data = json.loads(response.replace("\n", ""))
                 prompt = the_data["prompt"]
                 completion_response = self.optimizer.call_big(prompt, max_tokens=max_tokens)
+                print(completion_response)
                 the_tuple = (prompt, completion_response+example_delim)
             except Exception as e:
-                raise Exception(f"An error has ocurred: ${e}")
+                raise Exception(f"An error has ocurred: {e}")
                       
         else:
             try:
