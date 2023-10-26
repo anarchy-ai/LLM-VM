@@ -213,24 +213,6 @@ function skip_or_run() {
     fi
 }
 
-########## reloading shell helper ###########
-function reload_shell() {
-    case $(basename "$SHELL") in
-        bash)
-            source ~/.bashrc
-        ;;
-        zsh)
-            source ~/.zshrc # FIXME this triggers an error getting run from a bash shell
-        ;;
-        fish)
-            source ~/.config/fish/config.fish
-        ;;
-        *)
-            echo "Unsupported shell. Only bash, zsh, and fish supported."
-            exit 1
-    esac
-}
-
 ############ execute setup steps ##############
 echo_warn 'You can skip steps by passing [-s "os packages pyenv python direnv pip deps"]'
 skip_or_run check_os "os"
@@ -241,4 +223,3 @@ skip_or_run setup_direnv "direnv"
 skip_or_run setup_pip "pip"
 skip_or_run install_deps "deps"
 echo_warn "Congratulations - your local setup is complete!\n\nPlease reload your shell..."
-# reload_shel
