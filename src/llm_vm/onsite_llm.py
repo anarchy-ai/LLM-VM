@@ -566,53 +566,7 @@ class SmallLocalOpenLLama(BaseOnsiteLLM):
     def tokenizer_loader(self):
         return LlamaTokenizer.from_pretrained(self.model_uri)
 
-    
-<<<<<<< HEAD
-=======
-@RegisterModelClass("quantized-llama")
-class Quantized_Llama(BaseOnsiteLLM):
-    """
-    Class for running quantized Llama instances that use GGML
 
-    Attributes:
-        model_uri (str): Hugging Face Endpoint for LLM
-        model (LLM): The large language model. CTransformers includes its own tokenizer in the model
-
-    Methods:
-        __init__: Takes the same parameters as the base class, except it looks to see if there is a specific quantization you want to use
-        Quantized weights can be found (here)[https://huggingface.co/TheBloke/LLaMa-7B-GGML#provided-files]
-        model_loader: Loads the LLM into memory
-        tokenizer_loader: Does nothing. CTransformers includes its own tokenizer so this is unnecessary
-        generate: Generates a response from a given prompt with the loaded LLM and tokenizer
-    """
-
-    model_uri="TheBloke/LLaMa-7B-GGML"
-
-    def __init__(self,model_uri=None,tokenizer_kw_args={},model_kw_args={}):
-        # Pop because we don't want to pass model_file onto the super class.
-        self.model_file = model_kw_args.pop('model_file', None)
-        if self.model_file is None:
-        #     # Set default to smallest quantization available
-            self.model_file = "llama-7b.ggmlv3.q2_K.bin"
-        super().__init__(model_uri, tokenizer_kw_args, model_kw_args)
-
-
-    def model_loader(self):
-        # This file specifically is the smallest model.
-        return AutoModelForCausalLM.from_pretrained(self.model_uri, model_file=self.model_file)
-
-    # CTransformers loads its tokenizer in the model, so this function is unnecessary
-    def tokenizer_loader(self):
-        return
-
-    def generate(self, prompt, max_length=100, **kwargs):
-        inputs = self.model.tokenize(prompt)
-        generated_tokens = self.model.generate(inputs)
-        resp = (self.model.detokenize(generated_tokens))
-        return resp
-
-
->>>>>>> 497735fa3c9f89da8c2eb1a5421a01dffef60aeb
 @RegisterModelClass("llama2")
 class SmallLocalLLama(BaseOnsiteLLM):
 
