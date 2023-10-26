@@ -121,7 +121,7 @@ If you are on Linux you should do this:
 > git clone https://github.com/anarchy-ai/LLM-VM.git
 > cd LLM-VM
 > python -m venv <name>
-> source llm/bin/activate
+> source <name>/bin/activate
 > python -m pip install -e ."[dev]"
 ```
 
