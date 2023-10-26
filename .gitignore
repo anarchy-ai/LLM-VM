@@ -11,8 +11,9 @@ src/llm_vm.egg-info/*
 .venv
 dist
 .DS_STORE
-/poetry.lock
 *.ipynb
 /finetuned_models/
 settings.toml
 *.pkl
+
+.idea/

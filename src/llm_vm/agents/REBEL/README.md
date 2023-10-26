@@ -164,7 +164,7 @@ These talented individuals have brought their expertise and passion to make REBE
   author={Abhigya Sodani, Lauren Moos, and Matthew Mirman},
   booktitle={International Conference on Machine Learning (ICML) TEACH Workshop},
   year={2023},
-  url={https://drive.google.com/file/d/1Lmc7jXahND43vPRSdjiGadCLHw2U_y1i/view},
+  url={http://arxiv.org/abs/2309.11688},
 }
 ```
 

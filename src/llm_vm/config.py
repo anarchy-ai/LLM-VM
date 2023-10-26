@@ -45,7 +45,7 @@ if settings.small_model not in MODELS_AVAILABLE:
 #     exit()
 
 def isOpenAIModel(str):
-    str =="gpt" or str =="chat_gpt"
+    return str =="gpt" or str =="chat_gpt"
 
 if settings.openai_api_key is None and (isOpenAIModel(settings.small_model) or isOpenAIModel(settings.big_model)):
     print("Error: you must have an OpenAI API key set via config files, ./settings.default.toml or via environment variable ", file=sys.stderr)
