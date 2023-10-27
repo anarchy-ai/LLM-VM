@@ -35,29 +35,26 @@ function add_to_shell_profile() {
 ########### OS #################
 function check_os() {
     echo_step "Checking OS.."
-
-    # APPLE_CPU indicates if the machine is using a M1, M2 etc.
     APPLE_CPU=false
     case "$(uname -s)" in
         Darwin*)
             MACHINE=darwin
-            # Check cpu brand. We can't use arch here because we're using rosetta.
             [[ $(sysctl -n machdep.cpu.brand_string) =~ "Apple" ]] && APPLE_CPU=true || APPLE_CPU=false
             ;;
         Linux*)
-            bash ./bin/setup_linux.sh
-            exit
+            MACHINE=linux
             ;;
         *)
-            echo "This script only works on MacOS. Found unsupported OS: $(uname -s)"
+            echo "Unsupported OS: $(uname -s)"
             exit 1
             ;;
     esac
 }
 
-########### Homebrew ###########
-function set_homebrew() {
-    echo_step "Setting up homebrew..."
+
+########### Package Manager and Packages ###########
+function set_packages() {
+    echo_step "Setting up packages..."
     BREW_INSTALLATION_SCRIPT_URL="https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh"
 
     case $MACHINE in
@@ -68,6 +65,22 @@ function set_homebrew() {
 
             brew update
             brew -v
+            ;;
+        linux*)
+            sudo apt update
+            sudo apt install -y curl build-essential libssl-dev zlib1g-dev libbz2-dev \
+            libreadline-dev libsqlite3-dev wget llvm libncurses5-dev libncursesw5-dev \
+            xz-utils tk-dev libffi-dev liblzma-dev python3-openssl git procps file
+            /bin/bash -c "$(curl -fsSL $BREW_INSTALLATION_SCRIPT_URL)"
+
+            test -d /.linuxbrew && eval "$(/.linuxbrew/bin/brew shellenv)"
+            test -d /home/linuxbrew/.linuxbrew && eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+            echo "eval \"\$($(brew --prefix)/bin/brew shellenv)\"" >> ~/.bashrc
+            ;;
+        *)  
+            echo "Unsupported OS: $(uname -s)"
+            exit 1
+            ;;
     esac
 }
 
@@ -145,7 +158,6 @@ function install_deps() {
 function setup_pyenv() {
     echo_step "Setting up Pyenv"
 
-    pyenv_init_shim="$(pyenv init --path)"
     shell_profile=~/.zshrc
     case $(basename "$SHELL") in
         bash)
@@ -196,37 +208,18 @@ shift $((OPTIND -1))
 
 
 function skip_or_run() {
-    if [[ "$skip_steps" != *"$2"* ]]; then
+    if [[ "$skip_steps" != "$2" ]]; then
         $1
     fi
 }
 
-########## reloading shell helper ###########
-function reload_shell() {
-    case $(basename "$SHELL") in
-        bash)
-            source ~/.bashrc
-        ;;
-        zsh)
-            source ~/.zshrc # FIXME this triggers an error getting run from a bash shell
-        ;;
-        fish)
-            source ~/.config/fish/config.fish
-        ;;
-        *)
-            echo "Unsupported shell. Only bash, zsh, and fish supported."
-            exit 1
-    esac
-}
-
 ############ execute setup steps ##############
-echo_warn 'You can skip steps by passing [-s "os brew python direnv poetry deps"]'
+echo_warn 'You can skip steps by passing [-s "os packages pyenv python direnv pip deps"]'
 skip_or_run check_os "os"
-skip_or_run set_homebrew "brew"
+skip_or_run set_packages "packages"
 skip_or_run setup_pyenv "pyenv"
 skip_or_run setup_python "python"
 skip_or_run setup_direnv "direnv"
 skip_or_run setup_pip "pip"
 skip_or_run install_deps "deps"
 echo_warn "Congratulations - your local setup is complete!\n\nPlease reload your shell..."
-# reload_shell
