@@ -2,7 +2,7 @@ import sys
 from dotenv import load_dotenv
 import os
 import openai
-import llm_vm.completion.data_synthesis
+from llm_vm.completion.data_synthesis import DataSynthesis
 from llm_vm.completion.optimize import *
 from llm_vm.client import Client
 
@@ -16,7 +16,7 @@ if __name__ == "__main__":
     print("key:", openai.api_key, file=sys.stderr)
 
 
-    data_synthesizer = data_synthesis.DataSynthesis(0.87, 50)
+    data_synthesizer = DataSynthesis(0.87, 50)
 
     # for one-shot prompt
     prompt = "What is the currency in myanmmar?"
@@ -29,8 +29,5 @@ if __name__ == "__main__":
     for p in prompt_list:
         res = client.complete(prompt=p, context = "", openai_key="", temperature = 0.0)
         response_list.append(res["completion"])
-
-
-
 
     data_synthesizer.data_synthesis(client.optimizer, prompt_list, response_list,openai_key="", temperature=0.0)
