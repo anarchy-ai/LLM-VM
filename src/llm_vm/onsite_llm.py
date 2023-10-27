@@ -429,9 +429,7 @@ class SmallLocalBloom(BaseOnsiteLLM):
 
 @RegisterModelClass("neo")
 class SmallLocalNeo(BaseOnsiteLLM):
-
     """
-
     Attributes:
         model_uri (str): Hugging Face Endpoint for LLM
         tokenizer (AutoTokenizer): Tokenizer from Transformer's library
@@ -448,6 +446,126 @@ class SmallLocalNeo(BaseOnsiteLLM):
         return GPTNeoForCausalLM.from_pretrained(self.model_uri)
     def tokenizer_loader(self):
         return AutoTokenizer.from_pretrained(self.model_uri)
+
+
+# Add support for "Open-Orca/LlongOrca-7B-16k"
+@RegisterModelClass("smallorca")
+class SmallLocalOpenOrca(BaseOnsiteLLM):
+    """
+    This is a class for Openlm-Research's open_orca-3b LLM
+    
+    Attributes:
+        model_uri (str): Hugging Face Endpoint for LLM
+        tokenizer (AutoTokenizer): Tokenizer from Transformer's library
+        model (LLM): The large language model
+    
+    Methods:
+        model_loader: Loads the LLM into memory
+        tokenizer_loader: Loads the tokenizer into memory
+        generate: Generates a response from a given prompt with the loaded LLM and tokenizer
+    """
+    model_uri="Open-Orca/LlongOrca-7B-16k"
+    
+    def model_loader(self):
+        return LlamaForCausalLM.from_pretrained(self.model_uri)
+    def tokenizer_loader(self):
+        return LlamaTokenizer.from_pretrained(self.model_uri)
+
+
+# Add support for "Open-Orca/LlongOrca-13B-16k"
+@RegisterModelClass("orca")
+class LocalOpenOrca2(BaseOnsiteLLM):
+    """
+    This is a class for Openlm-Research's open_orca-3b LLM
+        
+    Attributes:
+        model_uri (str): Hugging Face Endpoint for LLM
+        tokenizer (AutoTokenizer): Tokenizer from Transformer's library
+        model (LLM): The large language model
+        
+    Methods:
+        model_loader: Loads the LLM into memory
+        tokenizer_loader: Loads the tokenizer into memory
+        generate: Generates a response from a given prompt with the loaded LLM and tokenizer
+    """
+    model_uri="Open-Orca/LlongOrca-13B-16k"
+        
+    def model_loader(self):
+        return LlamaForCausalLM.from_pretrained(self.model_uri)
+    def tokenizer_loader(self):
+        return LlamaTokenizer.from_pretrained(self.model_uri)
+
+
+# Add support for "Open-Orca/Mistral-7B-OpenOrca"
+@RegisterModelClass("mistral")
+class SmallLocalOpenMistral(BaseOnsiteLLM):
+    """
+    This is a class for OpenOrca's Mistral-7b LLM
+                
+    Attributes:
+        model_uri (str): Hugging Face Endpoint for LLM
+        tokenizer (AutoTokenizer): Tokenizer from Transformer's library
+        model (LLM): The large language model
+                
+    Methods:
+        model_loader: Loads the LLM into memory
+        tokenizer_loader: Loads the tokenizer into memory
+        generate: Generates a response from a given prompt with the loaded LLM and tokenizer
+    """
+    model_uri="Open-Orca/Mistral-7B-OpenOrca"
+                
+    def model_loader(self):
+        return LlamaForCausalLM.from_pretrained(self.model_uri)
+    def tokenizer_loader(self):
+        return LlamaTokenizer.from_pretrained(self.model_uri) 
+
+
+# Add support for "Open-Orca/OpenOrca-Platypus2-13B"
+@RegisterModelClass("platypus")
+class LocalOpenPlatypus(BaseOnsiteLLM):
+    """
+    This is a class for Open Orca's OpenOrca Platypus2-13b LLM
+                
+    Attributes:
+        model_uri (str): Hugging Face Endpoint for LLM
+        tokenizer (AutoTokenizer): Tokenizer from Transformer's library
+        model (LLM): The large language model
+                
+    Methods:
+        model_loader: Loads the LLM into memory
+        tokenizer_loader: Loads the tokenizer into memory
+        generate: Generates a response from a given prompt with the loaded LLM and tokenizer
+    """
+    model_uri="Open-Orca/OpenOrca-Platypus2-13B"
+                
+    def model_loader(self):
+        return LlamaForCausalLM.from_pretrained(self.model_uri)
+    def tokenizer_loader(self):
+        return LlamaTokenizer.from_pretrained(self.model_uri)
+    
+
+@RegisterModelClass("llama")
+class SmallLocalOpenLLama(BaseOnsiteLLM):
+    """
+    This is a class for Openlm-Research's open_llama-3b LLM
+
+    Attributes:
+        model_uri (str): Hugging Face Endpoint for LLM
+        tokenizer (AutoTokenizer): Tokenizer from Transformer's library
+        model (LLM): The large language model
+
+    Methods:
+        model_loader: Loads the LLM into memory
+        tokenizer_loader: Loads the tokenizer into memory
+        generate: Generates a response from a given prompt with the loaded LLM and tokenizer
+    """
+    model_uri="openlm-research/open_llama_3b_v2"
+
+    def model_loader(self):
+        return LlamaForCausalLM.from_pretrained(self.model_uri)
+    def tokenizer_loader(self):
+        return LlamaTokenizer.from_pretrained(self.model_uri)
+
 
 @RegisterModelClass("llama2")
 class SmallLocalLLama(BaseOnsiteLLM):
