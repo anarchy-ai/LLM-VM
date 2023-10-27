@@ -13,7 +13,7 @@ import hashlib
 import pickle
 from llm_vm.guided_completion import Completion
 # we need to package-ify so this works
-import llm_vm.completion.data_synthesis as data_synthesis
+from llm_vm.completion.data_synthesis import DataSynthesis
 import inspect
 
 
