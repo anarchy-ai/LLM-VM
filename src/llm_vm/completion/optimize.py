@@ -12,8 +12,8 @@ import requests
 import hashlib
 import pickle
 from llm_vm.guided_completion import Completion
-#we need to package-ify so this works
-from llm_vm.completion.data_synthesis import DataSynthesis
+# we need to package-ify so this works
+import llm_vm.completion.data_synthesis as data_synthesis
 import inspect
 
 
@@ -28,7 +28,9 @@ def exit_handler(signum, frame):
     print("user interrupt, exiting", file=sys.stderr)
     sys.exit()
 
-signal.signal(signal.SIGINT, exit_handler)
+
+if threading.current_thread() == threading.main_thread():        
+    signal.signal(signal.SIGINT, exit_handler)
 
 
 def generate_hash(input_string):
