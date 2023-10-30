@@ -8,6 +8,7 @@ import time
 import pickle
 import llm_vm.config as conf
 from llm_vm.guided_completion import GenerativeCompletion
+import re
 
 class DataSynthesis:
     def __init__(self, variance, examples_to_generate, seed_examples=10):
@@ -43,7 +44,7 @@ class DataSynthesis:
         while len(datapoints_list) < self.examples_to_generate:
             remaining_examples = self.examples_to_generate - len(datapoints_list)
             if remaining_examples < seed_batch_size:
-                final_prompt = "Generate {remaining_examples} json similar to the one below and separate each json using only 1 new line. \n" + final_prompt                
+                final_prompt = "Generate {remaining_examples} json similar to the one below and separate each json using a new line. \n" + final_prompt                
             datapoints = self.generate_examples(final_prompt, openai_key, completion=completion, call_big_kwargs=kwargs)
             datapoints_list += datapoints
             # Open AI rate limit is 1 request/second 
@@ -62,13 +63,23 @@ class DataSynthesis:
         # Generate seed prompts and responses using openAI
         response = openai.ChatCompletion.create(messages=cur_prompt, model=model, max_tokens=max_tokens, temperature=temperature)['choices'][0]['message']['content']
         the_data = response.split("\n")
+        # GPT responses might have empty strings
+        the_clean_data = []
+        if '' in  the_data:
+            # loop to remove empty strings
+            for i in range(len(the_data)):
+                if the_data[i] != '':
+                    the_clean_data.append(the_data[i])
+
         json_list = []
-        for data in the_data:
-            idx = data.index('{')
-            json_data = data[idx:]
-            print("JSON_DATA:", json_data)
-            json_list.append(json_data)
-        print(json_list)
+        for data in the_clean_data:
+            # Sometimes GPT-4 returns a numbered list
+            if data[0] != '{':
+                idx = data.index('{')
+                json_data = data[idx:]
+                json_list.append(json_data)
+            else:
+                json_list.append(data)
         
         prompt_list = [] 
 
@@ -76,7 +87,8 @@ class DataSynthesis:
         if self.examples_to_generate == self.seed_examples:
             for j in json_list:
                 j_dict = json.loads(j)
-                j_tuple = (j_dict["prompt"], j_dict["response"]+example_delim)
+                clean_res = re.sub('\n', '', j_dict["response"])
+                j_tuple = (j_dict["prompt"], clean_res+example_delim)
                 tuple_list.append(j_tuple)
             return tuple_list
         else:
