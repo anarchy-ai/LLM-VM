@@ -50,3 +50,21 @@ It makes neural network models more memory-efficient and computationally faster 
     3. The model's tendency to generate creative but incorrect information.
 
 Researchers and developers continually work to mitigate and reduce hallucination in LLMs to make them more reliable and trustworthy in their outputs.
+
+## References
+- ["Large Languge model"] (https://www.analyticsvidhya.com/blog/2023/03 an-introduction-to-large-language-models-llms/)
+
+- ["Transformer architecture"] (https://machinelearningmastery.com/the-transformer-model/)
+
+- ["Tokenization"] (https://www.analyticsvidhya.com/blog/2020/05/what-is-tokenization-nlp/)
+
+- ["Embedding Layer"] (https://machinelearningmastery.com/use-word-embedding-layers-deep-learning-keras/)
+
+- ["Prompt:"](https://machinelearningmastery.com/a-gentle-introduction-to-prompt-engineering/)
+
+- ["Transfer learning"] (https://machinelearningmastery.com/transfer-learning-for-deep-learning/)
+
+["Distributed learning"](https://cs.brown.edu/people/acrotty/pubs/Galakatos2017_ReferenceWorkEntry_DistributedMachineLearning.pdf)
+
+- ["Fine-tuning"](https://intellipaat.com/blog/fine-tuning/)
+- 
