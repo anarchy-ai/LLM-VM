@@ -13,7 +13,7 @@ import hashlib
 import pickle
 from llm_vm.guided_completion import Completion
 # we need to package-ify so this works
-import llm_vm.completion.data_synthesis as data_synthesis
+from llm_vm.completion.data_synthesis import DataSynthesis
 import inspect
 
 
@@ -185,7 +185,7 @@ class LocalOptimizer(Optimizer):
         self.big_model = big_model
         self.small_model = small_model
         self.openai_key = openai_key
-        self.data_synthesizer = data_synthesis.DataSynthesis(variance, num_examples)
+        self.data_synthesizer = DataSynthesis(variance, num_examples)
 
     def complete(self, stable_context, dynamic_prompt, data_synthesis = False, finetune = False, regex = None, type = None, choices = None, **kwargs):
 
@@ -236,6 +236,7 @@ class LocalOptimizer(Optimizer):
                     }) if c_id is None else c_id
         c_id = generate_hash(c_id_repr)
         completion = None
+        # will return None if no constraint is specified
         completion_model = Completion.create(regex, type, choices, grammar_type)
 
         model = self.storage.get_model(c_id)
@@ -248,6 +249,8 @@ class LocalOptimizer(Optimizer):
 
         best_completion_promise = None
         succeed_train = None
+        best_completion = None
+
         if len(training_exs) < self.MAX_TRAIN_EXS:
             def promiseCompletion():
                 if completion_model is not None:
@@ -266,7 +269,7 @@ class LocalOptimizer(Optimizer):
                         if len(self.storage.get_data(c_id)) < min_examples_for_synthesis:
                             print("Data synthesis is not available right now, need more examples in storage.", file=sys.stderr)
                         else:
-                            for j in self.data_synthesizer.data_synthesis(self,prompt,best_completion,openai_key=self.openai_key, completion=completion_model, **kwargs):
+                            for j in self.data_synthesizer.data_synthesis(self.call_big, prompt,best_completion,openai_key=self.openai_key, completion=completion_model, **kwargs):
                                 self.storage.add_example(c_id, j)
                     training_exs = self.storage.get_data(c_id)
                     print(training_exs, file=sys.stderr)
