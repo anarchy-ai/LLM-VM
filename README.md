@@ -1,4 +1,4 @@
-![Anarchy Logo](anarchy_logo.svg)
+![Anarchy Logo](https://github.com/VictorOdede/LLM-VM/blob/main/anarchy_logo.svg)
 
 <p align="center">
   <a href="https://anarchy.ai/" target="_blank"><img src="https://img.shields.io/badge/View%20Documentation-Docs-yellow"></a>
