@@ -113,9 +113,9 @@ To install the LLM-VM you simply need to download this repository and install it
 > ./setup.sh
 ```
 
-The above bash script `setup.sh` only works for MacOs.
+The above bash script `setup.sh` only works for MacOS and Linux.
 
-If you are on Linux you should do this:
+Alternatively you could do this:
 
 ```bash
 > git clone https://github.com/anarchy-ai/LLM-VM.git
