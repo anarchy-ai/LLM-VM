@@ -390,7 +390,7 @@ class SmallLocalLLama(BaseOnsiteLLM):
 
 
 @RegisterModelClass("codellama-7b")
-class SmallLocalCodeLLama(BaseOnsiteLLM):
+class CodeLlama7b(BaseOnsiteLLM):
         
     """
     This is a class for Meta's code-llama-7b LLM
@@ -413,7 +413,7 @@ class SmallLocalCodeLLama(BaseOnsiteLLM):
         return CodeLlamaTokenizer.from_pretrained(self.model_uri)
     
 @RegisterModelClass("codellama-13b")
-class LocalCodeLLama(BaseOnsiteLLM):
+class CodeLlama13b(BaseOnsiteLLM):
         
     """
     This is a class for Meta's code-llama-13b LLM
@@ -436,7 +436,7 @@ class LocalCodeLLama(BaseOnsiteLLM):
         return CodeLlamaTokenizer.from_pretrained(self.model_uri)   
     
 @RegisterModelClass("codellama-34b")
-class BigLocalCodeLLama(BaseOnsiteLLM):
+class CodeLlama34b(BaseOnsiteLLM):
         
     """
     This is a class for Meta's code-llama-34b LLM
