@@ -1,6 +1,6 @@
 [project]
 name = "llm_vm"
-version = "0.1.51 "
+version = "0.1.51"
 description = "An Open-Source AGI Server for Open-Source LLMs"
 authors = [{ name = "Anarchy Team", email = "matt@anarchy.ai" }]
 
