@@ -105,7 +105,9 @@ in memory and compute resources.
 
 ### 👨‍💻 Installation
 
-To install the LLM-VM you simply need to download this repository and install it with pip like so:
+The quickest way to get started is to run `pip install llm-vm` in your Python environment. 
+
+Another way to install the LLM-VM is to clone this repository and install it with pip like so:
 
 ```bash
 > git clone https://github.com/anarchy-ai/LLM-VM.git
