@@ -1,5 +1,3 @@
-
-
 #### Neo Model 
 | URI | Model Params | Checkpoint file size | Is Default?
 |-----|-------------|----------------------|-------------------
@@ -11,22 +9,12 @@
 #### Bloom Model  
 
 | URI | Model Params | Checkpoint file size | Is Default?
-|-----|--------------|-----------------------|------------------
-| bigscience/bloom-560m | 560m         | 1.12 GB | ✅
-| bigscience/bloom-1b7/ | 1.7B         | 3.4GB   | ❌
-| bigscience/bloom-3b | 3B           | 6.01 GB     | ❌
-| bigscience/bloom-7b1 | 7.1B         | 14 GB |    ❌
 
-
-#### Open Llama
-
-| URI | Model Params | Checkpoint file size | Is Default?
-|-------|-------------|---------------------|------------------
-| openlm-research/open_llama_3b_v2 | 3B  | 6.85 GB | ✅
-| openlm-research/open_llama_7b_v2  | 7B | 13 GB   | ❌
-| openlm-research/open_llama_13b | 13B | 26 GB   | ❌
-
-
+|-----|-------------|-----------------------|------------------
+| bigscience/bloom-560m | 560m | 1.12 GB | ✅
+| bigscience/bloom-1b7/ | 1.7B | 3.4GB   | ❌
+| bigscience/bloom-3b | 3B | 6.01 GB     | ❌
+| bigscience/bloom-7b1 | 7.1B | 14 GB |    ❌
 
 #### OPT
 
