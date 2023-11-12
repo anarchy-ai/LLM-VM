@@ -583,7 +583,7 @@ class SmallLocalLLama(BaseOnsiteLLM):
         tokenizer_loader: Loads the tokenizer into memory
         generate: Generates a response from a given prompt with the loaded LLM and tokenizer
     """
-    model_uri="meta-llama/Llama-2-7b"
+    model_uri="meta-llama/Llama-2-7b-hf"
 
     def model_loader(self):
         return LlamaForCausalLM.from_pretrained(self.model_uri)
