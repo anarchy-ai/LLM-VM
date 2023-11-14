@@ -29,7 +29,7 @@ class VectorDB(ABC):
         pass
 
     @abstractmethod
-    def query(self, *kwargs):
+    def query(self, **kwargs):
         pass
 
 
