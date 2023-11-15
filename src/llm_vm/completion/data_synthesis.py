@@ -54,7 +54,7 @@ class DataSynthesis:
         pickle.dump(datapoints_list, new_file)
         return datapoints_list
     
-    @backoff.on_exception(backoff.expo, openai.error.RateLimitError)
+    @backoff.on_exception(backoff.expo, openai.RateLimitError)
     def generate_examples(self, final_prompt, openai_key, example_delim="<END>", model="gpt-4", max_tokens=1000, temperature=1, completion=None, call_big_kwargs={}):
         openai.api_key = openai_key
         cur_prompt = [{'role': "system", 'content': final_prompt}]
