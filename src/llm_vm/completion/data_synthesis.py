@@ -61,7 +61,7 @@ class DataSynthesis:
         tuple_list = []
 
         # Generate seed prompts and responses using openAI
-        response = openai.ChatCompletion.create(messages=cur_prompt, model=model, max_tokens=max_tokens, temperature=temperature)['choices'][0]['message']['content']
+        response = openai.chat.completions.create(messages=cur_prompt, model=model, max_tokens=max_tokens, temperature=temperature).choices[0].message.content
         the_data = response.split("\n")
         # GPT responses might have empty strings
         the_clean_data = []

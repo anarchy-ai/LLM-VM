@@ -56,7 +56,7 @@ def call_ChatGPT(cur_prompt, stop = None, max_tokens = 20, temperature = 0.2, gp
         stop=stop,
         messages=cur_prompt,
         temperature=temperature)
-    return ans['choices'][0]['message']['content']
+    return ans.choices[0].message.content
     return response_text
 
 def call_gpt(cur_prompt: str, stop: str, max_tokens = 20, quality = "best", temperature = 0.0, model = "text-davinci-003"):

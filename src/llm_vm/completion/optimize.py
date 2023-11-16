@@ -23,7 +23,7 @@ def exit_handler(signum, frame):
 
     if (None != job_id):
         print("cancelling fine-tune if applicable", file=sys.stderr)
-        openai.FineTune.cancel(id=job_id)
+        openai.fine_tunes.cancel(id=job_id)
 
     print("user interrupt, exiting", file=sys.stderr)
     sys.exit()

@@ -1,4 +1,3 @@
-import openai
 from llm_vm.client import Client
 import pickle
 from math import sqrt, pow, exp
