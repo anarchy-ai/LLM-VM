@@ -65,6 +65,8 @@ class Client:
         Example:
             >>> client = Client(big_model = 'neo')
         """
+        self.big_model = big_model
+        self.small_model = small_model 
         self.teacher = load_model_closure(big_model)(**big_model_config)
         self.student = load_model_closure(small_model)(**small_model_config)
         self.vector_db = None
@@ -107,7 +109,8 @@ class Client:
                  temperature=0,
                  stoptoken = None,
                  tools = None,
-                 **kwargs):
+                 openai_kwargs = {},
+                 hf_kwargs = {}):
         """
         This function is Anarchy's completion entry point
 
@@ -116,7 +119,11 @@ class Client:
             context (str): Unchanging context to send to the LLM for generation.  Defaults to "" and doesn't do fine-tuning.
             finetune (bool): Boolean value that begins fine tuning when set to True
             data_synthesis (bool): Boolean value to determine whether data should be synthesized for fine-tuning or not
-            temperature (float): An analog
+            temperature (float): Sampling temperature for use during generation, between 0 and 2
+            stoptoken (str | list): Sequence for stopping token generation
+            tools (list): API tools for using with the Rebel agent
+            openai_kwargs (dict): Key word arguments for generation with Open AI models
+            hf_kwargs (dict): Key word arguments for generation with 
 
 
         Returns:
@@ -130,13 +137,21 @@ class Client:
         dynamic_prompt = prompt
         use_rebel_agent = False
 
-        kwargs.update({"temperature":temperature})
+        if self.big_model in ['gpt', 'chat_gpt', 'gpt4']:
+            kwargs = openai_kwargs
+            if "temperature" not in kwargs:
+                kwargs.update({"temperature":temperature})
+            if stoptoken is not None:
+                kwargs.update({"stop":stoptoken})
+                
+        else:
+            kwargs = hf_kwargs
+            if temperature > 0:
+                kwargs.update({"do_sample": True})
+                kwargs.update({"temperature":temperature})
 
         if openai_key is not None:
             self.openai_key = openai_key
-
-        if stoptoken is not None:
-            kwargs.update({"stop":stoptoken})
 
         if tools is not None:
             if type(tools) != list:
@@ -176,6 +191,7 @@ class Client:
         try:
             if not use_rebel_agent:
                 completion = self.optimizer.complete(static_context,dynamic_prompt,data_synthesis=data_synthesis,finetune = finetune, **kwargs)
+                print("COMPLETED RUNNING")
             else:
                 completion = self.rebel_agent.run(static_context+dynamic_prompt,[])[0]
         except Exception as e:
@@ -230,7 +246,27 @@ class Client:
                  stoptoken = None,
                  tools = None,
                  query_kwargs = {},
-                 **kwargs):
+                 hf_kwargs = {},
+                 openai_kwargs = {}):
+        
+        """
+        This function is Anarchy's completion entry point
+
+        Parameters:
+            prompt (str): Prompt to send to LLM for generation
+            context (str): Unchanging context to send to the LLM for generation.  Defaults to "" and doesn't do fine-tuning.
+            finetune (bool): Boolean value that begins fine tuning when set to True
+            data_synthesis (bool): Boolean value to determine whether data should be synthesized for fine-tuning or not
+            temperature (float): Sampling temperature for use during generation, between 0 and 2
+            stoptoken (str | list): Sequence for stopping token generation
+            tools (list): API tools for using with the Rebel agent
+            query_kwargs (dict): Key word arguments for querying the Pinecone vector database
+            openai_kwargs (dict): Key word arguments for generation with Open AI models
+            hf_kwargs (dict): Key word arguments for generation with 
+
+        Returns:
+            str: RAG Response
+        """
         
         prompt_embeddings = self.emb_model.encode(prompt)
         query_kwargs["vector"] = prompt_embeddings
@@ -247,13 +283,20 @@ class Client:
         dynamic_prompt = prompt
         use_rebel_agent = False
 
-        kwargs.update({"temperature":temperature})
+        if self.big_model in ['gpt', 'chat_gpt', 'gpt4']:
+            kwargs = openai_kwargs
+            if "temperature" not in kwargs:
+                kwargs.update({"temperature":temperature})
+            if stoptoken is not None:
+                kwargs.update({"stop":stoptoken})       
+        else:
+            kwargs = hf_kwargs
+            if temperature > 0:
+                kwargs.update({"do_sample": True})
+                kwargs.update({"temperature":temperature})
 
         if openai_key is not None:
             self.openai_key = openai_key
-
-        if stoptoken is not None:
-            kwargs.update({"stop":stoptoken})
 
         if tools is not None:
             if type(tools) != list:
@@ -298,5 +341,3 @@ class Client:
         except Exception as e:
             return {"status":0, "resp": str(e)}
         return {"completion":completion, "status": 200}
-
-        
