@@ -736,22 +736,22 @@ class GPT3:
             It typically takes about 100-200 days...
         """
 
-        ans = openai.Completion.create(prompt= prompt, model="text-davinci-003", **kwargs)
-        return ans['choices'][0]['text']
+        ans = openai.completions.create(prompt= prompt, model="text-davinci-003", **kwargs)
+        return ans.choices[0].text
 
 
     def finetune(self, dataset, optimizer, c_id, small_model_filename=None):
         old_model = optimizer.storage.get_model(c_id)
         training_file = create_jsonl_file(dataset)
-        upload_response = openai.File.create(file=training_file, purpose="fine-tune", model="gpt-3.5-turbo-0613")
+        upload_response = openai.files.create(file=training_file, purpose="fine-tune", model="gpt-3.5-turbo-0613")
         training_file.close()
-        fine_tuning_job = openai.FineTune.create(training_file= upload_response.id)
+        fine_tuning_job = openai.fine_tunes.create(training_file= upload_response.id)
 
         print(f"Fine-tuning job created: {fine_tuning_job}", flush=True, file=sys.stderr)
         global job_id # global state isn't great, but thats interrupt handlers
         job_id = fine_tuning_job["id"]
         while True:
-            fine_tuning_status = openai.FineTune.retrieve(id=job_id)
+            fine_tuning_status = openai.fine_tunes.retrieve(id=job_id)
             status = fine_tuning_status["status"]
             print(f"Fine-tuning job status: {status}", file=sys.stderr)
             if status in ["succeeded", "completed", "failed"]:
@@ -765,7 +765,7 @@ class GPT3:
         optimizer.storage.set_model(c_id, new_model_id)
         optimizer.storage.set_training_in_progress(c_id, False)
         if old_model is not None:
-            openai.Model.delete(old_model)
+            openai.models.delete(old_model)
 
 
 @RegisterModelClass("gpt4")
@@ -795,12 +795,11 @@ class GPT4:
         """
 
         cur_prompt = [{'role': "system", 'content': prompt}]
-        ans = openai.ChatCompletion.create(
-            messages=cur_prompt,
-            model="gpt-4",
-            **kwargs)
+        ans = openai.chat.completions.create(messages=cur_prompt,
+        model="gpt-4",
+        **kwargs)
 
-        return ans['choices'][0]['message']['content']
+        return ans.choices[0].message.content
 
     def finetune(self, dataset, optimizer, c_id, small_model_filename=None):
         print("fine tuning isn't supported by OpenAI on this model", file=sys.stderr)
@@ -833,11 +832,10 @@ class ChatGPT:
             It typically takes about 100-200 days...
         """
         cur_prompt = [{'role': "system", 'content' : prompt}]
-        ans = openai.ChatCompletion.create(
-            messages=cur_prompt,
-            model="gpt-3.5-turbo-0301",
-            **kwargs)
-        return ans['choices'][0]['message']['content']
+        ans = openai.chat.completions.create(messages=cur_prompt,
+        model="gpt-3.5-turbo-0301",
+        **kwargs)
+        return ans.choices[0].message.content
 
     def finetune(self, dataset, optimizer, c_id, small_model_filename=None):
         print("fine tuning isn't supported by OpenAI on this model", file=sys.stderr)

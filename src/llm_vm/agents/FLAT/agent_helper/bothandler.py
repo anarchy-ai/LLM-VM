@@ -1,5 +1,4 @@
 import re
-import openai
 import random
 from llm_vm.utils.typings_llm import *
 from llm_vm.agents.FLAT.agent_helper.requests.call_llm import call_llm
