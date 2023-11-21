@@ -3,6 +3,7 @@ import pinecone
 import weaviate
 from dotenv import load_dotenv
 import os
+import hnswlib
 
 load_dotenv("../../.env.example")
 
@@ -123,3 +124,20 @@ class WeaviateDB(VectorDB):
     def add_prop(self, class_name, prop):
         assert type(prop) == "dict"
         self.client.schema.property.create(class_name, prop)     
+
+
+class NativeHNSW(VectorDB):
+
+    def __init__(self, space, dim, num_elements):
+        self.space = space
+        self.dim = dim
+        self.num_elements = num_elements
+        self.index = None
+
+    def create_index(self):
+        self.index = hnswlib.Index(space=self.space, dim=self.dim)
+
+    def upsert(self):
+        pass
+
+        
