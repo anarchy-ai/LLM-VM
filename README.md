@@ -1,4 +1,4 @@
-![Anarchy Logo](anarchy_logo.svg)
+![Anarchy Logo](https://github.com/VictorOdede/LLM-VM/raw/main/anarchy_logo.svg)
 
 <p align="center">
   <a href="https://anarchy.ai/" target="_blank"><img src="https://img.shields.io/badge/View%20Documentation-Docs-yellow"></a>
@@ -105,7 +105,9 @@ in memory and compute resources.
 
 ### 👨‍💻 Installation
 
-To install the LLM-VM you simply need to download this repository and install it with pip like so:
+The quickest way to get started is to run `pip install llm-vm` in your Python environment. 
+
+Another way to install the LLM-VM is to clone this repository and install it with pip like so:
 
 ```bash
 > git clone https://github.com/anarchy-ai/LLM-VM.git
@@ -195,9 +197,15 @@ response = client.complete(prompt = 'What is Anarchy?', context = '')
 print(response)
 # Anarchy is a political philosophy that advocates no government...
 ```
+Here are some default model's details:
+| Name | Model_Uri | Model params | Checkpoint file size |
+|---|---|---|---|
+| Neo | `EleutherAI/gpt-neo-1.3B` | 1.3B | 5.31 GB |
+| Bloom | `bigscience/bloom-560m` | 1.7B | 1.12 GB |
+| OPT | `facebook/opt-350m` | 350m | 622 MB |
 
 For some other choices of memory usage and parameter count in each model family, check out the 
-tables in [model_uri_tables](./model_uri_tables.md)
+tables [model_uri_tables](./model_uri_tables.md).
 
 
 ### 🛠 Tool Usage
