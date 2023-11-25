@@ -3,7 +3,6 @@ import pinecone
 import weaviate
 from dotenv import load_dotenv
 import os
-import hnswlib
 
 load_dotenv("../../.env.example")
 
