@@ -12,7 +12,7 @@
 
 This is [Anarchy's](https://anarchy.ai) effort to build 🏗️ an open generalized artificial intelligence 🤖 through the LLM-VM: a way to give your LLMs superpowers 🦸 and superspeed 🚄.
 
-You can find detailed instructions to try it live here: [anarchy.ai](https://anarchy.ai)
+You can find detailed instructions to try it live here: [anarchy.ai](https://anarchy.ai). Try it now!
 
 > This project is in BETA. Expect continuous improvement and development.
 
