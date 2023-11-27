@@ -128,7 +128,7 @@ If you are on Linux you should do this:
 If you are on Windows, open command Prompt and do this:
 
 ```cmd
-> winget install Python.Python.3.12
+> winget install Python.Python.3.11
 > python --version
 > git clone https://github.com/anarchy-ai/LLM-VM.git
 > cd LLM-VM
