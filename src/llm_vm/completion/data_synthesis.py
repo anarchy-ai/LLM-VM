@@ -56,6 +56,7 @@ class DataSynthesis:
     
     @backoff.on_exception(backoff.expo, openai.RateLimitError)
     def generate_examples(self, final_prompt, openai_key, example_delim="<END>", model="gpt-4", max_tokens=1000, temperature=1, completion=None, call_big_kwargs={}):
+        # TODO: Remove duplicates from synthesized data
         openai.api_key = openai_key
         cur_prompt = [{'role': "system", 'content': final_prompt}]
         tuple_list = []
