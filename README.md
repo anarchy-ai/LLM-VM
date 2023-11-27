@@ -134,7 +134,7 @@ If you are on Windows. You can follow either of the below two methods:
 ```cmd
 > git clone https://github.com/anarchy-ai/LLM-VM.git
 > cd LLM-VM
-> ./windows_setup.bat
+> .\windows_setup.bat
 ```
 or
 
