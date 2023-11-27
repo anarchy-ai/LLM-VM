@@ -107,6 +107,8 @@ in memory and compute resources.
 
 To install the LLM-VM you simply need to download this repository and install it with pip like so:
 
+For MacOS
+
 ```bash
 > git clone https://github.com/anarchy-ai/LLM-VM.git
 > cd LLM-VM
@@ -125,7 +127,18 @@ If you are on Linux you should do this:
 > python -m pip install -e ."[dev]"
 ```
 
-If you are on Windows, open command Prompt and do this:
+If you are on Windows. You can follow either of the below two methods:
+
+1. Open Command Prompt and do this:
+
+```cmd
+> git clone https://github.com/anarchy-ai/LLM-VM.git
+> cd LLM-VM
+> ./windows_setup.bat
+```
+or
+
+2. Open Command Prompt and do this:
 
 ```cmd
 > winget install Python.Python.3.11
