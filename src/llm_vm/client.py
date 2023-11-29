@@ -204,6 +204,12 @@ class Client:
         else:
             self.teacher.load_finetune(model_filename)
 
+    def change_model_dtype(self, big_model_dtype=None, small_model_dtype=None):
+        if big_model_dtype is not None:
+            self.teacher.model_dtype(big_model_dtype)
+        if small_model_dtype is not None:
+            self.student.model_dtype(small_model_dtype)
+
     def set_pinecone_db(self, api_key, env_name):
         self.vector_db = PineconeDB(api_key, env_name)
         self.emb_model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")

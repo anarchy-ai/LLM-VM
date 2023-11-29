@@ -28,7 +28,11 @@ from peft import get_peft_model, LoraConfig, prepare_model_for_kbit_training
 from trl import SFTTrainer
 from sentence_transformers import SentenceTransformer
 
-
+model_dtypes = {
+    "float16": torch.float16,
+    "float32": torch.float32,
+    "bfloat16": torch.bfloat16,
+}
 
 __private_key_value_models_map =  {}
 # []   {
@@ -106,15 +110,9 @@ class BaseOnsiteLLM(ABC):
             print(f"`{self.model_uri}` loaded on {device}.", file=sys.stderr)
 
         if dtype is not None:
-            dtypes = {
-                'float16' : torch.float16,
-                'bfloat16' : torch.bfloat16,
-                'float32' : torch.float32,
-            }
-
-            if dtype not in dtypes:
-                raise ValueError(f"Invalid dtype: {dtype}. Valid options are: {dtypes.keys()}")
-            self.model.to(dtypes[dtype])
+            if dtype not in model_dtypes.keys():
+                raise ValueError(f"Invalid dtype: {dtype}. Valid options are: {model_dtypes.keys()}")
+            self.model.to(model_dtypes[dtype])
             print(f"`{self.model_uri}` loaded with dtype {dtype}.", file=sys.stderr)
 
     @property
@@ -276,6 +274,13 @@ class BaseOnsiteLLM(ABC):
             optimizer.storage.set_model(c_id, new_model)
             return math.exp(eval_results['eval_loss']) #perplexity is the metric we use for finetuning measurement
         return async_lora
+    
+    def model_dtype(self, dtype):
+        if dtype not in model_dtypes.keys():
+            raise ValueError(f"Invalid dtype: {dtype}. Valid options are: {model_dtypes.keys()}")
+        self.model.to(model_dtypes[dtype])
+        print(f"Changed `{self.model_uri}` dtype to {dtype}.", file=sys.stderr)
+
     
     def quantize_model(self, bits=4):
         if self.model.is_quantizable():
@@ -1079,3 +1084,5 @@ if "__main__" == __name__:
     response = client.complete(prompt = 'What is Anarchy?',
                             context='')
     print(response, file=sys.stderr)
+
+    client.change_model_dtype(big_model_dtype='float16')
