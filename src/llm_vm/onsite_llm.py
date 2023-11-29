@@ -27,6 +27,7 @@ import torch
 from peft import get_peft_model, LoraConfig, prepare_model_for_kbit_training
 from trl import SFTTrainer
 from sentence_transformers import SentenceTransformer
+from vllm import LLM, SamplingParams
 
 
 
@@ -86,7 +87,7 @@ class FinetuningDataset(torch.utils.data.Dataset):
         return self.dataset[idx]
 
 class BaseOnsiteLLM(ABC):
-    def __init__(self,model_uri=None, tokenizer_kw_args={}, model_kw_args={}):
+    def __init__(self,model_uri=None, vllm_support=None, tokenizer_kw_args={}, model_kw_args={}):
         if model_uri != None :
             self.model_uri= model_uri
         if model_uri is None and self.model_uri is None:
@@ -94,6 +95,7 @@ class BaseOnsiteLLM(ABC):
         self.model_name : str = self.model_uri.split('/')[-1] # our default for deriving model name
         self.model=self.model_loader(**model_kw_args)
         self.tokenizer=self.tokenizer_loader(**tokenizer_kw_args)
+        self.vllm_support=vllm_support
 
         # Move the model to the specified device(s)
         if isinstance(device, list):
@@ -145,6 +147,12 @@ class BaseOnsiteLLM(ABC):
            I think it takes about a week for the apple to grow.
         """
 
+        if generation_kwargs['num_return_sequences']>1 and self.vllm_support:
+            print("doing parallel sampling using vllm")
+            sampling_params = SamplingParams(n=generation_kwargs['num_return_sequences'], max_tokens=max_length)
+            llm = LLM(model=self.model_uri)
+            outputs = llm.generate(prompt, sampling_params)
+            return [outputs[0].outputs[i].text for i in range(generation_kwargs['num_return_sequences'])]
 
         if isinstance(device, list):
             # If multiple GPUs are available, use first one
@@ -377,6 +385,7 @@ class SmallLocalPythia(BaseOnsiteLLM):
     #     # self.model_uri =
     #     super().__init__(kwargs) ## this line is required
     model_uri = "EleutherAI/pythia-70m-deduped"
+    vllm_support = True
     def model_loader(self):
         return GPTNeoXForCausalLM.from_pretrained(self.model_uri)
     def tokenizer_loader(self):
@@ -400,6 +409,7 @@ class SmallLocalOpt(BaseOnsiteLLM):
         generate: Generates a response from a given prompt with the loaded LLM and tokenizer
     """
     model_uri="facebook/opt-350m"
+    vllm_support = True
     def model_loader(self):
         return OPTForCausalLM.from_pretrained(self.model_uri)
     def tokenizer_loader(self):
@@ -422,6 +432,7 @@ class SmallLocalBloom(BaseOnsiteLLM):
         generate: Generates a response from a given prompt with the loaded LLM and tokenizer
     """
     model_uri="bigscience/bloom-560m"
+    vllm_support = True
 
     def model_loader(self):
         return BloomForCausalLM.from_pretrained(self.model_uri)
@@ -466,6 +477,7 @@ class SmallLocalOpenOrca(BaseOnsiteLLM):
         generate: Generates a response from a given prompt with the loaded LLM and tokenizer
     """
     model_uri="Open-Orca/LlongOrca-7B-16k"
+    vllm_support = True
     
     def model_loader(self):
         return LlamaForCausalLM.from_pretrained(self.model_uri)
@@ -490,6 +502,7 @@ class LocalOpenOrca2(BaseOnsiteLLM):
         generate: Generates a response from a given prompt with the loaded LLM and tokenizer
     """
     model_uri="Open-Orca/LlongOrca-13B-16k"
+    vllm_support = True
         
     def model_loader(self):
         return LlamaForCausalLM.from_pretrained(self.model_uri)
@@ -514,6 +527,7 @@ class SmallLocalOpenMistral(BaseOnsiteLLM):
         generate: Generates a response from a given prompt with the loaded LLM and tokenizer
     """
     model_uri="Open-Orca/Mistral-7B-OpenOrca"
+    vllm_support = True
                 
     def model_loader(self):
         return LlamaForCausalLM.from_pretrained(self.model_uri)
@@ -538,6 +552,7 @@ class LocalOpenPlatypus(BaseOnsiteLLM):
         generate: Generates a response from a given prompt with the loaded LLM and tokenizer
     """
     model_uri="Open-Orca/OpenOrca-Platypus2-13B"
+    vllm_support = True
                 
     def model_loader(self):
         return LlamaForCausalLM.from_pretrained(self.model_uri)
@@ -561,6 +576,7 @@ class SmallLocalOpenLLama(BaseOnsiteLLM):
         generate: Generates a response from a given prompt with the loaded LLM and tokenizer
     """
     model_uri="openlm-research/open_llama_3b_v2"
+    vllm_support = True
 
     def model_loader(self):
         return LlamaForCausalLM.from_pretrained(self.model_uri)
@@ -585,6 +601,7 @@ class SmallLocalLLama(BaseOnsiteLLM):
         generate: Generates a response from a given prompt with the loaded LLM and tokenizer
     """
     model_uri="meta-llama/Llama-2-7b-hf"
+    vllm_support = True
 
     def model_loader(self):
         return LlamaForCausalLM.from_pretrained(self.model_uri)
@@ -609,6 +626,7 @@ class CodeLlama7b(BaseOnsiteLLM):
         generate: Generates a response from a given prompt with the loaded LLM and tokenizer
     """
     model_uri="codellama/CodeLlama-7b-hf"
+    vllm_support = True
     
     def model_loader(self):
         return LlamaForCausalLM.from_pretrained(self.model_uri)
@@ -632,6 +650,7 @@ class CodeLlama13b(BaseOnsiteLLM):
         generate: Generates a response from a given prompt with the loaded LLM and tokenizer
     """
     model_uri="codellama/CodeLlama-13b-hf"
+    vllm_support = True
     
     def model_loader(self):
         return LlamaForCausalLM.from_pretrained(self.model_uri)
@@ -655,6 +674,7 @@ class CodeLlama34b(BaseOnsiteLLM):
         generate: Generates a response from a given prompt with the loaded LLM and tokenizer
     """
     model_uri="codellama/CodeLlama-34b-hf"
+    vllm_support = True
     
     def model_loader(self):
         return LlamaForCausalLM.from_pretrained(self.model_uri)
