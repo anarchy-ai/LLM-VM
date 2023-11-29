@@ -86,7 +86,7 @@ class FinetuningDataset(torch.utils.data.Dataset):
         return self.dataset[idx]
 
 class BaseOnsiteLLM(ABC):
-    def __init__(self,model_uri=None, tokenizer_kw_args={}, model_kw_args={}):
+    def __init__(self,model_uri=None, tokenizer_kw_args={}, model_kw_args={}, dtype=None):
         if model_uri != None :
             self.model_uri= model_uri
         if model_uri is None and self.model_uri is None:
@@ -104,6 +104,18 @@ class BaseOnsiteLLM(ABC):
         else:
             self.model.to(device)  # Move model to the selected device (single GPU or CPU)
             print(f"`{self.model_uri}` loaded on {device}.", file=sys.stderr)
+
+        if dtype is not None:
+            dtypes = {
+                'float16' : torch.float16,
+                'bfloat16' : torch.bfloat16,
+                'float32' : torch.float32,
+            }
+
+            if dtype not in dtypes:
+                raise ValueError(f"Invalid dtype: {dtype}. Valid options are: {dtypes.keys()}")
+            self.model.to(dtypes[dtype])
+            print(f"`{self.model_uri}` loaded with dtype {dtype}.", file=sys.stderr)
 
     @property
     @abstractmethod
@@ -1047,3 +1059,23 @@ class Chat_Llama2_13b_Q6(BaseCtransformersLLM):
 
     model_uri="TheBloke/Llama-2-7B-32K-Instruct-GGML"
     model_file="llama-2-7b-32k-instruct.ggmlv3.q4_1.bin"
+
+
+if "__main__" == __name__:
+    import sys
+    from llm_vm.client import Client
+    import os
+
+    big_conf = {
+        'dtype': 'float32',
+    }
+
+    small_conf = {
+        'dtype': 'float32',
+    }
+
+    client = Client(big_model='pythia', big_model_config=big_conf, small_model_config=small_conf)
+
+    response = client.complete(prompt = 'What is Anarchy?',
+                            context='')
+    print(response, file=sys.stderr)
