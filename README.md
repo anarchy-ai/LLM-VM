@@ -1,4 +1,4 @@
-![Anarchy Logo](anarchy_logo.svg)
+![Anarchy Logo](https://github.com/VictorOdede/LLM-VM/raw/main/anarchy_logo.svg)
 
 <p align="center">
   <a href="https://anarchy.ai/" target="_blank"><img src="https://img.shields.io/badge/View%20Documentation-Docs-yellow"></a>
@@ -105,9 +105,9 @@ in memory and compute resources.
 
 ### 👨‍💻 Installation
 
-To install the LLM-VM you simply need to download this repository and install it with pip like so:
+The quickest way to get started is to run `pip install llm-vm` in your Python environment. 
 
-For MacOS
+Another way to install the LLM-VM is to clone this repository and install it with pip like so:
 
 ```bash
 > git clone https://github.com/anarchy-ai/LLM-VM.git
@@ -115,9 +115,9 @@ For MacOS
 > ./setup.sh
 ```
 
-The above bash script `setup.sh` only works for MacOs.
+The above bash script `setup.sh` only works for MacOS and Linux.
 
-If you are on Linux you should do this:
+Alternatively you could do this:
 
 ```bash
 > git clone https://github.com/anarchy-ai/LLM-VM.git
@@ -129,16 +129,26 @@ If you are on Linux you should do this:
 
 If you are on Windows. You can follow either of the below two methods:
 
-1. Open Command Prompt and do this:
+Before doing any of the following steps, you have to first open Powershell as administrator and run the below command
+
+```cmd
+> Set-ExecutionPolicy RemoteSigned
+> Press Y and enter
+> exit
+```
+
+Now you can follow either of the below two methods:
+
+1. Open Powershell and do this:
 
 ```cmd
 > git clone https://github.com/anarchy-ai/LLM-VM.git
 > cd LLM-VM
-> .\windows_setup.bat
+> .\windows_setup.ps1
 ```
 or
 
-2. Open Command Prompt and do this:
+2. Open Powershell and do this:
 
 ```cmd
 > winget install Python.Python.3.11
@@ -147,7 +157,7 @@ or
 > cd LLM-VM
 > python -m venv anarchyai
 > anarchyai\Scripts\activate
-> python -m pip install -e ."[dev]"
+> python -m pip install -e .
 ```
 **Note**: 
 1. For the above steps to work you have to be on Windows 10 1709 (build 16299) or later build.
@@ -223,9 +233,15 @@ response = client.complete(prompt = 'What is Anarchy?', context = '')
 print(response)
 # Anarchy is a political philosophy that advocates no government...
 ```
+Here are some default model's details:
+| Name | Model_Uri | Model params | Checkpoint file size |
+|---|---|---|---|
+| Neo | `EleutherAI/gpt-neo-1.3B` | 1.3B | 5.31 GB |
+| Bloom | `bigscience/bloom-560m` | 1.7B | 1.12 GB |
+| OPT | `facebook/opt-350m` | 350m | 622 MB |
 
 For some other choices of memory usage and parameter count in each model family, check out the 
-tables in [model_uri_tables](./model_uri_tables.md)
+tables [model_uri_tables](./model_uri_tables.md).
 
 
 ### 🛠 Tool Usage
