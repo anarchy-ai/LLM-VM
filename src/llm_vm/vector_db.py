@@ -31,7 +31,10 @@ class VectorDB(ABC):
     @abstractmethod
     def query(self, **kwargs):
         pass
-
+        
+    @abstractmethod
+    def faiss_index(self, index_name):
+        pass
 
 class PineconeDB(VectorDB):
     def __init__(self, api_key, pinecone_env):
@@ -60,6 +63,9 @@ class PineconeDB(VectorDB):
     def delete_index(self, index_name):
         self.pinecone.delete_index(index_name)
         print(f"${index_name} has been deleted")
+
+    def faiss_index(self, index_name):
+        return self.pinecone.add_faiss_index(index_name)
 
     def upsert(self, **kwargs):
         if "vectors" not in kwargs:
@@ -100,6 +106,9 @@ class WeaviateDB(VectorDB):
     
     def delete_index(self, class_name):
         self.client.schema.delete_class(class_name)
+
+    def faiss_index(self, class_name):
+        return self.client.schema.add_faiss_index(class_name)
     
     def upsert(self, class_name, batch_size=50, num_workers=1, dynamic=True, dataset=[]):
         self.client.batch.configure(batch_size=batch_size, num_workers=num_workers, dynamic=dynamic)
