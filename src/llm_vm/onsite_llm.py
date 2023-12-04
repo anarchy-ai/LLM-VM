@@ -1064,25 +1064,3 @@ class Chat_Llama2_13b_Q6(BaseCtransformersLLM):
 
     model_uri="TheBloke/Llama-2-7B-32K-Instruct-GGML"
     model_file="llama-2-7b-32k-instruct.ggmlv3.q4_1.bin"
-
-
-if "__main__" == __name__:
-    import sys
-    from llm_vm.client import Client
-    import os
-
-    big_conf = {
-        'dtype': 'float32',
-    }
-
-    small_conf = {
-        'dtype': 'float32',
-    }
-
-    client = Client(big_model='pythia', big_model_config=big_conf, small_model_config=small_conf)
-
-    response = client.complete(prompt = 'What is Anarchy?',
-                            context='')
-    print(response, file=sys.stderr)
-
-    client.change_model_dtype(big_model_dtype='float16')
