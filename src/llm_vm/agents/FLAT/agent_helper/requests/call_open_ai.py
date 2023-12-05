@@ -33,30 +33,26 @@ def call_open_ai(request: LLMCallParams) -> LLMCallReturnType:
         openai.api_key = api_key
 
     if chat == LLMCallType.OPENAI_CHAT:
-        response = openai.ChatCompletion.create(
-                model="gpt-3.5-turbo-0301",
-                max_tokens=max_tokens,
-                stop=stop,
-                messages=cur_prompt,
-                temperature=temperature
-            )
-        response_text = response['choices'][0]['message']['content']
+        response = openai.chat.completions.create(model="gpt-3.5-turbo-0301",
+        max_tokens=max_tokens,
+        stop=stop,
+        messages=cur_prompt,
+        temperature=temperature)
+        response_text = response.choices[0].message.content
     elif chat == LLMCallType.OPENAI_COMPLETION:
 
-        response = openai.Completion.create(
-                model=model,
-                max_tokens=max_tokens,
-                stop=stop,
-                prompt=cur_prompt,
-                temperature=temperature
-            )
+        response = openai.completions.create(model=model,
+        max_tokens=max_tokens,
+        stop=stop,
+        prompt=cur_prompt,
+        temperature=temperature)
 
-        response_text = response['choices'][0]['text']
+        response_text = response.choices[0].text
 
     if current_key:
         openai.api_key = current_key
         os.environ["OPENAI_API_KEY"] = current_key
 
-    usage = response["usage"]["total_tokens"]
+    usage = response.usage.total_tokens
     price = __tokens_to_dollars(usage)
     return response_text.strip("\n "), price

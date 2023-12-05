@@ -198,8 +198,11 @@ class Client:
             return {"status":0, "resp": str(e)}
         return {"completion":completion, "status": 200}
 
-    def load_finetune(self, model_filename=None):
-        self.teacher.load_finetune(model_filename)
+    def load_finetune(self, model_filename=None, small_model=False):
+        if small_model:
+            self.student.load_finetune(model_filename)
+        else:
+            self.teacher.load_finetune(model_filename)
 
     def set_pinecone_db(self, api_key, env_name):
         self.vector_db = PineconeDB(api_key, env_name)

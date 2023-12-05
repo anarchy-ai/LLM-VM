@@ -39,15 +39,13 @@ def upload_model (
             "elapsed_time_s": int(time.time() - start_of_execution)
         }
 
-    upload_response = openai.File.create(
-        file=open(file_path, "rb"),
-        purpose='fine-tune'
-    )
+    upload_response = openai.files.create(file=open(file_path, "rb"),
+    purpose='fine-tune')
 
     file_id = upload_response.id
 
-    fine_tune_response = openai.FineTune.create(training_file=file_id, model=openai_model)
-    job_id = fine_tune_response["id"]
+    fine_tune_response = openai.fine_tunes.create(training_file=file_id, model=openai_model)
+    job_id = fine_tune_response.id
     print(__START_LABEL, f'''job_id: {job_id}, model: {file_name}''', flush=True, file=sys.stderr)
 
     finetuned_model = {"status": None}

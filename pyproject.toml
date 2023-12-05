@@ -1,6 +1,6 @@
 [project]
 name = "llm_vm"
-version = "0.1.52"
+version = "0.1.55"
 description = "An Open-Source AGI Server for Open-Source LLMs"
 authors = [{ name = "Anarchy Team", email = "matt@anarchy.ai" }]
 
@@ -34,8 +34,9 @@ dependencies = [
     "trl>=0.7.2",
     "pinecone-client>=2.2.4",
     "PyPDF2>=3.0.1",
-    "scalene>=1.5.31.1"
-
+    "scalene>=1.5.31.1",
+    "weaviate-client>=3.25.3",
+    "python-dotenv>=1.0.0"
 ]
 
 [project.optional-dependencies]
@@ -97,15 +98,3 @@ exclude = '''
 )
 '''
 
-[tool.poetry]
-# does poetry make sense as a tool to use?
-# ... this is also the default anyways
-packages = [{ include = "llm_vm", from = "src" }]
-name = "llm_vm"
-version = "0.1.51"
-description = "An Open-Source AGI Server for Open-Source LLMs"
-authors = ["Anarchy Team"]
-
-[tool.poetry.scripts]
-llm_vm_server = "llm_vm.server.main:cli"
-my_script = "llm_vm.server.main:cli"
