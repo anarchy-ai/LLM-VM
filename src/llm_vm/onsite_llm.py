@@ -28,7 +28,11 @@ from peft import get_peft_model, LoraConfig, prepare_model_for_kbit_training
 from trl import SFTTrainer
 from sentence_transformers import SentenceTransformer
 
-
+model_dtypes = {
+    "float16": torch.float16,
+    "float32": torch.float32,
+    "bfloat16": torch.bfloat16,
+}
 
 __private_key_value_models_map =  {}
 # []   {
@@ -86,7 +90,7 @@ class FinetuningDataset(torch.utils.data.Dataset):
         return self.dataset[idx]
 
 class BaseOnsiteLLM(ABC):
-    def __init__(self,model_uri=None, tokenizer_kw_args={}, model_kw_args={}):
+    def __init__(self,model_uri=None, tokenizer_kw_args={}, model_kw_args={}, dtype=None):
         if model_uri != None :
             self.model_uri= model_uri
         if model_uri is None and self.model_uri is None:
@@ -104,6 +108,12 @@ class BaseOnsiteLLM(ABC):
         else:
             self.model.to(device)  # Move model to the selected device (single GPU or CPU)
             print(f"`{self.model_uri}` loaded on {device}.", file=sys.stderr)
+
+        if dtype is not None:
+            if dtype not in model_dtypes.keys():
+                raise ValueError(f"Invalid dtype: {dtype}. Valid options are: {model_dtypes.keys()}")
+            self.model.to(model_dtypes[dtype])
+            print(f"`{self.model_uri}` loaded with dtype {dtype}.", file=sys.stderr)
 
     @property
     @abstractmethod
@@ -264,6 +274,13 @@ class BaseOnsiteLLM(ABC):
             optimizer.storage.set_model(c_id, new_model)
             return math.exp(eval_results['eval_loss']) #perplexity is the metric we use for finetuning measurement
         return async_lora
+    
+    def model_dtype(self, dtype):
+        if dtype not in model_dtypes.keys():
+            raise ValueError(f"Invalid dtype: {dtype}. Valid options are: {model_dtypes.keys()}")
+        self.model.to(model_dtypes[dtype])
+        print(f"Changed `{self.model_uri}` dtype to {dtype}.", file=sys.stderr)
+
     
     def quantize_model(self, bits=4):
         if self.model.is_quantizable():
