@@ -110,7 +110,10 @@ class Client:
                  stoptoken = None,
                  tools = None,
                  openai_kwargs = {},
-                 hf_kwargs = {}):
+                 hf_kwargs = {},
+                 type = None,
+                 choices = None,
+                 regex = None):
         """
         This function is Anarchy's completion entry point
 
@@ -143,12 +146,23 @@ class Client:
                 kwargs.update({"temperature":temperature})
             if stoptoken is not None:
                 kwargs.update({"stop":stoptoken})
-                
+            if regex is not None:
+                kwargs.update({"regex":regex})
+            if type is not None:
+                kwargs.update({"type":type})
+            if choices is not None:
+                kwargs.update({"choices":choices})
         else:
             kwargs = hf_kwargs
             if temperature > 0:
                 kwargs.update({"do_sample": True})
                 kwargs.update({"temperature":temperature})
+            if regex is not None:
+                kwargs.update({"regex":regex})
+            if type is not None:
+                kwargs.update({"type":type})
+            if choices is not None:
+                kwargs.update({"choices":choices})
 
         if openai_key is not None:
             self.openai_key = openai_key
