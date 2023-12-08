@@ -127,6 +127,42 @@ Alternatively you could do this:
 > python -m pip install -e ."[dev]"
 ```
 
+If you are on Windows. You can follow either of the below two methods:
+
+Before doing any of the following steps, you have to first open Powershell as administrator and run the below command
+
+```cmd
+> Set-ExecutionPolicy RemoteSigned
+> Press Y and enter
+> exit
+```
+
+Now you can follow either of the below two methods:
+
+1. Open Powershell and do this:
+
+```cmd
+> git clone https://github.com/anarchy-ai/LLM-VM.git
+> cd LLM-VM
+> .\windows_setup.ps1
+```
+or
+
+2. Open Powershell and do this:
+
+```cmd
+> winget install Python.Python.3.11
+> python --version
+> git clone https://github.com/anarchy-ai/LLM-VM.git
+> cd LLM-VM
+> python -m venv anarchyai
+> anarchyai\Scripts\activate
+> python -m pip install -e .
+```
+**Note**: 
+1. For the above steps to work you have to be on Windows 10 1709 (build 16299) or later build.
+2. Enable developer mode in windows settings(not compulsory but if enabled will give an added advantage)
+
 #### One Last Step, almost there!
 If you're using one of the OpenAI models, you will need to set the `LLM_VM_OPENAI_API_KEY` environment
 variable with your API key. 
