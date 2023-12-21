@@ -52,7 +52,6 @@ if torch.cuda.device_count() > 1:
     device = [f"cuda:{i}" for i in range(torch.cuda.device_count())]  # List of available GPUs
 else:  # If only one GPU is available, use cuda:0, else use CPU
     device = "cuda:0" if torch.cuda.is_available() else "cpu"
-# device = "cpu"
 
 def RegisterModelClass(name):
     def regClass(cls):
