@@ -27,6 +27,7 @@ import torch
 from peft import get_peft_model, LoraConfig, prepare_model_for_kbit_training
 from trl import SFTTrainer
 from sentence_transformers import SentenceTransformer
+from .generation_algorithm import SpeculativeSamplingWrapper
 
 model_dtypes = {
     "float16": torch.float16,
@@ -51,6 +52,7 @@ if torch.cuda.device_count() > 1:
     device = [f"cuda:{i}" for i in range(torch.cuda.device_count())]  # List of available GPUs
 else:  # If only one GPU is available, use cuda:0, else use CPU
     device = "cuda:0" if torch.cuda.is_available() else "cpu"
+# device = "cpu"
 
 def RegisterModelClass(name):
     def regClass(cls):
@@ -90,7 +92,7 @@ class FinetuningDataset(torch.utils.data.Dataset):
         return self.dataset[idx]
 
 class BaseOnsiteLLM(ABC):
-    def __init__(self,model_uri=None, tokenizer_kw_args={}, model_kw_args={}, dtype=None):
+    def __init__(self,model_uri=None, tokenizer_kw_args={}, model_kw_args={}, generation_kw_args={}, dtype=None):
         if model_uri != None :
             self.model_uri= model_uri
         if model_uri is None and self.model_uri is None:
@@ -114,6 +116,15 @@ class BaseOnsiteLLM(ABC):
                 raise ValueError(f"Invalid dtype: {dtype}. Valid options are: {model_dtypes.keys()}")
             self.model.to(model_dtypes[dtype])
             print(f"`{self.model_uri}` loaded with dtype {dtype}.", file=sys.stderr)
+
+        # init speculative sampling wrapper
+        self.speculative_sampling = None
+        if "draft_model_uri" in generation_kw_args :
+            self.speculative_sampling = SpeculativeSamplingWrapper(self.model.device, **generation_kw_args)
+            # check if the conditions are met or raise exception
+            self.speculative_sampling.canPerformSpeculativeSampling(self.model, self.tokenizer)
+            print(f"`{self.speculative_sampling.draft_model_uri}` draft model loaded on {self.speculative_sampling.device} GPU.", file=sys.stderr)
+
 
     @property
     @abstractmethod
@@ -161,8 +172,17 @@ class BaseOnsiteLLM(ABC):
             inputs = self.tokenizer(prompt, return_tensors="pt", **tokenizer_kwargs).to(device[0])
         else:
             inputs = self.tokenizer(prompt, return_tensors="pt").to(device)
-        generate_ids=self.model.generate(inputs.input_ids, max_length=max_length, **generation_kwargs)
-        resp= self.tokenizer.batch_decode(generate_ids,skip_special_tokens=True,clean_up_tokenization_spaces=False)[0]
+
+        # selecting a generation algorithm
+        if self.speculative_sampling :
+            generated_ids = self.speculative_sampling.complete(inputs.input_ids, max_length, target_model=self.model, **generation_kwargs)
+            resp = self.tokenizer.batch_decode(generated_ids,skip_special_tokens=True,clean_up_tokenization_spaces=False)[0]
+            
+        # default generation algorithm
+        else :
+            generate_ids=self.model.generate(inputs.input_ids, max_length=max_length, **generation_kwargs)
+            resp = self.tokenizer.batch_decode(generate_ids,skip_special_tokens=True,clean_up_tokenization_spaces=False)[0]
+        
         # need to drop the len(prompt) prefix with these sequences generally
         # because they include the prompt.
         return resp[len(prompt):]
