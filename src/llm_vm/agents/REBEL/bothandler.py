@@ -2,6 +2,7 @@ import openai
 import re
 
 
+
 def tool_picker(tools_list, question, starting_tool_num):
 
     tools=""
@@ -23,10 +24,9 @@ Which tool (number only), if any, would you use to answer the following question
     max_tokens=256,
     stop=None,
     prompt=prompt,
-    temperature=0.4)
-    
+    temperature=0.4).choices[0].text.strip()
     try:
-        return (calcCost(prompt),str(int(re.sub("[^0-9]", "",ans['choices'][0]['text'].strip()))+starting_tool_num))
+        return (calcCost(prompt),str(int(re.sub("[^0-9]", "",ans))+starting_tool_num))
     except:
         return  (calcCost(prompt),1+starting_tool_num)
 
@@ -89,8 +89,10 @@ Look at the tools we have access to. Split Q into subquestions to answer Q that 
     max_tokens=256,
     stop=None,
     prompt=prompt,
-    temperature=0.2)
-    ans=ans['choices'][0]['text'].replace("\n","").split(",")
+    temperature=0.2).choices[0].text.strip()
+    
+    ans=ans.replace("\n","").split(",")
+    print(ans)
     return (calcCost(prompt),ans)
 
 
@@ -121,10 +123,7 @@ Is the answer to Q found in the memory or in your knowledge base already? Answer
     max_tokens=256,
     stop=None,
     prompt=prompt,
-    temperature=0.4)
-
-    ans=ans['choices'][0]['text']
-
+    temperature=0.4).choices[0].text.strip()
     if "yes" in ans.lower():
         return (calcCost(prompt),True)
     else:
