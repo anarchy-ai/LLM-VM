@@ -165,7 +165,13 @@ or
 
 #### One Last Step, almost there!
 If you're using one of the OpenAI models, you will need to set the `LLM_VM_OPENAI_API_KEY` environment
-variable with your API key. 
+variable with your API key.
+
+**Example:**
+
+In your project, create a file named `.env`.
+
+Add the following line to the `.env` file, replacing `your_openai_api_key_here` with your actual OpenAI API key:
 
 
 ### ✅ Generating Completions
