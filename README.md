@@ -173,6 +173,9 @@ In your project, create a file named `.env`.
 
 Add the following line to the `.env` file, replacing `your_openai_api_key_here` with your actual OpenAI API key:
 
+```bash
+LLM_VM_OPENAI_API_KEY=your_openai_api_key_here
+
 
 ### ✅ Generating Completions
 Our LLM-VM gets you working directly with popular LLMs locally in just 3 lines. Once you've installed it (as above), just load your model and start generating!
