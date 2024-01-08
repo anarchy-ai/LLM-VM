@@ -45,7 +45,7 @@ def call_ChatGPT(state, cur_prompt, stop=None, max_tokens=20, temperature=0.2):
             print_op("PrePrice: $" + str(c))
         return c
 
-    cost = calcCost(cur_prompt)
+    #cost = calcCost(cur_prompt)
     try:
         ans = openai.chat.completions.create(model="gpt-3.5-turbo-0301",
         max_tokens=max_tokens,
@@ -54,17 +54,17 @@ def call_ChatGPT(state, cur_prompt, stop=None, max_tokens=20, temperature=0.2):
         temperature=temperature)
 
     except Exception as e:
-        state.price += cost
+        #state.price += cost
         traceback.print_exc()
         print_op("Error:", e)
 
         return "OpenAI is down!"
 
-    price = ppt * ans["usage"]["total_tokens"] / 1000
+    price = ppt * ans.usage.total_tokens/1000
     if state.verbose > 0:
         print_op("Price: $" + str(price))
     state.price += price
-    response_text = ans["choices"][0]["message"]["content"]
+    response_text = ans.choices[0].message.content
 
     if state.verbose > 2:
         print_op("GPT output:")
