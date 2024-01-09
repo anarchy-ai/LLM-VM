@@ -20,7 +20,7 @@ Which tool (number only), if any, would you use to answer the following question
     tools+="tool "+str(count)+": "+str("Use this tool when the question can be answered without using any tool or if the question is a greeting or a casual conversation. Also if we need to convert languages other than english, use this tool.")+"\n"
     prompt=prompt.format(**{"tools":tools,"question":question})
     prompt += "\n\nYOU JUST ANSWER WITH A NUMBER."
-    ans = openai.completions.create(model="text-davinci-003",
+    ans = openai.completions.create(model="gpt-3.5-turbo-instruct",
     max_tokens=256,
     stop=None,
     prompt=prompt,
@@ -85,7 +85,7 @@ Q= "{question}"
 Look at the tools we have access to. Split Q into subquestions to answer Q that can each be solved with one use of one tool. Make as few subquestions as possible. Split each subquestion with a comma and have no extra information other than the subquestions.
     '''
     prompt=prompt.format(**{"question":question,"tools":tools,"memory":memory})
-    ans = openai.completions.create(model="text-davinci-003",
+    ans = openai.completions.create(model="gpt-3.5-turbo-instruct",
     max_tokens=256,
     stop=None,
     prompt=prompt,
@@ -119,7 +119,7 @@ Q: "{question}"
 Is the answer to Q found in the memory or in your knowledge base already? Answer with a yes or no.
     '''
     prompt=prompt.format(**{"memory":memory,"question":question})
-    ans = openai.completions.create(model="text-davinci-003",
+    ans = openai.completions.create(model="gpt-3.5-turbo-instruct",
     max_tokens=256,
     stop=None,
     prompt=prompt,
