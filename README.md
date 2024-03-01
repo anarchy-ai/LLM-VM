@@ -7,7 +7,7 @@
       <img src="https://img.shields.io/github/stars/anarchy-ai/LLM-VM" />
   </a>
 </p>
-<h1 align='center'> 🤖 Anarchy LLM-VM 🤖 </h1>
+<h1 align='center'> 🤖 Anarchy Labs' LLM-VM 🤖 </h1>
 <p align='center'><em>An Open-Source AGI Server for Open-Source LLMs</em></p>
 
 This is [Anarchy's](https://anarchy.ai) effort to build 🏗️ an open generalized artificial intelligence 🤖 through the LLM-VM: a way to give your LLMs superpowers 🦸 and superspeed 🚄.
