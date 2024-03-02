@@ -17,3 +17,6 @@ settings.toml
 *.pkl
 
 .idea/
+
+# Nix
+result
