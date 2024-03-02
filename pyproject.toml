@@ -34,6 +34,7 @@ dependencies = [
     "trl>=0.7.2",
     "pinecone-client>=2.2.4",
     "PyPDF2>=3.0.1",
+    "scalene>=1.5.31.1",
     "weaviate-client>=3.25.3",
     "python-dotenv>=1.0.0"
 ]

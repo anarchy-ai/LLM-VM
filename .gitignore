@@ -17,3 +17,5 @@ settings.toml
 *.pkl
 
 .idea/
+src/llm_vm/profile.html
+src/llm_vm/profile.json
