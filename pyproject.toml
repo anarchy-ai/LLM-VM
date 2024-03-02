@@ -10,6 +10,8 @@ readme = "README.md"
 license = { text = "MIT" }
 
 dependencies = [
+    "cohere",
+    "kaleido",
     "dynaconf>=3.2.0",
     "openai==1.6.1",
     "numpy>=1.22.4",
@@ -41,7 +43,7 @@ dependencies = [
 [project.optional-dependencies]
 dev = ["black>=23.7.0", "mypy>=1.5.1"]
 
-# todo: https://setuptools.pypa.io/en/latest/userguide/datafiles.html 
+# todo: https://setuptools.pypa.io/en/latest/userguide/datafiles.html
 
 [project.scripts] # these names are just placeholders
 #llm_vm_test_optimize = "tests.test_optimize:run_test_stub"
@@ -69,7 +71,7 @@ llm_vm = [
     "*.toml",
 ] # note how the left hand side, the key, needs to be the package name/namespace
 
-# lets maybe try pytest # question all of this 
+# lets maybe try pytest # question all of this
 [tool.pytest.ini_options]
 minversion = "6.0"
 addopts = "-ra -q"
