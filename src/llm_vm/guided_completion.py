@@ -1,5 +1,5 @@
 import outlines.models as models
-import outlines.text.generate as generate
+import outlines.generate.text as generate
 import torch
 from lark import Lark, Transformer, v_args
 from lark.indenter import PythonIndenter
