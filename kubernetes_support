@@ -1,0 +1,20 @@
+# We are importing the require library
+from kubernetes import client, config
+
+def main():
+    # We are Load kubeconfig file or in-cluster config
+    config.load_kube_config()
+    
+    # We are create Kubernetes API client
+    api_instance = client.CoreV1Api()
+    
+    # We are list pods in the default namespace
+    print("Listing pods with their IPs:")
+    ret = api_instance.list_pod_for_all_namespaces(watch=False)
+    for i in ret.items:
+        print(f"{i.metadata.name} : {i.status.pod_ip}")
+        
+        
+# We are define the entry point of the function
+if __name__ == "__main__":
+    main()
