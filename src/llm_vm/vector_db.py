@@ -3,6 +3,7 @@ import pinecone
 import weaviate
 from dotenv import load_dotenv
 import os
+import numpy as np
 
 load_dotenv("../../.env.example")
 
@@ -32,6 +33,7 @@ class VectorDB(ABC):
     def query(self, **kwargs):
         pass
 
+import faiss
 
 class PineconeDB(VectorDB):
     def __init__(self, api_key, pinecone_env):
@@ -123,3 +125,70 @@ class WeaviateDB(VectorDB):
     def add_prop(self, class_name, prop):
         assert type(prop) == "dict"
         self.client.schema.property.create(class_name, prop)     
+
+class Faiss(VectorDB):
+    def __init__(self):
+        self.faiss = faiss
+        self.name = None
+        self.index = None
+        self.dimension = 1024
+
+    def create_index(self, name=None, dimension=None):
+        if name is None:
+            raise ValueError("Expected name as a keyword argument but found None")
+        self.name = name
+        if self.index is not None:
+            raise ValueError("An index already exists")
+        if dimension is not None:
+            self.dimension = dimension
+
+        self.index = self.faiss.IndexHNSWFlat(self.dimension, 32)
+
+    def list_indexes(self):
+        return [self.index] if self.index else []
+
+    def describe_index(self):
+        pass
+
+    def delete_index(self):
+        if self.index is None:
+            raise ValueError("No index to delete")
+        self.index = None
+        print("Deleted the index")
+
+    def upsert(self, vectors=None):
+        if vectors is None:
+            raise ValueError("Expected vectors as a keyword argument but found None")
+        if self.index is None:
+            raise ValueError("No index to add vectors to")
+
+        self.index.add(vectors)
+        print(f"Added {len(vectors)} vectors to the index")
+
+    def query(self, vector=None, k=5):
+        if vector is None:
+            raise ValueError("Expected vector as a keyword argument but found None")
+        if self.index is None:
+            raise ValueError("No index to query")
+
+        D, I = self.index.search(vector, k)
+
+        if I.size > 0:
+            return np.array([self.index.reconstruct(int(idx)) for idx in I[0]])
+        else:
+            return None
+
+# Example of using the class
+if __name__ == "__main__":
+    np.random.seed(1)
+
+    faiss_instance = Faiss()
+    faiss_instance.create_index(name="test", dimension=1024)
+    print(faiss_instance.list_indexes())
+
+    data = np.random.rand(10000, 1024).astype(np.float32)
+    faiss_instance.upsert(vectors=data)
+
+    vector = np.random.rand(1, 1024).astype(np.float32)
+    result = faiss_instance.query(vector=vector, k=5)
+    print(result)
