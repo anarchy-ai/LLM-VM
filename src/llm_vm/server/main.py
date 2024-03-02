@@ -9,6 +9,7 @@ import os
 import hashlib
 import sys
 from flask_cors import CORS
+from cache import cache
 from contextlib import contextmanager
 import llm_vm.server.routes as routes
 from llm_vm.config import settings
@@ -16,7 +17,7 @@ from llm_vm.utils.ram import RAMLogger
 
 app = flask.Flask(__name__)
 CORS(app)
-app.config["DEBUG"] = True
+cache.init_app(app)
 
 # Register_blueprint from routes to load API
 app.register_blueprint(routes.bp)
