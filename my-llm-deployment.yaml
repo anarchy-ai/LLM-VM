@@ -1,0 +1,17 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-llm-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: my-llm-service
+  template:
+    metadata:
+      labels:
+        app: my-llm-service
+    spec:
+      containers:
+      - name: my-llm-container
+        image: gcr.io/your-project/llm-image:tag
