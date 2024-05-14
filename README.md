@@ -10,6 +10,8 @@
 <h1 align='center'> 🤖 Anarchy Labs' LLM-VM 🤖 </h1>
 <p align='center'><em>An Open-Source AGI Server for Open-Source LLMs</em></p>
 
+# 🛑 DEVELOPMENT ON PAUSE 🛑
+
 This is [Anarchy's](https://anarchy.ai) effort to build 🏗️ an open generalized artificial intelligence 🤖 through the LLM-VM: a way to give your LLMs superpowers 🦸 and superspeed 🚄.
 
 You can find detailed instructions to try it live here: [anarchy.ai](https://anarchy.ai)
