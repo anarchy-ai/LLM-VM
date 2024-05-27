@@ -6,6 +6,7 @@ import openai
 from llm_vm.agents.REBEL import agent
 from llm_vm.client import Client
 from llm_vm.config import settings
+from cache import cache
 # load optimizer for endpoint use
 # optimizer = LocalOptimizer(MIN_TRAIN_EXS=2,openai_key=None)
 
@@ -20,6 +21,7 @@ def home():
     return '''home'''
 
 @bp.route('/v1/complete', methods=['POST'])
+@cache.cached()
 def optimizing_complete():
     rebel_agent = agent.Agent("", [], verbose=1)
     data = json.loads(request.data)
