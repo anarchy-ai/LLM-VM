@@ -1,8 +1,12 @@
 from abc import ABC,abstractmethod
 import pinecone
+
 import weaviate
 from dotenv import load_dotenv
 import os
+
+from scalene import profile
+
 
 load_dotenv("../../.env.example")
 
@@ -32,7 +36,7 @@ class VectorDB(ABC):
     def query(self, **kwargs):
         pass
 
-
+@profile
 class PineconeDB(VectorDB):
     def __init__(self, api_key, pinecone_env):
         self.pinecone = pinecone
