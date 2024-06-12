@@ -12,6 +12,7 @@ from transformers import (
     GPTNeoForCausalLM,
     GPTNeoXForCausalLM,
     LlamaForCausalLM,
+    MistralForCausalLM,
     LlamaTokenizer,
     CodeLlamaTokenizer,
     DataCollatorForLanguageModeling,
@@ -533,7 +534,7 @@ class SmallLocalOpenMistral(BaseOnsiteLLM):
     model_uri="Open-Orca/Mistral-7B-OpenOrca"
                 
     def model_loader(self):
-        return LlamaForCausalLM.from_pretrained(self.model_uri)
+        return MistralForCausalLM.from_pretrained(self.model_uri)
     def tokenizer_loader(self):
         return LlamaTokenizer.from_pretrained(self.model_uri) 
 
