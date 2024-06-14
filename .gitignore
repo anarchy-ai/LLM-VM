@@ -17,3 +17,5 @@ settings.toml
 *.pkl
 
 .idea/
+
+*~
