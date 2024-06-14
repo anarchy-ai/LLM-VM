@@ -44,7 +44,7 @@ try:
     )
 
 except:
-    from bothandler import (
+    from .bothandler import (
         question_split,
         tool_picker,
         memory_check,
@@ -54,7 +54,7 @@ except:
 try:
     from .utils import *
 except:
-    from utils import *
+    from .utils import *
 
 
 def prepPrintPromptContext(p):
