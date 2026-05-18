@@ -38,6 +38,8 @@ def call_open_ai(request: LLMCallParams) -> LLMCallReturnType:
         stop=stop,
         messages=cur_prompt,
         temperature=temperature)
+        if not response.choices or response.choices[0].message is None:
+            raise ValueError("LLM returned empty or filtered response")
         response_text = response.choices[0].message.content
     elif chat == LLMCallType.OPENAI_COMPLETION:
 
@@ -47,6 +49,8 @@ def call_open_ai(request: LLMCallParams) -> LLMCallReturnType:
         prompt=cur_prompt,
         temperature=temperature)
 
+        if not response.choices:
+            raise ValueError("LLM returned empty choices list")
         response_text = response.choices[0].text
 
     if current_key:

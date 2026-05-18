@@ -64,6 +64,8 @@ def call_ChatGPT(state, cur_prompt, stop=None, max_tokens=20, temperature=0.2):
     if state.verbose > 0:
         print_op("Price: $" + str(price))
     state.price += price
+    if not ans.choices or ans.choices[0].message is None:
+        raise ValueError("LLM returned empty or filtered response")
     response_text = ans.choices[0].message.content
 
     if state.verbose > 2:
