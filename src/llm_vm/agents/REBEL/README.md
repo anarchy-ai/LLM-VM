@@ -81,7 +81,7 @@ To define a tool create a dictionary with the following fields:
 |Field| Type | Description|
 |-|-|-|
 |```'description'```| string | A description of what the tool does|
-|```'dynamic_params'```| dictionary | A dictionary containing key value pairs (paramter name : description) of the API endpoint's mutable parameters that need to be set by REBEL in order to answer a query|
+|```'dynamic_params'```| dictionary | A dictionary containing key value pairs (parameter name : description) of the API endpoint's mutable parameters that need to be set by REBEL in order to answer a query|
 |```'method'```| string | ```GET``` or ```POST```, whichever is the type of the API endpoint|
 |```'url'```| string | URL of the API endpoint that the given tool specifies|
 |```'static_params'```| dictionary | Any parameters that are constant between all API calls. An API key/token is an example of this|
